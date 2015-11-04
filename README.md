@@ -6,6 +6,7 @@ Aspects:
 - Written in PureScript
 - Frontend and Backend in one language = "universal"
 - Static typing stretching from front to back
+- Using optic-ui on frontend
 - SQLite Database
 
 Todo:
