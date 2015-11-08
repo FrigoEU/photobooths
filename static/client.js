@@ -1,173 +1,6790 @@
-(function e$$0(q,r,b){function a(c,f){if(!r[c]){if(!q[c]){var g="function"==typeof require&&require;if(!f&&g)return g(c,!0);if(d)return d(c,!0);g=Error("Cannot find module '"+c+"'");throw g.code="MODULE_NOT_FOUND",g;}g=r[c]={exports:{}};q[c][0].call(g.exports,function(d){var b=q[c][1][d];return a(b?b:d)},g,g.exports,e$$0,q,r,b)}return r[c].exports}for(var d="function"==typeof require&&require,c=0;c<b.length;c++)a(b[c]);return a})({1:[function(m,q,r){var b={};(function(a){a.arrayMap=function(a){return function(c){for(var b=
-c.length,f=Array(b),g=0;g<b;g++)f[g]=a(c[g]);return f}};a.concatArray=function(a){return function(c){return a.concat(c)}};a.refEq=function(a){return function(c){return a===c}};a.showIntImpl=function(a){return a.toString()};a.showStringImpl=function(a){return JSON.stringify(a)}})(b.Prelude=b.Prelude||{});(function(a){var d=b.Prelude,c=function(a){this.compose=a},e=function(a,d){this["__superclass_Prelude.Semigroupoid_0"]=a;this.id=d},f=function(a){this.map=a},g=function(a){this.append=a},k=function(a){this.eq=
-a},h=function(a){this.show=a},l={},n=new h(d.showStringImpl),p=new h(d.showIntImpl),z=new c(function(a){return function(d){return function(c){return a(d(c))}}}),O=new g(d.concatArray),u=function(a){return a.pure},t=new f(d.arrayMap),v=function(a){return function(d){return function(c){return a(c)(d)}}},d=new k(d.refEq),y=function(a){return function(d){return a}},G=new e(function(){return z},function(a){return a}),A=function(a){return a.bind},m=function(a){return a.apply};a.Show=h;a.Eq=k;a.Semigroup=
-g;a.Monad=function(a,d){this["__superclass_Prelude.Applicative_0"]=a;this["__superclass_Prelude.Bind_1"]=d};a.Bind=function(a,d){this["__superclass_Prelude.Apply_0"]=a;this.bind=d};a.Applicative=function(a,d){this["__superclass_Prelude.Apply_0"]=a;this.pure=d};a.Apply=function(a,d){this["__superclass_Prelude.Functor_0"]=a;this.apply=d};a.Functor=f;a.Category=e;a.Semigroupoid=c;a.show=function(a){return a.show};a["=="]=function(a){return a.eq};a.eq=function(a){return a.eq};a["++"]=function(a){return a.append};
-a["<>"]=function(a){return a.append};a.append=function(a){return a.append};a.ap=function(a){return function(d){return function(c){return A(a["__superclass_Prelude.Bind_1"]())(d)(function(d){return A(a["__superclass_Prelude.Bind_1"]())(c)(function(c){return u(a["__superclass_Prelude.Applicative_0"]())(d(c))})})}}};a.liftM1=function(a){return function(d){return function(c){return A(a["__superclass_Prelude.Bind_1"]())(c)(function(c){return u(a["__superclass_Prelude.Applicative_0"]())(d(c))})}}};a["return"]=
-u;a[">>="]=function(a){return a.bind};a.bind=A;a.liftA1=function(a){return function(d){return function(c){return m(a["__superclass_Prelude.Apply_0"]())((0,a.pure)(d))(c)}}};a.pure=function(a){return a.pure};a["<*>"]=m;a.apply=function(a){return a.apply};a["void"]=function(a){return function(d){return(0,a.map)(y(l))(d)}};a["<$>"]=function(a){return a.map};a.map=function(a){return a.map};a.id=function(a){return a.id};a[">>>"]=function(a){return v(a.compose)};a.compose=function(a){return a.compose};
-a["const"]=y;a.flip=v;a.$=function(a){return function(d){return a(d)}};a.unit=l;a.semigroupoidFn=z;a.categoryFn=G;a.functorArray=t;a.semigroupArray=O;a.eqString=d;a.showInt=p;a.showString=n})(b.Prelude=b.Prelude||{});(function(a){a.createElement=function(){var a=m("virtual-dom/create-element");return function(c){return a(c)}}();a.diff=function(){var a=m("virtual-dom/diff");return function(c){return function(b){return a(c,b)}}}();a.patch=function(){var a=m("virtual-dom/patch");return function(c){return function(b){return function(){return a(b,
-c)}}}}();a.vtext=function(){var a=m("virtual-dom/vnode/vtext");return function(c){return new a(c)}}();a.vnode=function(){var a=m("virtual-dom/vnode/vnode"),c=m("virtual-dom/virtual-hyperscript/hooks/soft-set-hook");return function(b){return function(f){return function(g){return function(k){return function(h){"input"===f&&void 0!==k.value&&(k.value=new c(k.value));return new a(f,k,h,g,b)}}}}}}();a.prop=function(a,c){var b={};b[a]=c;return b};a.attrProp=function(a,c){var b={attributes:{}};b.attributes[a]=
-c;return b};a.handlerProp=function(a,c){var b=function(){},f={};b.prototype.callback=function(a){c(a)()};b.prototype.hook=function(c){c.addEventListener(a,this.callback)};b.prototype.unhook=function(c){c.removeEventListener(a,this.callback)};f["opticui-hook-"+a]=new b(c);return f};a.concatProps=function(){var a=Object.prototype.hasOwnProperty,c=function(c,b){for(var g in c)if(a.call(c,g))if("attributes"===g){var k=c[g],h=b[g],l;for(l in k)a.call(k,l)&&(h[l]=k[l])}else b[g]=c[g];return b};return function(a,
-b){return c(a,c(b,{attributes:{}}))}}();a.emptyProps={};a.initializer=function(a,c){var b=function(){};b.prototype.hook=function(a){a.initialized||(a.initialized=!0,c(a)())};var f={};f[a]=new b(c);return f};a.finalizer=function(a,c){var b=function(){};b.prototype.unhook=function(a){c(a)()};var f={};f[a]=new b(c);return f}})(b["OpticUI.Internal.VirtualDOM"]=b["OpticUI.Internal.VirtualDOM"]||{});(function(a){var d=b.Prelude,c=function(a,c){this["__superclass_Prelude.Semigroup_0"]=a;this.mempty=c},e=
-new c(function(){return d.semigroupArray},[]);a.Monoid=c;a.mempty=function(a){return a.mempty};a.monoidArray=e})(b["Data.Monoid"]=b["Data.Monoid"]||{});(function(a){a.returnE=function(a){return function(){return a}};a.bindE=function(a){return function(c){return function(){return c(a())()}}};a.runPure=function(a){return a()}})(b["Control.Monad.Eff"]=b["Control.Monad.Eff"]||{});(function(a){var d=b["Control.Monad.Eff"],c=b.Prelude,e=new c.Monad(function(){return k},function(){return f}),f=new c.Bind(function(){return g},
-d.bindE),g=new c.Apply(function(){return h},c.ap(e)),k=new c.Applicative(function(){return g},d.returnE),h=new c.Functor(c.liftA1(k));a.functorEff=h;a.applyEff=g;a.applicativeEff=k;a.bindEff=f;a.monadEff=e;a.runPure=d.runPure})(b["Control.Monad.Eff"]=b["Control.Monad.Eff"]||{});(function(a){a.runFn2=function(a){return function(c){return function(b){return a(c,b)}}};a.runFn4=function(a){return function(c){return function(b){return function(f){return function(g){return a(c,b,f,g)}}}}}})(b["Data.Function"]=
-b["Data.Function"]||{});(function(a){var d=b["Data.Function"];a.runFn4=d.runFn4;a.runFn2=d.runFn2})(b["Data.Function"]=b["Data.Function"]||{});(function(a){a.foldrArray=function(a){return function(b){return function(e){for(var f=b,g=e.length-1;0<=g;g--)f=a(e[g])(f);return f}}};a.foldlArray=function(a){return function(b){return function(e){for(var f=b,g=e.length,k=0;k<g;k++)f=a(f)(e[k]);return f}}}})(b["Data.Foldable"]=b["Data.Foldable"]||{});(function(a){var d=b.Prelude;a["*>"]=function(a){return function(b){return function(f){return d["<*>"](a)(d["<$>"](a["__superclass_Prelude.Functor_0"]())(d["const"](d.id(d.categoryFn)))(b))(f)}}}})(b["Control.Apply"]=
-b["Control.Apply"]||{});(function(a){var d=b.Prelude,c=function(){function a(){}a.value=new a;return a}(),e=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),f=new d.Functor(function(a){return function(b){return b instanceof e?new e(a(b.value0)):c.value}}),g=new d.Apply(function(){return f},function(a){return function(b){if(a instanceof e)return d["<$>"](f)(a.value0)(b);if(a instanceof c)return c.value;throw Error("Failed pattern match at Data.Maybe line 121, column 1 - line 145, column 1: "+
-[a.constructor.name,b.constructor.name]);}}),k=new d.Bind(function(){return g},function(a){return function(b){if(a instanceof e)return b(a.value0);if(a instanceof c)return c.value;throw Error("Failed pattern match at Data.Maybe line 180, column 1 - line 199, column 1: "+[a.constructor.name,b.constructor.name]);}}),h=new d.Applicative(function(){return g},e.create);a.Nothing=c;a.Just=e;a.maybe=function(a){return function(b){return function(d){if(d instanceof c)return a;if(d instanceof e)return b(d.value0);
-throw Error("Failed pattern match at Data.Maybe line 26, column 1 - line 27, column 1: "+[a.constructor.name,b.constructor.name,d.constructor.name]);}}};a.functorMaybe=f;a.applyMaybe=g;a.applicativeMaybe=h;a.bindMaybe=k})(b["Data.Maybe"]=b["Data.Maybe"]||{});(function(a){var d=b["Data.Foldable"],c=b.Prelude,e=b["Data.Maybe"],f=b["Data.Monoid"],g=function(a,b,c){this.foldMap=a;this.foldl=b;this.foldr=c},k=new g(function(a){return function(b){return function(d){return(0,k.foldr)(function(d){return function(e){return c["<>"](a["__superclass_Prelude.Semigroup_0"]())(b(d))(e)}})(f.mempty(a))(d)}}},
-d.foldlArray,d.foldrArray);a.Foldable=g;a.find=function(a){return function(b){return(0,a.foldl)(function(a){return function(c){var d=b(c);if(d)return new e.Just(c);if(!d)return a;throw Error("Failed pattern match at Data.Foldable line 181, column 1 - line 182, column 1: "+[d.constructor.name]);}})(e.Nothing.value)}};a.mconcat=function(a){return function(b){return(0,a.foldl)(c["<>"](b["__superclass_Prelude.Semigroup_0"]()))(f.mempty(b))}};a.foldMap=function(a){return a.foldMap};a.foldl=function(a){return a.foldl};
-a.foldr=function(a){return a.foldr};a.foldableArray=k})(b["Data.Foldable"]=b["Data.Foldable"]||{});(function(a){a.traverseArrayImpl=function(){function a(b){this.fn=b}function b(a){return function(b){return new g(a,b)}}function e(a){for(var b=[];a!==f;)b.push(a.head),a=a.tail;return b}var f={},g=function(a,b){this.head=a;this.tail=b};return function(g){return function(h){return function(l){return function(n){var p=function(e,f,l){if(0===f)return e;var t=l[f-1];return new a(function(){var a=p,d;d=
-g(h(b)(n(t)))(e);return a(d,f-1,l)})};return function(b){for(b=p(l(f),b.length,b);b instanceof a;)b=b.fn();return h(e)(b)}}}}}}()})(b["Data.Traversable"]=b["Data.Traversable"]||{});(function(a){var d=b["Data.Traversable"],c=b.Prelude,e=b["Data.Foldable"],f=function(a,b,c,d){this["__superclass_Data.Foldable.Foldable_1"]=a;this["__superclass_Prelude.Functor_0"]=b;this.sequence=c;this.traverse=d},g=new f(function(){return e.foldableArray},function(){return c.functorArray},function(a){return(0,g.traverse)(a)(c.id(c.categoryFn))},
-function(a){return d.traverseArrayImpl(c.apply(a["__superclass_Prelude.Apply_0"]()))(c.map(a["__superclass_Prelude.Apply_0"]()["__superclass_Prelude.Functor_0"]()))(c.pure(a))});a.Traversable=f;a["for"]=function(a){return function(b){return function(c){return function(d){return(0,b.traverse)(a)(d)(c)}}}};a.sequence=function(a){return a.sequence};a.traverse=function(a){return a.traverse};a.traversableArray=g})(b["Data.Traversable"]=b["Data.Traversable"]||{});(function(a){var d=b.Prelude,c=function(){function a(b){this.value0=
-b}a.create=function(b){return new a(b)};return a}(),e=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),f=new d.Functor(function(a){return function(b){if(b instanceof c)return new c(b.value0);if(b instanceof e)return new e(a(b.value0));throw Error("Failed pattern match at Data.Either line 52, column 1 - line 56, column 1: "+[a.constructor.name,b.constructor.name]);}}),g=function(a){return function(b){return function(d){if(d instanceof c)return a(d.value0);if(d instanceof
-e)return b(d.value0);throw Error("Failed pattern match at Data.Either line 28, column 1 - line 29, column 1: "+[a.constructor.name,b.constructor.name,d.constructor.name]);}}},k=new d.Apply(function(){return f},function(a){return function(b){if(a instanceof c)return new c(a.value0);if(a instanceof e)return d["<$>"](f)(a.value0)(b);throw Error("Failed pattern match at Data.Either line 92, column 1 - line 116, column 1: "+[a.constructor.name,b.constructor.name]);}}),h=new d.Bind(function(){return k},
-g(function(a){return function(b){return new c(a)}})(function(a){return function(b){return b(a)}})),l=new d.Applicative(function(){return k},e.create);a.Left=c;a.Right=e;a.either=g;a.functorEither=f;a.applyEither=k;a.applicativeEither=l;a.bindEither=h})(b["Data.Either"]=b["Data.Either"]||{});(function(a){a.parseJSONImpl=function(a,b,e){try{return b(JSON.parse(e))}catch(f){return a(f.toString())}};a.toForeign=function(a){return a};a.unsafeFromForeign=function(a){return a};a.typeOf=function(a){return typeof a};
-a.tagOf=function(a){return Object.prototype.toString.call(a).slice(8,-1)};a.isNull=function(a){return null===a};a.isUndefined=function(a){return void 0===a}})(b["Data.Foreign"]=b["Data.Foreign"]||{});(function(a){a.fromNumberImpl=function(a){return function(b){return function(e){return(e|0)===e?a(e):b}}};a.toNumber=function(a){return a}})(b["Data.Int"]=b["Data.Int"]||{});(function(a){var d=b["Data.Int"],c=b["Data.Maybe"],c=d.fromNumberImpl(c.Just.create)(c.Nothing.value);a.fromNumber=c;a.toNumber=
-d.toNumber})(b["Data.Int"]=b["Data.Int"]||{});(function(a){var d=b["Data.Foreign"],c=b.Prelude,e=b["Data.Either"],f=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),g=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),k=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),
-h=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),l=function(a){return function(b){return c["=="](c.eqString)(d.tagOf(b))(a)?c.pure(e.applicativeEither)(d.unsafeFromForeign(b)):new e.Left(new f(a,d.tagOf(b)))}},n=new c.Show(function(a){if(a instanceof f)return"Type mismatch: expected "+(a.value0+(", found "+a.value1));if(a instanceof g)return"Error at array index "+(c.show(c.showInt)(a.value0)+(": "+c.show(n)(a.value1)));if(a instanceof k)return"Error at property "+
-(c.show(c.showString)(a.value0)+(": "+c.show(n)(a.value1)));if(a instanceof h)return"JSON error: "+a.value0;throw Error("Failed pattern match: "+[a.constructor.name]);}),p=l("String");a.TypeMismatch=f;a.ErrorAtIndex=g;a.ErrorAtProperty=k;a.JSONError=h;a.readString=p;a.unsafeReadTagged=l;a.parseJSON=function(a){return d.parseJSONImpl(function(a){return e.Left.create(h.create(a))},e.Right.create,a)};a.showForeignError=n;a.isUndefined=d.isUndefined;a.isNull=d.isNull;a.typeOf=d.typeOf;a.toForeign=d.toForeign})(b["Data.Foreign"]=
-b["Data.Foreign"]||{});(function(a){a.length=function(a){return a.length};a.snoc=function(a){return function(b){var e=a.slice();e.push(b);return e}};a["uncons'"]=function(a){return function(b){return function(e){return 0===e.length?a({}):b(e[0])(e.slice(1))}}};a.indexImpl=function(a){return function(b){return function(e){return function(f){return 0>f||f>=e.length?b:a(e[f])}}}};a._updateAt=function(a){return function(b){return function(e){return function(f){return function(g){if(0>e||e>=g.length)return b;
-g=g.slice();g[e]=f;return a(g)}}}}};a.slice=function(a){return function(b){return function(e){return e.slice(a,b)}}};a.zipWith=function(a){return function(b){return function(e){for(var f=b.length<e.length?b.length:e.length,g=Array(f),k=0;k<f;k++)g[k]=a(b[k])(e[k]);return g}}}})(b["Data.Array"]=b["Data.Array"]||{});(function(a){var d=b.Prelude,c=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),d=new d.Functor(function(a){return function(b){return new c(b.value0,
-a(b.value1))}});a.Tuple=c;a.fst=function(a){return a.value0};a.functorTuple=d})(b["Data.Tuple"]=b["Data.Tuple"]||{});(function(a){var d=b["Data.Array"],c=b.Prelude,e=b["Data.Maybe"],f=b["Data.Traversable"],g=d._updateAt(e.Just.create)(e.Nothing.value),e=d.indexImpl(e.Just.create)(e.Nothing.value),k=function(a){return function(b){return function(e){return d["uncons'"](function(b){return c["return"](a["__superclass_Prelude.Applicative_0"]())(e)})(function(d){return function(f){return c[">>="](a["__superclass_Prelude.Bind_1"]())(b(e)(d))(function(c){return k(a)(b)(c)(f)})}})}}};
-a.foldM=k;a.zipWithA=function(a){return function(b){return function(c){return function(e){return f.sequence(f.traversableArray)(a)(d.zipWith(b)(c)(e))}}}};a.updateAt=g;a.index=e;a["!!"]=e;a.snoc=d.snoc})(b["Data.Array"]=b["Data.Array"]||{});(function(a){a.unsafeReadPropImpl=function(a,b,e,f){return null==f?a:b(f[e])};a.unsafeHasOwnProperty=function(a,b){return Object.prototype.hasOwnProperty.call(b,a)};a.unsafeHasProperty=function(a,b){return a in b}})(b["Data.Foreign.Index"]=b["Data.Foreign.Index"]||
-{});(function(a){var d=b["Data.Foreign.Index"],c=b.Prelude,e=b["Data.Either"],f=b["Data.Foreign"],g=function(a,b,c,d){this.errorAt=a;this.hasOwnProperty=b;this.hasProperty=c;this.ix=d},k=function(a){return function(b){return d.unsafeReadPropImpl(new e.Left(new f.TypeMismatch("object",f.typeOf(b))),c.pure(e.applicativeEither),a,b)}},h=new g(f.ErrorAtProperty.create,function(a){return function(b){return f.isNull(b)||f.isUndefined(b)?!1:c["=="](c.eqString)(f.typeOf(b))("object")||c["=="](c.eqString)(f.typeOf(b))("function")?
-d.unsafeHasOwnProperty(a,b):!1}},function(a){return function(b){return f.isNull(b)||f.isUndefined(b)?!1:c["=="](c.eqString)(f.typeOf(b))("object")||c["=="](c.eqString)(f.typeOf(b))("function")?d.unsafeHasProperty(a,b):!1}},c.flip(k));a.Index=g;a.errorAt=function(a){return a.errorAt};a.hasOwnProperty=function(a){return a.hasOwnProperty};a.hasProperty=function(a){return a.hasProperty};a["!"]=function(a){return a.ix};a.ix=function(a){return a.ix};a.prop=k;a.indexString=h})(b["Data.Foreign.Index"]=b["Data.Foreign.Index"]||
-{});(function(a){var d=b.Prelude,c=b["Data.Either"],e=b["Data.Foreign.Index"],f=function(a){this.read=a},g=new f(b["Data.Foreign"].readString),k=function(a){return function(b){return function(d){return c.either(function(a){return c.Left.create(b(a))})(c.Right.create)((0,a.read)(d))}}};a.IsForeign=f;a.readProp=function(a){return function(b){return function(f){return function(g){return d[">>="](c.bindEither)(e["!"](b)(g)(f))(k(a)(e.errorAt(b)(f)))}}}};a.readWith=k;a.read=function(a){return a.read};
-a.stringIsForeign=g})(b["Data.Foreign.Class"]=b["Data.Foreign.Class"]||{});(function(a){a.unsafeCoerce=function(a){return a}})(b["Unsafe.Coerce"]=b["Unsafe.Coerce"]||{});(function(a){a.unsafeCoerce=b["Unsafe.Coerce"].unsafeCoerce})(b["Unsafe.Coerce"]=b["Unsafe.Coerce"]||{});(function(a){var d=b["Unsafe.Coerce"],c=d.unsafeCoerce;a.htmlElementToNode=d.unsafeCoerce;a.windowToEventTarget=c})(b["DOM.HTML.Types"]=b["DOM.HTML.Types"]||{});(function(a){a["null"]=null;a.nullable=function(a,b,e){return null==
-a?b:e(a)};a.notNull=function(a){return a}})(b["Data.Nullable"]=b["Data.Nullable"]||{});(function(a){var d=b["Data.Nullable"],c=b["Data.Maybe"],e=c.maybe(d["null"])(d.notNull);a.toNullable=e;a.toMaybe=function(a){return d.nullable(a,c.Nothing.value,c.Just.create)}})(b["Data.Nullable"]=b["Data.Nullable"]||{});(function(a){var d=b["OpticUI.Internal.VirtualDOM"],c=b["Data.Monoid"],e=new b.Prelude.Semigroup(b["Data.Function"].runFn2(d.concatProps)),c=new c.Monoid(function(){return e},d.emptyProps);a.semigroupProps=
-e;a.monoidProps=c;a.finalizer=d.finalizer;a.initializer=d.initializer;a.handlerProp=d.handlerProp;a.attrProp=d.attrProp;a.prop=d.prop;a.vnode=d.vnode;a.vtext=d.vtext;a.patch=d.patch;a.diff=d.diff;a.createElement=d.createElement})(b["OpticUI.Internal.VirtualDOM"]=b["OpticUI.Internal.VirtualDOM"]||{});(function(a){a.mkExists=function(a){return a};a.runExists=function(a){return function(b){return a(b)}}})(b["Data.Exists"]=b["Data.Exists"]||{});(function(a){var d=b["Data.Exists"];a.runExists=d.runExists;
-a.mkExists=d.mkExists})(b["Data.Exists"]=b["Data.Exists"]||{});(function(a){var d=b.Prelude,c=b["Data.Exists"],e=b["Data.Monoid"],f=b["Unsafe.Coerce"],g=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),k=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),h=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),l=
-function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),n=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),p=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),z=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),O=function(){function a(b,
-c,d,e){this.value0=b;this.value1=c;this.value2=d;this.value3=e}a.create=function(b){return function(c){return function(d){return function(e){return new a(b,c,d,e)}}}};return a}(),u=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),t=f.unsafeCoerce,v=new d.Semigroup(function(a){return function(b){return new u(d["++"](d.semigroupArray)(a.value0)(b.value0))}}),e=new e.Monoid(function(){return v},new u([]));a.PropE=g;a.AttrP=k;a.PropP=h;a.HandlerP=l;a.InitializerP=
-n;a.FinalizerP=p;a.Text=z;a.Element=O;a.Markup=u;a.runFinalizer=function(a){return function(b){return a(f.unsafeCoerce(b))}};a.runInitializer=function(a){return function(b){return a(f.unsafeCoerce(b))}};a.runEventHandler=function(a){return function(b){return a(f.unsafeCoerce(b))}};a.mkEventHandler=t;a.handle=function(a){return function(b){return new l(a,t(b))}};a.prop=function(a){return function(b){return new h(a,c.mkExists(new g(b)))}};a.attr=function(a){return function(b){return new k(a,b)}};a.text=
-function(a){return new u([new z(a)])};a.element=function(a){return function(b){return function(c){return function(d){return new u([new O(a,b,c,d)])}}}};a.markupSemigroup=v;a.markupMonoid=e})(b["OpticUI.Markup"]=b["OpticUI.Markup"]||{});(function(a){var d=b.Prelude,c=function(a){this.dimap=a},e=new c(function(a){return function(b){return function(c){return d[">>>"](d.semigroupoidFn)(a)(d[">>>"](d.semigroupoidFn)(c)(b))}}});a.Profunctor=c;a.rmap=function(a){return function(b){return(0,a.dimap)(d.id(d.categoryFn))(b)}};
-a.dimap=function(a){return a.dimap};a.profunctorFn=e})(b["Data.Profunctor"]=b["Data.Profunctor"]||{});(function(a){var d=b["Data.Either"],c=b["Data.Profunctor"],e=function(a,b,c){this["__superclass_Data.Profunctor.Profunctor_0"]=a;this.left=b;this.right=c},f=new e(function(){return c.profunctorFn},function(a){return function(b){if(b instanceof d.Left)return d.Left.create(a(b.value0));if(b instanceof d.Right)return new d.Right(b.value0);throw Error("Failed pattern match at Data.Profunctor.Choice line 17, column 1 - line 22, column 1: "+
-[a.constructor.name,b.constructor.name]);}},b.Prelude["<$>"](d.functorEither));a.Choice=e;a.right=function(a){return a.right};a.left=function(a){return a.left};a.choiceFn=f})(b["Data.Profunctor.Choice"]=b["Data.Profunctor.Choice"]||{});(function(a){var d=b["Data.Profunctor"],c=b["Data.Tuple"],e=function(a,b,c){this["__superclass_Data.Profunctor.Profunctor_0"]=a;this.first=b;this.second=c},f=new e(function(){return d.profunctorFn},function(a){return function(b){return new c.Tuple(a(b.value0),b.value1)}},
-b.Prelude["<$>"](c.functorTuple));a.Strong=e;a.second=function(a){return a.second};a.first=function(a){return a.first};a.strongFn=f})(b["Data.Profunctor.Strong"]=b["Data.Profunctor.Strong"]||{});(function(a){var d=b.Prelude,c=function(a){return a},e=new d.Functor(function(a){return function(b){return a(b)}}),f=new d.Apply(function(){return e},function(a){return function(b){return a(b)}}),g=new d.Bind(function(){return f},function(a){return function(b){return b(a)}}),k=new d.Applicative(function(){return f},
-c),d=new d.Monad(function(){return k},function(){return g});a.Identity=c;a.runIdentity=function(a){return a};a.functorIdentity=e;a.applyIdentity=f;a.applicativeIdentity=k;a.bindIdentity=g;a.monadIdentity=d})(b["Data.Identity"]=b["Data.Identity"]||{});(function(a){var d=b.Prelude,c=b["Data.Tuple"];a.MonadState=function(a,b){this["__superclass_Prelude.Monad_0"]=a;this.state=b};a.modify=function(a){return function(b){return(0,a.state)(function(a){return new c.Tuple(d.unit,b(a))})}};a.gets=function(a){return function(b){return(0,a.state)(function(a){return new c.Tuple(b(a),
-a)})}};a.state=function(a){return a.state}})(b["Control.Monad.State.Class"]=b["Control.Monad.State.Class"]||{});(function(a){a.MonadError=function(a,b,e){this["__superclass_Prelude.Monad_0"]=a;this.catchError=b;this.throwError=e};a.catchError=function(a){return a.catchError};a.throwError=function(a){return a.throwError}})(b["Control.Monad.Error.Class"]=b["Control.Monad.Error.Class"]||{});(function(a){var d=b.Prelude,c=b["Data.Tuple"],e=b["Control.Monad.State.Class"],f=function(a){return a},g=function(a){return a},
-k=function(a){return new d.Monad(function(){return p(a)},function(){return l(a)})},h=function(a){return new d.Functor(d.liftM1(k(a)))},l=function(a){return new d.Bind(function(){return n(a)},function(b){return function(c){return function(e){return d.bind(a["__superclass_Prelude.Bind_1"]())(b(e))(function(a){return g(c(a.value0))(a.value1)})}}})},n=function(a){return new d.Apply(function(){return h(a)},d.ap(k(a)))},p=function(a){return new d.Applicative(function(){return n(a)},function(b){return f(function(e){return d["return"](a["__superclass_Prelude.Applicative_0"]())(new c.Tuple(b,
-e))})})};a.StateT=f;a.runStateT=g;a.functorStateT=h;a.applyStateT=n;a.applicativeStateT=p;a.bindStateT=l;a.monadStateT=k;a.monadStateStateT=function(a){return new e.MonadState(function(){return k(a)},function(b){return f(function(c){return d["return"](a["__superclass_Prelude.Applicative_0"]())(b(c))})})}})(b["Control.Monad.State.Trans"]=b["Control.Monad.State.Trans"]||{});(function(a){var d=b["Data.Identity"],c=b["Data.Tuple"],e=b["Control.Monad.State.Trans"],f=function(a){return function(b){return d.runIdentity(e.runStateT(a)(b))}};
-a.evalState=function(a){return function(b){return c.fst(f(a)(b))}};a.runState=f})(b["Control.Monad.State"]=b["Control.Monad.State"]||{});(function(a){var d=b.Prelude,c=b["Data.Tuple"],e=b["Data.Either"],f=b["Data.Profunctor"],g=b["Data.Profunctor.Strong"],k=b["Data.Profunctor.Choice"],h=function(a){return a},l=function(a){return new f.Profunctor(function(b){return function(c){return function(e){return d[">>>"](d.semigroupoidFn)(b)(d[">>>"](d.semigroupoidFn)(e)(d.map(a)(c)))}}})};a.Star=h;a.runStar=
-function(a){return a};a.profunctorStar=l;a.strongStar=function(a){return new g.Strong(function(){return l(a)},function(b){return function(e){return d.map(a)(function(a){return new c.Tuple(a,e.value1)})(b(e.value0))}},function(b){return function(e){return d.map(a)(c.Tuple.create(e.value0))(b(e.value1))}})};a.choiceStar=function(a){return new k.Choice(function(){return l(a["__superclass_Prelude.Apply_0"]()["__superclass_Prelude.Functor_0"]())},function(b){return h(e.either(function(c){return d.map(a["__superclass_Prelude.Apply_0"]()["__superclass_Prelude.Functor_0"]())(e.Left.create)(b(c))})(function(b){return d.pure(a)(e.Right.create(b))}))},
-function(b){return h(e.either(function(b){return d.pure(a)(e.Left.create(b))})(function(c){return d.map(a["__superclass_Prelude.Apply_0"]()["__superclass_Prelude.Functor_0"]())(e.Right.create)(b(c))}))})}})(b["Data.Profunctor.Star"]=b["Data.Profunctor.Star"]||{});(function(a){a.Contravariant=function(a){this.cmap=a};a.cmap=function(a){return a.cmap}})(b["Data.Functor.Contravariant"]=b["Data.Functor.Contravariant"]||{});(function(a){var d=b.Prelude,c=b["Data.Profunctor"],e=b["Data.Profunctor.Choice"],
-f=b["Data.Profunctor.Strong"],g=b["Control.Monad.State"],k=b["Control.Monad.State.Class"],h=b["Control.Monad.Eff"],l=b["Data.Monoid"],n=b["Data.Traversable"],p=b["Data.Tuple"],z=b["Data.Either"],m=b["Data.Functor.Contravariant"],u=b["Control.Monad.State.Trans"],t=b["Data.Identity"],v=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),y=function(a){return new d.Semigroup(function(b){return function(c){return function(e){return function(f){return d["<*>"](h.applyEff)(d["<$>"](h.functorEff)(d.append(a))(b(e)(f)))(c(e)(f))}}}})},
-G=function(a){return function(b){return new v(b,a(b))}},A=new m.Contravariant(function(a){return function(b){return function(c){return b(a(c))}}}),M=new d.Functor(function(a){return function(b){return new v(a(b.value0),function(c){return b.value1(m.cmap(A)(a)(c))})}}),T=function(a){return new d.Apply(function(){return M},function(b){return function(c){return new v(b.value0(c.value0),function(e){return d["<*>"](h.applyEff)(d["<$>"](h.functorEff)(d.append(a))(b.value1(m.cmap(A)(function(a){return a(c.value0)})(e))))(c.value1(m.cmap(A)(d.$(b.value0))(e)))})}})},
-J=function(a){return new d.Applicative(function(){return T(a["__superclass_Prelude.Semigroup_0"]())},function(b){return new v(b,function(b){return d.pure(h.applicativeEff)(l.mempty(a))})})},q=new c.Profunctor(function(a){return function(b){return function(c){return function(d){return function(e){return c(a(d))(m.cmap(A)(b)(e))}}}}}),c=new f.Strong(function(){return q},function(a){return function(b){return function(c){return a(b.value0)(m.cmap(A)(function(a){return new p.Tuple(a,b.value1)})(c))}}},
-function(a){return function(b){return function(c){return a(b.value1)(m.cmap(A)(function(a){return new p.Tuple(b.value0,a)})(c))}}}),r=function(a){return function(b){return a(b).value1}};a.Handler=function(a){return a};a.inline=function(a){return function(b){return function(b){return a}}};a.foreach=function(a){return function(b){return function(c){var d=function(a){return function(c){return g.evalState(n.traverse(b)(u.applicativeStateT(t.monadIdentity))(function(b){return k.state(u.monadStateStateT(t.monadIdentity))(function(c){return new p.Tuple(a(c)(b),
-c+1|0)})})(c))(0)}};return r(function(e){return n.sequence(b)(J(a))(d(function(a){return G(c(a))})(e))})}}};a.withView=function(a){return function(b){return function(c){return function(e){return d.map(h.functorEff)(a)(b(c)(e))}}}};a["with"]=function(a){return function(b){return function(c){return a(b)(c)(b)(c)}}};a.ui=function(a){return function(b){return function(b){return d.pure(h.applicativeEff)(a)}}};a.runUI=function(a){return a};a.runHandler=function(a){return a};a.uiProfunctor=q;a.uiChoice=
-function(a){return new e.Choice(function(){return q},function(b){return function(c){return function(e){return z.either(d.flip(b)(m.cmap(A)(z.Left.create)(e)))(function(b){return d.pure(h.applicativeEff)(l.mempty(a))})(c)}}},function(b){return function(c){return function(e){return z.either(function(b){return d.pure(h.applicativeEff)(l.mempty(a))})(d.flip(b)(m.cmap(A)(z.Right.create)(e)))(c)}}})};a.uiStrong=c;a.uiSemigroup=y;a.uiMonoid=function(a){return new l.Monoid(function(){return y(a["__superclass_Prelude.Semigroup_0"]())},
-function(b){return function(b){return d.pure(h.applicativeEff)(l.mempty(a))}})};a.handlerContravariant=A})(b["OpticUI.Core"]=b["OpticUI.Core"]||{});(function(a){var d=b.Prelude;a.when=function(a){return function(b){return function(f){if(b)return f;if(!b)return d["return"](a["__superclass_Prelude.Applicative_0"]())(d.unit);throw Error("Failed pattern match at Control.Monad line 8, column 1 - line 9, column 1: "+[b.constructor.name,f.constructor.name]);}}}})(b["Control.Monad"]=b["Control.Monad"]||{});
-(function(a){a.newRef=function(a){return function(){return{value:a}}};a.readRef=function(a){return function(){return a.value}};a.writeRef=function(a){return function(b){return function(){a.value=b;return{}}}}})(b["Control.Monad.Eff.Ref"]=b["Control.Monad.Eff.Ref"]||{});(function(a){var d=b["Control.Monad.Eff.Ref"];a.writeRef=d.writeRef;a.readRef=d.readRef;a.newRef=d.newRef})(b["Control.Monad.Eff.Ref"]=b["Control.Monad.Eff.Ref"]||{});(function(a){a._copyEff=function(a){return function(){var b={},e;
-for(e in a)a.hasOwnProperty(e)&&(b[e]=a[e]);return b}};a.empty={};a.runST=function(a){return a};a._lookup=function(a,b,e,f){return e in f?b(f[e]):a}})(b["Data.StrMap"]=b["Data.StrMap"]||{});(function(a){a["new"]=function(){return{}};a.poke=function(a){return function(b){return function(e){return function(){a[b]=e;return a}}}}})(b["Data.StrMap.ST"]=b["Data.StrMap.ST"]||{});(function(a){var d=b["Data.StrMap.ST"];a.poke=d.poke;a["new"]=d["new"]})(b["Data.StrMap.ST"]=b["Data.StrMap.ST"]||{});(function(a){var d=
-b["Data.StrMap"],c=b.Prelude,e=b["Control.Monad.Eff"],f=b["Data.Maybe"],g=b["Data.StrMap.ST"],k=d._copyEff,h=function(a){return e.runPure(d.runST(a))},l=function(a){return function(b){return h(function(){var d=k(b)();a(d)();return c["return"](e.applicativeEff)(d)()})}},f=b["Data.Function"].runFn4(d._lookup)(f.Nothing.value)(f.Just.create);a.thawST=k;a.lookup=f;a.insert=function(a){return function(b){return l(function(c){return g.poke(c)(a)(b)})}};a.singleton=function(a){return function(b){return h(function(){var d=
-g["new"]();g.poke(d)(a)(b)();return c["return"](e.applicativeEff)(d)()})}};a.empty=d.empty})(b["Data.StrMap"]=b["Data.StrMap"]||{});(function(a){a.eventListener=function(a){return function(b){return a(b)()}};a.addEventListener=function(a){return function(b){return function(e){return function(f){return function(){f.addEventListener(a,b,e);return{}}}}}}})(b["DOM.Event.EventTarget"]=b["DOM.Event.EventTarget"]||{});(function(a){a.error=function(a){return Error(a)};a.message=function(a){return a.message}})(b["Control.Monad.Eff.Exception"]=
-b["Control.Monad.Eff.Exception"]||{});(function(a){var d=b["Control.Monad.Eff.Exception"];a.message=d.message;a.error=d.error})(b["Control.Monad.Eff.Exception"]=b["Control.Monad.Eff.Exception"]||{});(function(a){var d=b["DOM.Event.EventTarget"];a.addEventListener=d.addEventListener;a.eventListener=d.eventListener})(b["DOM.Event.EventTarget"]=b["DOM.Event.EventTarget"]||{});(function(a){a.load="load"})(b["DOM.Event.EventTypes"]=b["DOM.Event.EventTypes"]||{});(function(a){a.window=function(){return window}})(b["DOM.HTML"]=
-b["DOM.HTML"]||{});(function(a){a.window=b["DOM.HTML"].window})(b["DOM.HTML"]=b["DOM.HTML"]||{});(function(a){a.body=function(a){return function(){return a.body}}})(b["DOM.HTML.Document"]=b["DOM.HTML.Document"]||{});(function(a){a.body=b["DOM.HTML.Document"].body})(b["DOM.HTML.Document"]=b["DOM.HTML.Document"]||{});(function(a){a.document=function(a){return function(){return a.document}}})(b["DOM.HTML.Window"]=b["DOM.HTML.Window"]||{});(function(a){a.document=b["DOM.HTML.Window"].document})(b["DOM.HTML.Window"]=
-b["DOM.HTML.Window"]||{});(function(a){a.appendChild=function(a){return function(b){return function(){return b.appendChild(a)}}}})(b["DOM.Node.Node"]=b["DOM.Node.Node"]||{});(function(a){a.appendChild=b["DOM.Node.Node"].appendChild})(b["DOM.Node.Node"]=b["DOM.Node.Node"]||{});(function(a){var d=b.Prelude,c=b["OpticUI.Internal.VirtualDOM"],e=b["OpticUI.Markup"],f=b["OpticUI.Core"],g=b["Control.Monad"],k=b["Control.Monad.Eff"],h=b["Control.Monad.Eff.Ref"],l=b["Control.Monad.State"],n=b["Control.Monad.State.Class"],
-p=b["Data.Exists"],z=b["Data.Maybe"],m=b["Data.Nullable"],u=b["Data.Monoid"],t=b["Data.Tuple"],v=b["Data.Traversable"],y=b["Data.Array"],G=b["Data.StrMap"],A=b["DOM.Event.EventTarget"],M=b["DOM.Event.EventTypes"],T=b["DOM.HTML"],J=b["DOM.HTML.Document"],q=b["DOM.HTML.Types"],r=b["DOM.HTML.Window"],B=b["DOM.Node.Node"],w=b["Control.Monad.State.Trans"],x=b["Data.Identity"],E=function(a){return function(){var b=T.window();return function(){var c=q.windowToEventTarget(b);return A.addEventListener(M.load)(A.eventListener(function(b){return a}))(!1)(c)}()()}},
-H=function(a){return function(b){return function(c){return function(e){return d.bind(w.bindStateT(x.monadIdentity))(n.gets(w.monadStateStateT(x.monadIdentity))(a))(function(a){var f=G.lookup(c)(a);if(f instanceof z.Nothing)return d.bind(w.bindStateT(x.monadIdentity))(n.modify(w.monadStateStateT(x.monadIdentity))(b(G.insert(c)(e)(a))))(function(){return d["return"](w.applicativeStateT(x.monadIdentity))(e)});if(f instanceof z.Just)return d["return"](w.applicativeStateT(x.monadIdentity))(f.value0);throw Error("Failed pattern match at OpticUI.Run line 95, column 1 - line 100, column 1: "+
-[f.constructor.name]);})}}}},I=function(a){if(a instanceof e.AttrP)return d.pure(w.applicativeStateT(x.monadIdentity))(c.attrProp(a.value0,a.value1));if(a instanceof e.HandlerP)return d.pure(w.applicativeStateT(x.monadIdentity))(e.runEventHandler(function(b){return c.handlerProp(a.value0,b)})(a.value1));if(a instanceof e.PropP)return d.pure(w.applicativeStateT(x.monadIdentity))(p.runExists(function(b){return c.prop(a.value0,b.value0)})(a.value1));if(a instanceof e.InitializerP)return H(function(a){return a.initializers})(function(a){return function(b){var c=
-{},d;for(d in b)b.hasOwnProperty(d)&&(c[d]=b[d]);c.initializers=a;return c}})(a.value0)(e.runInitializer(function(b){return c.initializer(a.value0,b)})(a.value1));if(a instanceof e.FinalizerP)return H(function(a){return a.finalizers})(function(a){return function(b){var c={},d;for(d in b)b.hasOwnProperty(d)&&(c[d]=b[d]);c.finalizers=a;return c}})(a.value0)(e.runFinalizer(function(b){return c.finalizer(a.value0,b)})(a.value1));throw Error("Failed pattern match at OpticUI.Run line 83, column 1 - line 84, column 1: "+
-[a.constructor.name]);},C=function(a){if(a instanceof e.Text)return d["return"](w.applicativeStateT(x.monadIdentity))(c.vtext(a.value0));if(a instanceof e.Element)return d.bind(w.bindStateT(x.monadIdentity))(y.foldM(w.monadStateT(x.monadIdentity))(function(a){return function(b){return d["<$>"](w.functorStateT(x.monadIdentity))(d.append(c.semigroupProps)(a))(I(b))}})(u.mempty(c.monoidProps))(a.value2))(function(b){return d.bind(w.bindStateT(x.monadIdentity))(v.traverse(v.traversableArray)(w.applicativeStateT(x.monadIdentity))(C)(a.value3.value0))(function(e){return d["return"](w.applicativeStateT(x.monadIdentity))(c.vnode(m.toNullable(a.value0))(a.value1)(m.toNullable(z.Nothing.value))(b)(e))})});
-throw Error("Failed pattern match: "+[a.constructor.name]);},F=function(a){return function(b){var d=m.toNullable(z.Nothing.value);b=l.runState(v.traverse(v.traversableArray)(w.applicativeStateT(x.monadIdentity))(C)(a.value0))(b);return new t.Tuple(c.vnode(d)("div")(d)(u.mempty(c.monoidProps))(b.value0),b.value1)}},L=function(a){return function(){var b=T.window(),b=r.document(b)(),b=d["<$>"](k.functorEff)(m.toMaybe)(J.body(b))();if(b instanceof z.Nothing)b=d.pure(k.applicativeEff)(d.unit);else if(b instanceof
-z.Just)b=d["void"](k.functorEff)(B.appendChild(q.htmlElementToNode(a))(q.htmlElementToNode(b.value0)));else throw Error("Failed pattern match at OpticUI.Run line 116, column 1 - line 117, column 1: "+[b.constructor.name]);return b()}};a.appendToBody=L;a.onLoad=E;a.findProp=H;a.toVProp=I;a.toVTree=C;a.buildVTree=F;a.animate=function(a){return function(b){var e=c.vtext(""),l=c.createElement(e);return function(){var n=h.newRef(e)(),p=h.newRef(l)(),t=h.newRef(0)(),v=h.newRef({initializers:G.empty,finalizers:G.empty})();
-return function(){var e=function(a){return function(b){return function(){var c=h.readRef(t)();return g.when(k.monadEff)(a===c)(function(){h.writeRef(t)(c+1|0)();return b()})()}}},y=function(a){return function(g){return e(a)(function(){var e=h.readRef(n)(),l=h.readRef(v)(),t=d["<$>"](k.functorEff)(function(a){return F(a)(l)})(f.runUI(b)(g)(f.Handler(y(a+1|0))))();h.writeRef(v)(t.value1)();h.writeRef(n)(t.value0)();var u=h.readRef(p)(),e=c.patch(c.diff(e)(t.value0))(u)();return h.writeRef(p)(e)()})}};
-return E(function(){L(l)();return y(0)(a)()})}()()}}}})(b["OpticUI.Run"]=b["OpticUI.Run"]||{});(function(a){var d=b.Prelude,c=b["Data.Monoid"],e=new d.Functor(function(a){return function(a){return a}}),f=function(a){return new d.Apply(function(){return e},function(b){return function(c){return d["<>"](a)(b)(c)}})};a.Const=function(a){return a};a.getConst=function(a){return a};a.functorConst=e;a.applyConst=f;a.applicativeConst=function(a){return new d.Applicative(function(){return f(a["__superclass_Prelude.Semigroup_0"]())},
-function(b){return c.mempty(a)})}})(b["Data.Const"]=b["Data.Const"]||{});(function(a){var d=b.Prelude;a.set=function(a){return function(b){return a(d["const"](b))}};a.over=function(a){return a}})(b["Data.Lens.Setter"]=b["Data.Lens.Setter"]||{});(function(a){var d=b["Data.Const"],c=b["Data.Profunctor.Star"];a.view=function(a){return function(b){return d.getConst(c.runStar(a(d.Const))(b))}}})(b["Data.Lens.Getter"]=b["Data.Lens.Getter"]||{});(function(a){var d=b["Data.Tuple"],c=b["Data.Profunctor"],
-e=b["Data.Profunctor.Strong"],f=function(a){return function(b){return function(d){return c.dimap(b["__superclass_Data.Profunctor.Profunctor_0"]())(a)(function(a){return a.value1(a.value0)})(e.first(b)(d))}}};a.lens=function(a){return function(b){return function(c){return f(function(c){return new d.Tuple(a(c),function(a){return b(c)(a)})})(c)}}}})(b["Data.Lens.Lens"]=b["Data.Lens.Lens"]||{});(function(a){var d=b["Data.Maybe"],c=function(){function a(){}a.value=new a;return a}(),e=function(){function a(b,
-c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}(),f=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),g=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),k=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),h=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),l=function(){function a(b){this.value0=
-b}a.create=function(b){return new a(b)};return a}(),n=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),p=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),z=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),m=function(){function a(){}a.value=new a;return a}(),u=function(){function a(){}a.value=new a;return a}(),t=function(){function a(){}a.value=new a;return a}(),v=function(){function a(){}
-a.value=new a;return a}(),y=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),G=function(a,b,c){this.fromSpine=a;this.toSignature=b;this.toSpine=c},A=new G(function(a){return a instanceof l?new d.Just(a.value0):d.Nothing.value},function(a){return v.value},function(a){return new l(a)}),M=c.value;a.Proxy=c;a.SigProd=p;a.SigRecord=z;a.SigNumber=m;a.SigBoolean=u;a.SigInt=t;a.SigString=v;a.SigArray=y;a.SProd=e;a.SRecord=f;a.SNumber=g;a.SBoolean=k;a.SInt=h;a.SString=
-l;a.SArray=n;a.Generic=G;a.anyProxy=M;a.fromSpine=function(a){return a.fromSpine};a.toSignature=function(a){return a.toSignature};a.toSpine=function(a){return a.toSpine};a.genericString=A})(b["Data.Generic"]=b["Data.Generic"]||{});(function(a){function b(a){return a}a.fromBoolean=b;a.fromNumber=b;a.fromString=b;a.fromArray=b;a.fromObject=b;a.jsonNull=null;a._stringify=function(a){return JSON.stringify(a)};a._foldJson=function(a,b,d,g,k,h,l){return null==l?a(null):"boolean"===typeof l?b(l):"number"===
-typeof l?d(l):"string"===typeof l?g(l):"[object Array]"===Object.prototype.toString.call(l)?k(l):h(l)}})(b["Data.Argonaut.Core"]=b["Data.Argonaut.Core"]||{});(function(a){var d=b["Data.Argonaut.Core"],c=b.Prelude,e=b["Data.Maybe"],f=function(a){return function(b){return function(c){return c(a)(b)}}}(e.Nothing.value)(e.Just.create),e=new c.Show(d._stringify),g=function(a){return function(b){return function(e){return d._foldJson(c["const"](a),c["const"](a),c["const"](a),b,c["const"](a),c["const"](a),
-e)}}},k=f(g),h=function(a){return function(b){return function(e){return d._foldJson(c["const"](a),c["const"](a),c["const"](a),c["const"](a),c["const"](a),b,e)}}},l=f(h),n=function(a){return function(b){return function(e){return d._foldJson(c["const"](a),c["const"](a),b,c["const"](a),c["const"](a),c["const"](a),e)}}},p=f(n),z=function(a){return function(b){return function(e){return d._foldJson(c["const"](a),b,c["const"](a),c["const"](a),c["const"](a),c["const"](a),e)}}},m=f(z),u=function(a){return function(b){return function(e){return d._foldJson(c["const"](a),
-c["const"](a),c["const"](a),c["const"](a),b,c["const"](a),e)}}},f=f(u);a.toObject=l;a.toArray=f;a.toString=k;a.toNumber=p;a.toBoolean=m;a.foldJsonObject=h;a.foldJsonArray=u;a.foldJsonString=g;a.foldJsonNumber=n;a.foldJsonBoolean=z;a.foldJsonNull=function(a){return function(b){return function(e){return d._foldJson(b,c["const"](a),c["const"](a),c["const"](a),c["const"](a),c["const"](a),e)}}};a.showJson=e;a.jsonNull=d.jsonNull;a.fromObject=d.fromObject;a.fromArray=d.fromArray;a.fromString=d.fromString;
-a.fromNumber=d.fromNumber;a.fromBoolean=d.fromBoolean})(b["Data.Argonaut.Core"]=b["Data.Argonaut.Core"]||{});(function(a){var d=b.Prelude,c=b["Data.Argonaut.Core"],e=b["Data.Int"],f=b["Data.Foldable"],g=b["Data.Generic"],k=b["Data.StrMap"],h=function(a){this.encodeJson=a},l=new h(d["const"](c.jsonNull)),n=new h(d.id(d.categoryFn)),p=new h(c.fromString),z=function(a){return a.encodeJson},m=function(a){return new h(function(b){return c.fromArray(d["<$>"](d.functorArray)(a.encodeJson)(b))})},u=function(a){var b=
-function(a){return k.insert(a.recLabel)(u(a.recValue(d.unit)))};if(a instanceof g.SInt)return c.fromNumber(e.toNumber(a.value0));if(a instanceof g.SString)return c.fromString(a.value0);if(a instanceof g.SNumber)return c.fromNumber(a.value0);if(a instanceof g.SBoolean)return c.fromBoolean(a.value0);if(a instanceof g.SArray)return c.fromArray(d["<$>"](d.functorArray)(function(a){return u(a(d.unit))})(a.value0));if(a instanceof g.SProd)return c.fromObject(k.insert("tag")((0,p.encodeJson)(a.value0))(k.singleton("values")(z(m(n))(d["<$>"](d.functorArray)(function(a){return u(a(d.unit))})(a.value1)))));
-if(a instanceof g.SRecord)return c.fromObject(f.foldr(f.foldableArray)(b)(k.empty)(a.value0));throw Error("Failed pattern match: "+[a.constructor.name]);};a.EncodeJson=h;a.gEncodeJson=function(a){return function(b){return u(g.toSpine(a)(b))}};a.encodeJson=z;a.encodeJsonUnit=l;a.encodeJsonJString=p;a.encodeJsonJson=n;a.encodeJsonArray=m})(b["Data.Argonaut.Encode"]=b["Data.Argonaut.Encode"]||{});(function(a){var d=b.Prelude,c=function(a){return function(b){return function(c){return d[">>="](a)(c)(b)}}};
-a["<=<"]=function(a){return function(b){return function(d){return function(k){return c(a)(b)(d(k))}}}};a["=<<"]=c})(b["Control.Bind"]=b["Control.Bind"]||{});(function(a){var d=b.Prelude,c=b["Data.Argonaut.Core"],e=b["Data.Array"],f=b["Data.Either"],g=b["Data.Int"],k=b["Data.Maybe"],h=b["Control.Bind"],l=b["Data.Traversable"],n=b["Data.Foldable"],p=b["Data.Generic"],z=b["Data.StrMap"],m=function(a){this.decodeJson=a},u=function(a){return function(b){var v=function(a){return k.maybe(new f.Left(a))(f.Right.create)};
-if(a instanceof p.SigNumber)return d["<$>"](f.functorEither)(p.SNumber.create)(v("Expected a number")(c.toNumber(b)));if(a instanceof p.SigInt)return d["<$>"](f.functorEither)(p.SInt.create)(v("Expected an integer number")(h["=<<"](k.bindMaybe)(g.fromNumber)(c.toNumber(b))));if(a instanceof p.SigString)return d["<$>"](f.functorEither)(p.SString.create)(v("Expected a string")(c.toString(b)));if(a instanceof p.SigBoolean)return d["<$>"](f.functorEither)(p.SBoolean.create)(v("Expected a boolean")(c.toBoolean(b)));
-if(a instanceof p.SigArray)return d.bind(f.bindEither)(v("Expected an array")(c.toArray(b)))(function(b){return d["<$>"](f.functorEither)(p.SArray.create)(l.traverse(l.traversableArray)(f.applicativeEither)(function(b){return d.map(f.functorEither)(d["const"])(u(a.value0(d.unit))(b))})(b))});if(a instanceof p.SigRecord)return d.bind(f.bindEither)(v("Expected an object")(c.toObject(b)))(function(b){return d["<$>"](f.functorEither)(p.SRecord.create)(l["for"](f.applicativeEither)(l.traversableArray)(a.value0)(function(a){return d.bind(f.bindEither)(v("'"+
-(a.recLabel+"' property missing"))(z.lookup(a.recLabel)(b)))(function(b){return d.bind(f.bindEither)(u(a.recValue(d.unit))(b))(function(b){return d.pure(f.applicativeEither)({recLabel:a.recLabel,recValue:d["const"](b)})})})}))});if(a instanceof p.SigProd)return d.bind(f.bindEither)(v("Expected an object")(c.toObject(b)))(function(b){return d.bind(f.bindEither)(v("'tag' string property is missing")(h["=<<"](k.bindMaybe)(c.toString)(z.lookup("tag")(b))))(function(l){var g=n.find(n.foldableArray)(function(a){return d["=="](d.eqString)(l)(a.sigConstructor)})(a.value0);
-if(g instanceof k.Nothing)return new f.Left("'"+(l+"' isn't a valid constructor"));if(g instanceof k.Just)return d.bind(f.bindEither)(v("'values' array is missing")(h["=<<"](k.bindMaybe)(c.toArray)(z.lookup("values")(b))))(function(a){return d.bind(f.bindEither)(e.zipWithA(f.applicativeEither)(function(a){return u(a(d.unit))})(g.value0.sigValues)(a))(function(a){return d.pure(f.applicativeEither)(new p.SProd(l,d["<$>"](d.functorArray)(d["const"])(a)))})});throw Error("Failed pattern match: "+[g.constructor.name]);
-})});throw Error("Failed pattern match: "+[a.constructor.name]);}},t=new m(c.foldJsonNull(new f.Left("Not null."))(d["const"](new f.Right(d.unit)))),v=function(a){return function(b){return f.either(d["const"](k.Nothing.value))(d.pure(k.applicativeMaybe))((0,a.decodeJson)(b))}};a.DecodeJson=m;a.decodeMaybe=v;a.gDecodeJson=function(a){return function(b){return h["=<<"](f.bindEither)(function(b){return k.maybe(new f.Left("fromSpine failed"))(f.Right.create)(p.fromSpine(a)(b))})(u(p.toSignature(a)(p.Proxy.value))(b))}};
-a.decodeJson=function(a){return a.decodeJson};a.decodeJsonNull=t;a.decodeArray=function(a){return new m(function(b){return k.maybe(new f.Left("Couldn't decode."))(f.Right.create)(d.bind(k.bindMaybe)(c.toArray(b))(function(b){return l.traverse(l.traversableArray)(k.applicativeMaybe)(v(a))(b)}))})}})(b["Data.Argonaut.Decode"]=b["Data.Argonaut.Decode"]||{});(function(a){var d=b["Data.Lens.Lens"],c=b.Prelude,e=b["Data.Generic"],f=b["Data.Argonaut.Encode"],g=b["Data.Argonaut.Decode"],k=b["Data.Maybe"],
-h=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),l=new e.Generic(function(a){return a instanceof e.SProd&&"Photobooth"===a.value0&&1===a.value1.length?c.apply(k.applyMaybe)(new k.Just(h.create))(function(a){return a instanceof e.SRecord&&3===a.value0.length?c.apply(k.applyMaybe)(c.apply(k.applyMaybe)(c.apply(k.applyMaybe)(new k.Just(function(a){return function(b){return function(c){return{alias:a,computername:b,defaultprofile:c}}}}))(e.fromSpine(e.genericString)(a.value0[0].recValue(c.unit))))(e.fromSpine(e.genericString)(a.value0[1].recValue(c.unit))))(e.fromSpine(e.genericString)(a.value0[2].recValue(c.unit))):
-k.Nothing.value}(a.value1[0](c.unit))):k.Nothing.value},function(a){return new e.SigProd([{sigConstructor:"Photobooth",sigValues:[function(a){return new e.SigRecord([{recLabel:"alias",recValue:function(a){return e.toSignature(e.genericString)(e.anyProxy)}},{recLabel:"computername",recValue:function(a){return e.toSignature(e.genericString)(e.anyProxy)}},{recLabel:"defaultprofile",recValue:function(a){return e.toSignature(e.genericString)(e.anyProxy)}}])}]}])},function(a){return new e.SProd("Photobooth",
-[function(b){return new e.SRecord([{recLabel:"alias",recValue:function(b){return e.toSpine(e.genericString)(a.value0.alias)}},{recLabel:"computername",recValue:function(b){return e.toSpine(e.genericString)(a.value0.computername)}},{recLabel:"defaultprofile",recValue:function(b){return e.toSpine(e.genericString)(a.value0.defaultprofile)}}])}])}),f=new f.EncodeJson(f.gEncodeJson(l)),g=new g.DecodeJson(g.gDecodeJson(l)),n=d.lens(function(a){return a.value0})(function(a){return function(a){return new h(a)}});
-a.Photobooth=h;a._Photobooth=n;a._defaultprofile=function(a){return d.lens(function(a){return a.defaultprofile})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.defaultprofile=b;return c}})(a)};a._alias=function(a){return d.lens(function(a){return a.alias})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.alias=b;return c}})(a)};a._computername=function(a){return d.lens(function(a){return a.computername})(function(a){return function(b){var c=
-{},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.computername=b;return c}})(a)};a.genericPhotobooth=l;a.encodeJsonPhotobooth=f;a.decodeJsonPhotobooth=g})(b["Klikhut.Model.Photobooth"]=b["Klikhut.Model.Photobooth"]||{});(function(a){var d=b.Prelude,c=b["Data.Either"],e=b["Data.Maybe"],f=b["Data.Profunctor"],g=b["Data.Profunctor.Choice"],k=function(a){return function(b){return function(e){return function(k){return f.dimap(e["__superclass_Data.Profunctor.Profunctor_0"]())(b)(c.either(d.id(d.categoryFn))(d.id(d.categoryFn)))(g.right(e)(f.rmap(e["__superclass_Data.Profunctor.Profunctor_0"]())(a)(k)))}}}};
-a["prism'"]=function(a){return function(b){return function(d){return k(a)(function(a){return e.maybe(new c.Left(a))(c.Right.create)(b(a))})(d)}}};a.prism=k})(b["Data.Lens.Prism"]=b["Data.Lens.Prism"]||{});(function(a){a._makeAff=function(a){return function(b,e){return a(function(a){return function(){e(a)}})(function(a){return function(){try{b(a)}catch(d){e(d)}}})()}};a._pure=function(a,b){return function(e,f){try{e(b)}catch(g){f(g)}return a}};a._throwError=function(a,b){return function(e,f){f(b);
-return a}};a._fmap=function(a,b){return function(e,f){return b(function(b){try{e(a(b))}catch(c){f(c)}},f)}};a._bind=function(a,b,e){return function(f,g){var k,h,l=!1,n=!1,p=function(){};k=b(function(b){if(n)return l=!0,a;h=e(b)(f,g);p(h);return h},g);return function(a){return function(b,c){n=!0;return void 0!==h?h(a)(b,c):k(a)(function(d){if(d||l)try{b(!0)}catch(e){c(e)}else p=function(d){d(a)(b,c)}},c)}}}};a._attempt=function(a,b,e){return function(f,g){return e(function(a){try{f(b(a))}catch(d){g(d)}},
-function(b){try{f(a(b))}catch(c){g(c)}})}};a._runAff=function(a,b,e){return function(){return e(function(e){try{b(e)()}catch(g){a(g)()}},function(b){a(b)()})}}})(b["Control.Monad.Aff"]=b["Control.Monad.Aff"]||{});(function(a){var d=b["Control.Monad.Aff"],c=b.Prelude,e=b["Control.Monad.Eff"],f=b["Control.Monad.Error.Class"],g=b["Data.Either"],k=function(a){return d._makeAff(a)},h=new c.Functor(function(a){return function(b){return d._fmap(a,b)}}),l=function(a){return d._attempt(g.Left.create,g.Right.create,
-a)},n=new c.Apply(function(){return h},function(a){return function(b){return d._bind(q,a,function(a){return c["<$>"](h)(a)(b)})}}),p=new c.Applicative(function(){return n},function(a){return d._pure(m,a)}),m=c["const"](c.pure(p)(!1)),q=c["const"](c.pure(p)(!0)),u=new c.Bind(function(){return n},function(a){return function(b){return d._bind(q,a,b)}}),t=new c.Monad(function(){return p},function(){return u}),f=new f.MonadError(function(){return t},function(a){return function(b){return c[">>="](u)(l(a))(g.either(b)(c.pure(p)))}},
-function(a){return d._throwError(m,a)});a.runAff=function(a){return function(b){return function(c){return d._runAff(a,b,c)}}};a.nonCanceler=m;a["makeAff'"]=k;a.makeAff=function(a){return k(function(b){return function(d){return c["<$>"](e.functorEff)(c["const"](m))(a(b)(d))}})};a.attempt=l;a.functorAff=h;a.applyAff=n;a.applicativeAff=p;a.bindAff=u;a.monadAff=t;a.monadErrorAff=f})(b["Control.Monad.Aff"]=b["Control.Monad.Aff"]||{});(function(a){var d=b.Prelude,c=b["OpticUI.Core"],e=b["Control.Monad.Eff"],
-f=b["Control.Monad.Eff.Ref"],g=b["Control.Monad.Aff"],k=b["Data.Either"],h=b["Data.Monoid"],l=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}();a.Async=l;a.async=function(a){return function(){var b=f.newRef(d["const"](d.pure(e.applicativeEff)(d.unit)))();return function(){var c=function(a){return function(){return f.readRef(b)()(new k.Right(a))()}},d=function(a){return function(){return f.readRef(b)()(new k.Left(a))()}};return function(){g.runAff(d)(c)(a)();
-return new l(b)}}()()}};a.onResult=function(a){return function(b){return function(d){return c["with"](function(e){return function(l){return c.inline(function(){f.writeRef(e.value0)(k.either(d)(b))();return h.mempty(a)})}})}}}})(b["OpticUI.Components.Async"]=b["OpticUI.Components.Async"]||{});(function(a){var d=b["Data.Lens.Prism"],c=b.Prelude,e=b["Data.Maybe"],f=function(){function a(){}a.value=new a;return a}(),g=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),
-k=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),h=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}();a.Initial=f;a.Busy=g;a.Errored=k;a.Done=h;a._Done=function(a){return d["prism'"](h.create)(function(a){return a instanceof h?new e.Just(a.value0):e.Nothing.value})(a)};a._Errored=function(a){return d["prism'"](k.create)(function(a){return a instanceof k?new e.Just(a.value0):e.Nothing.value})(a)};a._Busy=function(a){return d["prism'"](g.create)(function(a){return a instanceof
-g?new e.Just(a.value0):e.Nothing.value})(a)};a._Initial=function(a){return d["prism'"](c["const"](f.value))(function(a){return a instanceof f?new e.Just(c.unit):e.Nothing.value})(a)}})(b["Klikhut.Async"]=b["Klikhut.Async"]||{});(function(a){var d=b.Prelude,c=b["OpticUI.Markup"],e=b["Data.Maybe"],f=b["Data.Either"],g=b["Data.Monoid"],k=b["Data.Foreign"],h=b["Data.Foreign.Class"],l=b["Data.Foreign.Index"],n=c.prop("value"),p=c.attr("type"),m=c.element(e.Nothing.value)("tr"),q=c.element(e.Nothing.value)("th"),
-u=c.element(e.Nothing.value)("td"),t=c.element(e.Nothing.value)("tbody"),v=c.element(e.Nothing.value)("table"),y=function(a){return function(b){return function(c){return f.either(d["const"](e.Nothing.value))(e.Just.create)(h.readProp(a)(l.indexString)(b)(k.toForeign(c.target)))}}},G=c.element(e.Nothing.value)("div"),A=c.attr("class"),M=c.element(e.Nothing.value)("button");a.getProp=y;a.onInput=function(a){return function(b){return c.handle("input")(function(c){return b(c)(y(a)("value")(c))})}};a.onClick=
-function(a){return c.handle("click")(a)};a.valueA=n;a.typeA=p;a.classA=A;a.tr=m;a.th=q;a.td=u;a.tbody=t;a.table=v;a.input_=function(a){return c.element(e.Nothing.value)("input")(a)(g.mempty(c.markupMonoid))};a.div=G;a.button=M})(b["OpticUI.Markup.HTML"]=b["OpticUI.Markup.HTML"]||{});(function(a){var d=b.Prelude,c=b["OpticUI.Core"],e=b["OpticUI.Markup.HTML"],f=b["Data.Maybe"],g=b["Data.Foreign.Class"];a.textField=function(a){return c["with"](function(b){return function(l){var n=[e.valueA(b),e.typeA("text"),
-e.onInput(g.stringIsForeign)(function(a){return function(a){return c.runHandler(l)(f.maybe("")(d.id(d.categoryFn))(a))}})];return c.ui(e.input_(d["++"](d.semigroupArray)(a)(n)))}})}})(b["OpticUI.Components"]=b["OpticUI.Components"]||{});(function(a){a._ajax=function(a,b,e,f,g){var k={};"undefined"!==typeof q&&q.require?(k.newXHR=function(){return new (q.require("xhr2"))},k.fixupUrl=function(a){var b=q.require("url");a=b.parse(a);a.protocol=a.protocol||"http:";a.hostname=a.hostname||"localhost";return b.format(a)},
-k.getResponse=function(a){return a.response}):(k.newXHR=function(){return new XMLHttpRequest},k.fixupUrl=function(a){return a||"/"},k.getResponse=function(a){return a.response});return function(){var h=k.newXHR(),l=k.fixupUrl(b.url);h.open(b.method||"GET",l,!0,b.username,b.password);if(b.headers)for(var l=0,n;null!=(n=b.headers[l]);l++)h.setRequestHeader(n.field,n.value);h.onerror=function(){f(Error("AJAX request failed: "+b.method+" "+b.url))()};h.onload=function(){g({status:h.status,headers:h.getAllResponseHeaders().split("\n").filter(function(a){return 0<
-a.length}).map(function(b){var c=b.indexOf(":");return a(b.substring(0,c))(b.substring(c+2))}),response:k.getResponse(h)})()};h.responseType=b.responseType;h.send(b.content);return e(h)}};a._cancelAjax=function(a,b,e,f){return function(){try{a.abort()}catch(b){return f(!1)()}return f(!0)()}}})(b["Network.HTTP.Affjax"]=b["Network.HTTP.Affjax"]||{});(function(a){var d=function(a){this.toRequest=a},c=new d(b["Unsafe.Coerce"].unsafeCoerce);a.Requestable=d;a.toRequest=function(a){return a.toRequest};a.requestableString=
-c})(b["Network.HTTP.Affjax.Request"]=b["Network.HTTP.Affjax.Request"]||{});(function(a){var d=b["Data.Foreign"],c=function(){function a(){}a.value=new a;return a}(),e=function(){function a(){}a.value=new a;return a}(),f=function(){function a(){}a.value=new a;return a}(),g=function(){function a(){}a.value=new a;return a}(),k=function(){function a(){}a.value=new a;return a}(),h=function(a,b){this.fromResponse=a;this.responseType=b},d=new h(d.readString,k.value);a.ArrayBufferResponse=c;a.BlobResponse=
-e;a.DocumentResponse=f;a.JSONResponse=g;a.StringResponse=k;a.Respondable=h;a.fromResponse=function(a){return a.fromResponse};a.responseType=function(a){return a.responseType};a.responseTypeToString=function(a){if(a instanceof c)return"arraybuffer";if(a instanceof e)return"blob";if(a instanceof f)return"document";if(a instanceof g||a instanceof k)return"text";throw Error("Failed pattern match at Network.HTTP.Affjax.Response line 41, column 1 - line 42, column 1: "+[a.constructor.name]);};a.responsableString=
-d})(b["Network.HTTP.Affjax.Response"]=b["Network.HTTP.Affjax.Response"]||{});(function(a){var d=b.Prelude,c=function(){function a(){}a.value=new a;return a}(),e=function(){function a(){}a.value=new a;return a}(),f=function(){function a(){}a.value=new a;return a}(),g=function(){function a(){}a.value=new a;return a}(),k=function(){function a(){}a.value=new a;return a}(),h=function(){function a(){}a.value=new a;return a}(),l=function(){function a(){}a.value=new a;return a}(),n=function(){function a(){}
-a.value=new a;return a}(),p=function(){function a(){}a.value=new a;return a}(),m=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),q=new d.Show(function(a){if(a instanceof c)return"DELETE";if(a instanceof e)return"GET";if(a instanceof f)return"HEAD";if(a instanceof g)return"OPTIONS";if(a instanceof k)return"PATCH";if(a instanceof h)return"POST";if(a instanceof l)return"PUT";if(a instanceof n)return"MOVE";if(a instanceof p)return"COPY";if(a instanceof m)return"(CustomMethod "+
-(d.show(d.showString)(a.value0)+")");throw Error("Failed pattern match at Network.HTTP.Method line 29, column 1 - line 41, column 1: "+[a.constructor.name]);});a.DELETE=c;a.GET=e;a.HEAD=f;a.OPTIONS=g;a.PATCH=k;a.POST=h;a.PUT=l;a.MOVE=n;a.COPY=p;a.CustomMethod=m;a.methodToString=function(a){return a instanceof m?a.value0:d.show(q)(a)};a.showMethod=q})(b["Network.HTTP.Method"]=b["Network.HTTP.Method"]||{});(function(a){a.mimeTypeToString=function(a){return a}})(b["Network.HTTP.MimeType"]=b["Network.HTTP.MimeType"]||
-{});(function(a){var d=b["Network.HTTP.MimeType"],c=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),e=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),f=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(c){return new a(b,c)}};return a}();a.Accept=c;a.ContentType=e;a.RequestHeader=f;a.requestHeaderValue=function(a){if(a instanceof c||a instanceof e)return d.mimeTypeToString(a.value0);
-if(a instanceof f)return a.value1;throw Error("Failed pattern match at Network.HTTP.RequestHeader line 28, column 1 - line 29, column 1: "+[a.constructor.name]);};a.requestHeaderName=function(a){if(a instanceof c)return"Accept";if(a instanceof e)return"Content-Type";if(a instanceof f)return a.value0;throw Error("Failed pattern match at Network.HTTP.RequestHeader line 23, column 1 - line 24, column 1: "+[a.constructor.name]);}})(b["Network.HTTP.RequestHeader"]=b["Network.HTTP.RequestHeader"]||{});
-(function(a){var b=function(){function a(b,c){this.value0=b;this.value1=c}a.create=function(b){return function(d){return new a(b,d)}};return a}();a.responseHeader=function(a){return function(e){return new b(a,e)}}})(b["Network.HTTP.ResponseHeader"]=b["Network.HTTP.ResponseHeader"]||{});(function(a){var d=b["Network.HTTP.Affjax"],c=b.Prelude,e=b["Control.Bind"],f=b["Control.Monad.Aff"],g=b["Control.Monad.Eff.Exception"],k=b["Data.Either"],h=b["Data.Foreign"],l=b["Data.Maybe"],n=b["Data.Nullable"],
-p=b["Network.HTTP.Affjax.Request"],m=b["Network.HTTP.Affjax.Response"],q=b["Network.HTTP.Method"],u=b["Network.HTTP.RequestHeader"],t=b["Network.HTTP.ResponseHeader"],v=function(a){return function(b){return f.makeAff(function(c){return function(e){return d._cancelAjax(a,b,c,e)}})}},y=function(a){return function(b){return function(f){return function(y){return function(r){var K={method:q.methodToString(f.method),url:f.url,headers:c["<$>"](c.functorArray)(function(a){return{field:u.requestHeaderName(a),
-value:u.requestHeaderValue(a)}})(f.headers),content:n.toNullable(c["<$>"](l.functorMaybe)(p.toRequest(a))(f.content)),responseType:m.responseTypeToString(m.responseType(b)),username:n.toNullable(f.username),password:n.toNullable(f.password)},D=m.responseType(b)instanceof m.JSONResponse?e["<=<"](k.bindEither)(m.fromResponse(b))(e["<=<"](k.bindEither)(h.parseJSON)(h.readString)):m.fromResponse(b);return d._ajax(t.responseHeader,K,v,y,function(a){var b=c["<$>"](k.functorEither)(function(b){var c={},
-d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.response=b;return c})(D(a.response));if(b instanceof k.Left)return y(g.error(c.show(h.showForeignError)(b.value0)));if(b instanceof k.Right)return r(b.value0);throw Error("Failed pattern match at Network.HTTP.Affjax line 197, column 1 - line 202, column 1: "+[b.constructor.name]);})}}}}};a.affjax=function(a){return function(b){return function(c){return f["makeAff'"](y(a)(b)(c))}}}})(b["Network.HTTP.Affjax"]=b["Network.HTTP.Affjax"]||{});(function(a){var d=
-b["Data.Maybe"],c=b["Data.Either"],e=b["Data.Lens.Prism"];a._Just=function(a){return e.prism(d.Just.create)(d.maybe(new c.Left(d.Nothing.value))(c.Right.create))(a)}})(b["Data.Lens.Common"]=b["Data.Lens.Common"]||{});(function(a){a.applicationJSON="application/json"})(b["Network.HTTP.MimeType.Common"]=b["Network.HTTP.MimeType.Common"]||{});(function(a){a._jsonParser=function(a,b,e){try{return b(JSON.parse(e))}catch(f){return a(f.message)}}})(b["Data.Argonaut.Parser"]=b["Data.Argonaut.Parser"]||{});
-(function(a){var d=b["Data.Argonaut.Parser"],c=b["Data.Either"];a.jsonParser=function(a){return d._jsonParser(c.Left.create,c.Right.create,a)}})(b["Data.Argonaut.Parser"]=b["Data.Argonaut.Parser"]||{});(function(a){var d=function(a){this.printJson=a},c=new d(b.Prelude.show(b["Data.Argonaut.Core"].showJson));a.Printer=d;a.printJson=function(a){return a.printJson};a.printerString=c})(b["Data.Argonaut.Printer"]=b["Data.Argonaut.Printer"]||{});(function(a){var d=b.Prelude,c=b["Network.HTTP.Affjax"],e=
-b["Network.HTTP.RequestHeader"],f=b["Network.HTTP.MimeType.Common"],g=b["Network.HTTP.Method"],k=b["Control.Monad.Aff"],h=b["Data.Argonaut.Parser"],l=b["Data.Argonaut.Decode"],n=b["Data.Argonaut.Encode"],p=b["Data.Argonaut.Printer"],m=b["Control.Monad.Error.Class"],q=b["Control.Monad.Eff.Exception"],u=b["Data.Either"],t=b["Data.Maybe"],v=b["Network.HTTP.Affjax.Request"],y=b["Network.HTTP.Affjax.Response"],G=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),A=
-new G({method:g.PUT.value,serverUrl:"/api/photobooths",mkClientUrl:d["const"]("/api/photobooths")}),M=new G({method:g.POST.value,serverUrl:"/api/photobooths",mkClientUrl:d["const"]("/api/photobooths")}),r=function(a){return function(b){var c=function(a){return m.throwError(k.monadErrorAff)(q.error(a))};return u.either(c)(function(b){return u.either(c)(d["return"](k.applicativeAff))(l.decodeJson(a)(b))})(h.jsonParser(b))}},g=new G({method:g.GET.value,serverUrl:"/api/photobooths",mkClientUrl:d["const"]("/api/photobooths")});
-a.Endpoint=G;a.parseOrThrow=r;a.putPhotobooths=A;a.postPhotobooths=M;a.getPhotobooths=g;a.execEndpoint=function(a){return function(b){return function(b){return function(b){return function(g){return function(l){return function(h){h={method:g.value0.method,url:g.value0.mkClientUrl(l),headers:[new e.ContentType(f.applicationJSON)],content:t.Just.create(p.printJson(p.printerString)(n.encodeJson(a)(h))),username:t.Nothing.value,password:t.Nothing.value};return d[">>="](k.bindAff)(c.affjax(v.requestableString)(y.responsableString)(h))(d[">>>"](d.semigroupoidFn)(function(a){return a.response})(r(b)))}}}}}}}})(b["Klikhut.Endpoint"]=
-b["Klikhut.Endpoint"]||{});(function(a){var d=b["OpticUI.Run"],c=b["OpticUI.Core"],e=b["Data.Lens.Setter"],f=b["Data.Lens.Getter"],g=b["Data.Lens.Lens"],k=b.Prelude,h=b["Klikhut.Model.Photobooth"],l=b["Klikhut.Async"],n=b["OpticUI.Markup.HTML"],p=b["OpticUI.Markup"],m=b["OpticUI.Components"],q=b["OpticUI.Components.Async"],u=b["Data.Lens.Common"],t=b["Data.Foldable"],v=b["Data.Array"],y=b["Data.Maybe"],G=b["Control.Monad.Eff.Exception"],A=b["Control.Monad.Eff"],M=b["Control.Apply"],r=b["Klikhut.Endpoint"],
-J=b["Data.Argonaut.Encode"],K=b["Data.Argonaut.Decode"],D=b["Data.Traversable"],B=b["Data.Profunctor.Strong"],w=b["Data.Profunctor.Star"],x=b["Data.Const"],E=b["Data.Profunctor.Choice"],H=b["Data.Monoid"],I=function(){function a(){}a.value=new a;return a}(),C=function(){function a(){}a.value=new a;return a}(),F=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),L=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),V=function(){function a(){}
-a.value=new a;return a}(),W=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),X=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),Y=function(){function a(){}a.value=new a;return a}(),Z=function(){function a(){}a.value=new a;return a}(),aa=function(){function a(){}a.value=new a;return a}(),ba=function(){function a(b){this.value0=b}a.create=function(b){return new a(b)};return a}(),ca=function(a){return r.execEndpoint(h.encodeJsonPhotobooth)(h.decodeJsonPhotobooth)(J.encodeJsonUnit)(K.decodeJsonNull)(r.putPhotobooths)(k.unit)(a)},
-ga=function(a){return function(b){return function(d){return b instanceof y.Just&&d===b.value0?c["with"](function(b){return function(d){return c.withView(n.tr([]))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.td([])(p.text(b.value0.computername))),c.withView(n.td([]))(h._Photobooth(c.uiStrong)(h._alias(c.uiStrong)(m.textField([])))),c.withView(n.td([]))(h._Photobooth(c.uiStrong)(h._defaultprofile(c.uiStrong)(m.textField([])))),c.withView(n.td([]))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.button([n.classA("btn btn-warning"),
-n.onClick(function(b){return a(Y.value)})])(p.text("Cancel"))),c.ui(n.button([n.classA("btn btn-success"),n.onClick(function(b){return a(Z.value)})])(p.text("Save")))]))]))}}):b instanceof y.Just?c["with"](function(a){return function(b){return c.withView(n.tr([]))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.td([])(p.text(a.value0.computername))),c.ui(n.td([])(p.text(a.value0.alias))),c.ui(n.td([])(p.text(a.value0.defaultprofile)))]))}}):c["with"](function(b){return function(e){return c.withView(n.tr([]))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.td([])(p.text(b.value0.computername))),
-c.ui(n.td([])(p.text(b.value0.alias))),c.ui(n.td([])(p.text(b.value0.defaultprofile))),c.ui(n.button([n.classA("btn btn-primary"),n.onClick(function(b){return a(new X(d))})])(p.text("Edit")))]))}})}}},ja=function(a){return r.execEndpoint(h.encodeJsonPhotobooth)(h.decodeJsonPhotobooth)(J.encodeJsonUnit)(K.decodeJsonNull)(r.postPhotobooths)(k.unit)(a)},da=c["with"](function(a){return function(a){return c.withView(n.tr([]))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.withView(n.td([]))(h._computername(c.uiStrong)(m.textField([]))),
-c.withView(n.td([]))(h._alias(c.uiStrong)(m.textField([]))),c.withView(n.td([]))(h._defaultprofile(c.uiStrong)(m.textField([])))]))}}),ea=function(a){return c["with"](function(b){return function(b){return t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([l._Initial(c.uiChoice(p.markupMonoid))(c.ui(n.button([n.classA("btn btn-primary"),n.onClick(function(b){return a(C.value)})])(p.text("Save shit")))),l._Busy(c.uiChoice(p.markupMonoid))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.button([n.classA("btn btn-warning")])(p.text("Saving PB"))),
-q.onResult(p.markupMonoid)(function(b){return a(V.value)})(function(b){return a(W.create(b))})])),l._Done(c.uiChoice(p.markupMonoid))(c.ui(n.button([n.classA("btn btn-success"),n.onClick(function(b){return a(C.value)})])(p.text("Saved!")))),l._Errored(c.uiChoice(p.markupMonoid))(c["with"](function(a){return function(b){return t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.button([n.classA("btn btn-danger")])(p.text("Failed!"))),c.ui(n.div([n.classA("alert alert-danger")])(p.text("Photobooths failed to get saved: "+
-G.message(a))))])}}))])}})},fa=r.execEndpoint(J.encodeJsonUnit)(K.decodeJsonNull)(J.encodeJsonArray(h.encodeJsonPhotobooth))(K.decodeArray(h.decodeJsonPhotobooth))(r.getPhotobooths)(k.unit)(k.unit),ha={photobooths:l.Initial.value,newPb:{model:{computername:"",alias:"",defaultprofile:""},state:l.Initial.value},editing:y.Nothing.value},R=function(a){return g.lens(function(a){return a.state})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.state=b;return c}})(a)},
-U=function(a){return g.lens(function(a){return a.saving})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.saving=b;return c}})(a)},ia=g.lens(function(a){return{photobooths:a.photobooths,editing:a.editing}})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.photobooths=b.photobooths;c.editing=b.editing;return c}}),P=function(a){return g.lens(function(a){return a.photobooths})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&
-(c[d]=a[d]);c.photobooths=b;return c}})(a)},Q=function(a){return g.lens(function(a){return a.newPb})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.newPb=b;return c}})(a)},S=function(a){return g.lens(function(a){return a.model})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.model=b;return c}})(a)},N=function(a){return g.lens(function(a){return a.editing})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&
-(c[d]=a[d]);c.editing=b;return c}})(a)},ka=function(a){return function(b){return t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([P(c.uiStrong)(c["with"](function(d){return function(d){return t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([l._Initial(c.uiChoice(p.markupMonoid))(c.inline(M["*>"](A.applyEff)(a(I.value))(k["return"](A.applicativeEff)(n.tr([])(n.td([])(p.text("Nothing loaded yet"))))))),l._Busy(c.uiChoice(p.markupMonoid))(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.tr([])(n.td([])(p.text("Loading photobooths")))),
-q.onResult(p.markupMonoid)(function(b){return a(F.create(b))})(function(b){return a(L.create(b))})])),l._Done(c.uiChoice(p.markupMonoid))(c.foreach(p.markupMonoid)(D.traversableArray)(ga(a)(b))),l._Errored(c.uiChoice(p.markupMonoid))(c["with"](function(a){return function(b){return c.ui(n.tr([])(n.td([])(p.text("Photobooths failed to load: "+G.message(a)))))}}))])}})),N(c.uiStrong)(u._Just(c.uiChoice(p.markupMonoid))(U(c.uiStrong)(l._Busy(c.uiChoice(p.markupMonoid))(q.onResult(p.markupMonoid)(function(b){return a(aa.value)})(function(b){return a(ba.create(b))})))))])}},
-la=c["with"](function(a){return function(b){var d=function(d){if(d instanceof I)return function(){var d=q.async(fa)();return c.runHandler(b)(e.set(P(B.strongFn))(new l.Busy(d))(a))()};if(d instanceof C)return function(){var d=q.async(ja(new h.Photobooth(f.view(function(a){return Q(w.strongStar(x.functorConst))(S(w.strongStar(x.functorConst))(a))})(a))))();return c.runHandler(b)(e.set(function(a){return Q(B.strongFn)(R(B.strongFn)(a))})(new l.Busy(d))(a))()};if(d instanceof F)return c.runHandler(b)(e.set(P(B.strongFn))(new l.Done(d.value0))(a));
-if(d instanceof L)return c.runHandler(b)(e.set(P(B.strongFn))(new l.Errored(d.value0))(a));if(d instanceof W)return c.runHandler(b)(e.set(function(a){return Q(B.strongFn)(R(B.strongFn)(a))})(new l.Errored(d.value0))(a));if(d instanceof V){var g=h.Photobooth.create(f.view(function(a){return Q(w.strongStar(x.functorConst))(S(w.strongStar(x.functorConst))(a))})(a));return c.runHandler(b)(function(a){return e.over(function(a){return P(B.strongFn)(l._Done(E.choiceFn)(a))})(function(a){return v.snoc(a)(g)})(e.set(function(a){return Q(B.strongFn)(S(B.strongFn)(a))})({computername:"",
-alias:"",defaultprofile:""})(e.set(function(a){return Q(B.strongFn)(R(B.strongFn)(a))})(new l.Done(k.unit))(a)))}(a))}if(d instanceof X){var n=v["!!"](f.view(function(a){return P(w.strongStar(x.functorConst))(l._Done(w.choiceStar(x.applicativeConst(H.monoidArray)))(a))})(a))(d.value0);if(n instanceof y.Nothing)return k["return"](A.applicativeEff)(k.unit);if(n instanceof y.Just)return c.runHandler(b)(e.set(N(B.strongFn))(new y.Just({index:d.value0,previous:n.value0,saving:l.Initial.value}))(a));throw Error("Failed pattern match at Client line 70, column 25 - line 71, column 25: "+
-[n.constructor.name]);}if(d instanceof Y){var p=f.view(N(w.strongStar(x.functorConst)))(a);if(p instanceof y.Nothing)return k["return"](A.applicativeEff)(k.unit);if(p instanceof y.Just)return c.runHandler(b)(e.set(N(B.strongFn))(y.Nothing.value)(e.over(function(a){return P(B.strongFn)(l._Done(E.choiceFn)(a))})(function(a){return y.maybe(a)(k.id(k.categoryFn))(v.updateAt(p.value0.index)(p.value0.previous)(a))})(a)));throw Error("Failed pattern match at Client line 70, column 25 - line 71, column 25: "+
-[p.constructor.name]);}if(d instanceof Z){d=f.view(N(w.strongStar(x.functorConst)))(a);if(d instanceof y.Nothing)return k["return"](A.applicativeEff)(k.unit);if(d instanceof y.Just){n=f.view(P(w.strongStar(x.functorConst)))(a);if(n instanceof l.Done){var m=v["!!"](n.value0)(d.value0.index);if(m instanceof y.Just)return function(){var d=q.async(ca(m.value0))();return c.runHandler(b)(e.set(function(a){return N(B.strongFn)(u._Just(E.choiceFn)(U(B.strongFn)(a)))})(new l.Busy(d))(a))()}}return k["return"](A.applicativeEff)(k.unit)}throw Error("Failed pattern match at Client line 70, column 25 - line 71, column 25: "+
-[d.constructor.name]);}if(d instanceof aa)return c.runHandler(b)(e.set(N(B.strongFn))(y.Nothing.value)(a));if(d instanceof ba)return c.runHandler(b)(e.set(function(a){return N(B.strongFn)(u._Just(E.choiceFn)(U(B.strongFn)(a)))})(new l.Errored(d.value0))(a));throw Error("Failed pattern match at Client line 70, column 25 - line 71, column 25: "+[d.constructor.name]);};return t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.withView(function(a){return n.table([n.classA("table")])(n.tbody([])(a))})(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([c.ui(n.tr([])(t.mconcat(t.foldableArray)(p.markupMonoid)([n.th([])(p.text("Name")),
-n.th([])(p.text("Alias")),n.th([])(p.text("Default Profile"))]))),ia(c.uiStrong)(ka(d)(y.maybe(y.Nothing.value)(function(a){return new y.Just(a.index)})(f.view(N(w.strongStar(x.functorConst)))(a)))),Q(c.uiStrong)(S(c.uiStrong)(da))])),Q(c.uiStrong)(R(c.uiStrong)(ea(d)))])}}),d=d.animate(ha)(t.mconcat(t.foldableArray)(c.uiMonoid(p.markupMonoid))([la]));a.LoadAll=I;a.SaveModel=C;a.Loaded=F;a.LoadingFailed=L;a.NewSaved=V;a.NewSaveFailed=W;a.StartEdit=X;a.CancelEdit=Y;a.SaveEdit=Z;a.EditSaved=aa;a.EditSaveFailed=
-ba;a._saving=U;a._previous=function(a){return g.lens(function(a){return a.previous})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.previous=b;return c}})(a)};a._index=function(a){return g.lens(function(a){return a.index})(function(a){return function(b){var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=a[d]);c.index=b;return c}})(a)};a._editing=N;a._state=R;a._model=S;a._newPb=Q;a._photoboothsEditing=ia;a._photobooths=P;a.updatePB=ca;a.saveNewPb=ja;a.loadPbs=
-fa;a.showPB=ga;a.listPhotobooths=ka;a.makeNewPbButton=ea;a.makeNewPbInputs=da;a.photoboothsPage=la;a.main=d;a.initialState=ha})(b.Client=b.Client||{});b.Client.main()},{"virtual-dom/create-element":5,"virtual-dom/diff":6,"virtual-dom/patch":7,"virtual-dom/virtual-hyperscript/hooks/soft-set-hook":14,"virtual-dom/vnode/vnode":22,"virtual-dom/vnode/vtext":24}],2:[function(m,q,r){},{}],3:[function(m,q,r){r="undefined"!==typeof global?global:"undefined"!==typeof self?self:"undefined"!==typeof window?window:
-{};r="undefined"!==typeof r?r:"undefined"!==typeof window?window:{};m=m("min-document");if("undefined"!==typeof document)q.exports=document;else{var b=r["__GLOBAL_DOCUMENT_CACHE@4"];b||(b=r["__GLOBAL_DOCUMENT_CACHE@4"]=m);q.exports=b}},{"min-document":2}],4:[function(m,q,r){q.exports=function(b){return"object"===typeof b&&null!==b}},{}],5:[function(m,q,r){m=m("./vdom/create-element.js");q.exports=m},{"./vdom/create-element.js":9}],6:[function(m,q,r){m=m("./vtree/diff.js");q.exports=m},{"./vtree/diff.js":26}],
-7:[function(m,q,r){m=m("./vdom/patch.js");q.exports=m},{"./vdom/patch.js":12}],8:[function(m,q,r){function b(a,b,d,k){if(k)if(k=k[b],c(k))k.unhook&&k.unhook(a,b,d);else if("attributes"===b)for(var h in k)a.removeAttribute(h);else if("style"===b)for(var l in k)a.style[l]="";else a[b]="string"===typeof k?"":null}function a(a){if(Object.getPrototypeOf)return Object.getPrototypeOf(a);if(a.__proto__)return a.__proto__;if(a.constructor)return a.constructor.prototype}var d=m("is-object"),c=m("../vnode/is-vhook.js");
-q.exports=function(e,f,g){for(var k in f){var h=f[k];if(void 0===h)b(e,k,h,g);else if(c(h))b(e,k,h,g),h.hook&&h.hook(e,k,g?g[k]:void 0);else if(d(h)){var l=e,n=k,p=g?g[n]:void 0;if("attributes"===n)for(n in n=void 0,h)p=h[n],void 0===p?l.removeAttribute(n):l.setAttribute(n,p);else if(p&&d(p)&&a(p)!==a(h))l[n]=h;else{d(l[n])||(l[n]={});var p="style"===n?"":void 0,m=void 0;for(m in h){var q=h[m];l[n][m]=void 0===q?p:q}}}else e[k]=h}}},{"../vnode/is-vhook.js":17,"is-object":4}],9:[function(m,q,r){function b(k,
-h){var l=h?h.document||a:a,n=h?h.warn:null;k=g(k).a;if(f(k))return k.init();if(e(k))return l.createTextNode(k.text);if(!c(k))return n&&n("Item is not a valid virtual dom node",k),null;l=null===k.namespace?l.createElement(k.tagName):l.createElementNS(k.namespace,k.tagName);d(l,k.properties);for(var n=k.children,p=0;p<n.length;p++){var m=b(n[p],h);m&&l.appendChild(m)}return l}var a=m("global/document"),d=m("./apply-properties"),c=m("../vnode/is-vnode.js"),e=m("../vnode/is-vtext.js"),f=m("../vnode/is-widget.js"),
-g=m("../vnode/handle-thunk.js");q.exports=b},{"../vnode/handle-thunk.js":15,"../vnode/is-vnode.js":18,"../vnode/is-vtext.js":19,"../vnode/is-widget.js":20,"./apply-properties":8,"global/document":3}],10:[function(m,q,r){function b(d,f,g,k,h){k=k||{};if(d){a(g,h,h)&&(k[h]=d);var l=f.children;if(l){d=d.childNodes;for(var n=0;n<f.children.length;n++){h+=1;var p=l[n]||c,m=h+(p.count||0);a(g,h,m)&&b(d[n],p,g,k,h);h=m}}}return k}function a(a,b,c){if(0===a.length)return!1;for(var d=0,h=a.length-1,l,n;d<=
-h;){l=(h+d)/2>>0;n=a[l];if(d===h)return n>=b&&n<=c;if(n<b)d=l+1;else if(n>c)h=l-1;else return!0}return!1}function d(a,b){return a>b?1:-1}var c={};q.exports=function(a,c,g,k){return g&&0!==g.length?(g.sort(d),b(a,c,g,k,0)):{}}},{}],11:[function(m,q,r){function b(a,b){"function"===typeof b.destroy&&d(b)&&b.destroy(a)}var a=m("./apply-properties"),d=m("../vnode/is-widget.js"),c=m("../vnode/vpatch.js"),e=m("./update-widget");q.exports=function(d,g,k){var h=d.vNode,l=d.patch;switch(d.type){case c.REMOVE:return(l=
-g.parentNode)&&l.removeChild(g),b(g,h),null;case c.INSERT:return l=k.render(l,k),g&&g.appendChild(l),g;case c.VTEXT:return 3===g.nodeType?(g.replaceData(0,g.length,l.text),l=g):(h=g.parentNode,l=k.render(l,k),h&&l!==g&&h.replaceChild(l,g)),l;case c.WIDGET:return l=(d=e(h,l))?l.update(h,g)||g:k.render(l,k),(k=g.parentNode)&&l!==g&&k.replaceChild(l,g),d||b(g,h),l;case c.VNODE:return h=g.parentNode,l=k.render(l,k),h&&l!==g&&h.replaceChild(l,g),l;case c.ORDER:h=g.childNodes;k={};for(var n,p=0;p<l.removes.length;p++)n=
-l.removes[p],d=h[n.from],n.key&&(k[n.key]=d),g.removeChild(d);for(var p=h.length,m=0;m<l.inserts.length;m++)n=l.inserts[m],d=k[n.key],g.insertBefore(d,n.to>=p++?null:h[n.to]);return g;case c.PROPS:return a(g,l,h.properties),g;case c.THUNK:return l=k.patch(g,l,k),g&&l&&g!==l&&g.parentNode&&g.parentNode.replaceChild(l,g),l;default:return g}}},{"../vnode/is-widget.js":20,"../vnode/vpatch.js":23,"./apply-properties":8,"./update-widget":13}],12:[function(m,q,r){function b(c,d,f){f=f||{};f.patch=f.patch&&
-f.patch!==b?f.patch:a;f.render=f.render||e;return f.patch(c,d,f)}function a(a,b,e){var n=[],m;for(m in b)"a"!==m&&n.push(Number(m));if(0===n.length)return a;m=f(a,b.a,n);var q=a.ownerDocument;e.document||q===d||(e.document=q);for(q=0;q<n.length;q++){var r=n[q];var u=m[r],r=b[r],t=e;if(u){var v=void 0;if(c(r))for(var y=0;y<r.length;y++)v=g(r[y],u,t),u===a&&(a=v);else v=g(r,u,t),u===a&&(a=v)}}return a}var d=m("global/document"),c=m("x-is-array"),e=m("./create-element"),f=m("./dom-index"),g=m("./patch-op");
-q.exports=b},{"./create-element":9,"./dom-index":10,"./patch-op":11,"global/document":3,"x-is-array":27}],13:[function(m,q,r){var b=m("../vnode/is-widget.js");q.exports=function(a,d){return b(a)&&b(d)?"name"in a&&"name"in d?a.id===d.id:a.init===d.init:!1}},{"../vnode/is-widget.js":20}],14:[function(m,q,r){function b(a){if(!(this instanceof b))return new b(a);this.value=a}q.exports=b;b.prototype.hook=function(a,b){a[b]!==this.value&&(a[b]=this.value)}},{}],15:[function(m,q,r){function b(b,e){var k=
-b.vnode;k||(k=b.vnode=b.render(e));if(!(a(k)||d(k)||c(k)))throw Error("thunk did not return a valid node");return k}var a=m("./is-vnode"),d=m("./is-vtext"),c=m("./is-widget"),e=m("./is-thunk");q.exports=function(a,c){var d=a,h=c;e(c)&&(h=b(c,a));e(a)&&(d=b(a,null));return{a:d,b:h}}},{"./is-thunk":16,"./is-vnode":18,"./is-vtext":19,"./is-widget":20}],16:[function(m,q,r){q.exports=function(b){return b&&"Thunk"===b.type}},{}],17:[function(m,q,r){q.exports=function(b){return b&&("function"===typeof b.hook&&
-!b.hasOwnProperty("hook")||"function"===typeof b.unhook&&!b.hasOwnProperty("unhook"))}},{}],18:[function(m,q,r){var b=m("./version");q.exports=function(a){return a&&"VirtualNode"===a.type&&a.version===b}},{"./version":21}],19:[function(m,q,r){var b=m("./version");q.exports=function(a){return a&&"VirtualText"===a.type&&a.version===b}},{"./version":21}],20:[function(m,q,r){q.exports=function(b){return b&&"Widget"===b.type}},{}],21:[function(m,q,r){q.exports="2"},{}],22:[function(m,q,r){function b(b,
-h,l,n,m){this.tagName=b;this.properties=h||f;this.children=l||g;this.key=null!=n?String(n):void 0;this.namespace="string"===typeof m?m:null;b=l&&l.length||0;n=0;var q=m=!1,r=!1,u,t;for(t in h)if(h.hasOwnProperty(t)){var v=h[t];e(v)&&v.unhook&&(u||(u={}),u[t]=v)}for(h=0;h<b;h++)t=l[h],a(t)?(n+=t.count||0,!m&&t.hasWidgets&&(m=!0),!q&&t.hasThunks&&(q=!0),r||!t.hooks&&!t.descendantHooks||(r=!0)):!m&&d(t)?"function"===typeof t.destroy&&(m=!0):!q&&c(t)&&(q=!0);this.count=b+n;this.hasWidgets=m;this.hasThunks=
-q;this.hooks=u;this.descendantHooks=r}r=m("./version");var a=m("./is-vnode"),d=m("./is-widget"),c=m("./is-thunk"),e=m("./is-vhook");q.exports=b;var f={},g=[];b.prototype.version=r;b.prototype.type="VirtualNode"},{"./is-thunk":16,"./is-vhook":17,"./is-vnode":18,"./is-widget":20,"./version":21}],23:[function(m,q,r){function b(a,b,c){this.type=Number(a);this.vNode=b;this.patch=c}m=m("./version");b.NONE=0;b.VTEXT=1;b.VNODE=2;b.WIDGET=3;b.PROPS=4;b.ORDER=5;b.INSERT=6;b.REMOVE=7;b.THUNK=8;q.exports=b;b.prototype.version=
-m;b.prototype.type="VirtualPatch"},{"./version":21}],24:[function(m,q,r){function b(a){this.text=String(a)}m=m("./version");q.exports=b;b.prototype.version=m;b.prototype.type="VirtualText"},{"./version":21}],25:[function(m,q,r){function b(e,f){var g,k;for(k in e){k in f||(g=g||{},g[k]=void 0);var h=e[k],l=f[k];if(h!==l)if(d(h)&&d(l))if(a(l)!==a(h))g=g||{},g[k]=l;else if(c(l))g=g||{},g[k]=l;else{if(h=b(h,l))g=g||{},g[k]=h}else g=g||{},g[k]=l}for(var n in f)n in e||(g=g||{},g[n]=f[n]);return g}function a(a){if(Object.getPrototypeOf)return Object.getPrototypeOf(a);
-if(a.__proto__)return a.__proto__;if(a.constructor)return a.constructor.prototype}var d=m("is-object"),c=m("../vnode/is-vhook");q.exports=b},{"../vnode/is-vhook":17,"is-object":4}],26:[function(m,q,r){function b(b,c){var d={a:b};a(b,c,d,0);return d}function a(b,h,m,q){if(b!==h){var r=m[q],u=!1;if(O(b)||O(h))c(b,h,m,q);else if(null==h)z(b)||(e(b,m,q),d(b,m,q),r=m[q]),r=k(r,new l(l.REMOVE,b,h));else if(n(h))if(n(b))if(b.tagName===h.tagName&&b.namespace===h.namespace&&b.key===h.key){var J=t(b.properties,
-h.properties);J&&(r=k(r,new l(l.PROPS,b,J)));var J=q,K=b.children;h=h.children;var D=g(h),B=D.keys,w=D.free;if(w.length===h.length)h={children:h,moves:null};else{var D=g(K),x=D.keys;if(D.free.length===K.length)h={children:h,moves:null};else{for(var D=[],E=0,H=w.length,I=0,C=0;C<K.length;C++){var F=K[C];F.key?B.hasOwnProperty(F.key)?(F=B[F.key],D.push(h[F])):(I++,D.push(null)):E<H?(F=w[E++],D.push(h[F])):(I++,D.push(null))}w=E>=w.length?h.length:w[E];for(E=0;E<h.length;E++)H=h[E],H.key?x.hasOwnProperty(H.key)||
-D.push(H):E>=w&&D.push(H);x=D.slice();w=0;E=[];H=[];for(F=0;F<h.length;){for(var L=h[F],C=x[w];null===C&&x.length;)E.push(f(x,w,null)),C=x[w];C&&C.key===L.key?(w++,F++):L.key?(C&&C.key?B[C.key]!==F+1?(E.push(f(x,w,C.key)),(C=x[w])&&C.key===L.key?w++:H.push({key:L.key,to:F})):H.push({key:L.key,to:F}):H.push({key:L.key,to:F}),F++):C&&C.key&&E.push(f(x,w,C.key))}for(;w<x.length;)C=x[w],E.push(f(x,w,C&&C.key));h=E.length!==I||H.length?{children:D,moves:{removes:E,inserts:H}}:{children:D,moves:null}}}B=
-h.children;D=K.length;I=B.length;D=D>I?D:I;for(I=0;I<D;I++)x=K[I],w=B[I],J+=1,x?a(x,w,m,J):w&&(r=k(r,new l(l.INSERT,null,w))),n(x)&&x.count&&(J+=x.count);h.moves&&(r=k(r,new l(l.ORDER,b,h.moves)))}else r=k(r,new l(l.VNODE,b,h)),u=!0;else r=k(r,new l(l.VNODE,b,h)),u=!0;else p(h)?p(b)?b.text!==h.text&&(r=k(r,new l(l.VTEXT,b,h))):(r=k(r,new l(l.VTEXT,b,h)),u=!0):z(h)&&(z(b)||(u=!0),r=k(r,new l(l.WIDGET,b,h)));r&&(m[q]=r);u&&(e(b,m,q),d(b,m,q))}}function d(a,b,e){if(z(a))"function"===typeof a.destroy&&
-(b[e]=k(b[e],new l(l.REMOVE,a,null)));else if(n(a)&&(a.hasWidgets||a.hasThunks)){a=a.children;for(var f=a.length,g=0;g<f;g++){var h=a[g];e+=1;d(h,b,e);n(h)&&h.count&&(e+=h.count)}}else O(a)&&c(a,null,b,e)}function c(a,c,d,e){a=u(a,c);a=b(a.a,a.b);var f;a:{for(f in a)if("a"!==f){f=!0;break a}f=!1}f&&(d[e]=new l(l.THUNK,null,a))}function e(a,b,d){if(n(a)){if(a.hooks){var f=b[d],g=l.PROPS,h=a.hooks,m={},p;for(p in h)m[p]=void 0;b[d]=k(f,new l(g,a,m))}if(a.descendantHooks||a.hasThunks)for(a=a.children,
-f=a.length,g=0;g<f;g++)h=a[g],d+=1,e(h,b,d),n(h)&&h.count&&(d+=h.count)}else O(a)&&c(a,null,b,d)}function f(a,b,c){a.splice(b,1);return{from:b,key:c}}function g(a){for(var b={},c=[],d=a.length,e=0;e<d;e++){var f=a[e];f.key?b[f.key]=e:c.push(e)}return{keys:b,free:c}}function k(a,b){return a?(h(a)?a.push(b):a=[a,b],a):b}var h=m("x-is-array"),l=m("../vnode/vpatch"),n=m("../vnode/is-vnode"),p=m("../vnode/is-vtext"),z=m("../vnode/is-widget"),O=m("../vnode/is-thunk"),u=m("../vnode/handle-thunk"),t=m("./diff-props");
-q.exports=b},{"../vnode/handle-thunk":15,"../vnode/is-thunk":16,"../vnode/is-vnode":18,"../vnode/is-vtext":19,"../vnode/is-widget":20,"../vnode/vpatch":23,"./diff-props":25,"x-is-array":27}],27:[function(m,q,r){function b(b){return"[object Array]"===a.call(b)}var a=Object.prototype.toString;q.exports=Array.isArray||b},{}]},{},[1]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// Generated by psc-bundle 0.7.5.2
+var PS = { };
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Prelude
+
+  //- Functor --------------------------------------------------------------------
+
+  exports.arrayMap = function (f) {
+    return function (arr) {
+      var l = arr.length;
+      var result = new Array(l);
+      for (var i = 0; i < l; i++) {
+        result[i] = f(arr[i]);
+      }
+      return result;
+    };
+  };
+
+  exports.concatArray = function (xs) {
+    return function (ys) {
+      return xs.concat(ys);
+    };
+  };
+
+  //- Eq -------------------------------------------------------------------------
+
+  exports.refEq = function (r1) {
+    return function (r2) {
+      return r1 === r2;
+    };
+  };
+
+  //- Show -----------------------------------------------------------------------
+
+  exports.showIntImpl = function (n) {
+    return n.toString();
+  };
+
+  exports.showStringImpl = function (s) {
+    return JSON.stringify(s);
+  };
+ 
+})(PS["Prelude"] = PS["Prelude"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Prelude"];
+  var Semigroupoid = function (compose) {
+      this.compose = compose;
+  };
+  var Category = function (__superclass_Prelude$dotSemigroupoid_0, id) {
+      this["__superclass_Prelude.Semigroupoid_0"] = __superclass_Prelude$dotSemigroupoid_0;
+      this.id = id;
+  };
+  var Functor = function (map) {
+      this.map = map;
+  };
+  var Apply = function (__superclass_Prelude$dotFunctor_0, apply) {
+      this["__superclass_Prelude.Functor_0"] = __superclass_Prelude$dotFunctor_0;
+      this.apply = apply;
+  };
+  var Applicative = function (__superclass_Prelude$dotApply_0, pure) {
+      this["__superclass_Prelude.Apply_0"] = __superclass_Prelude$dotApply_0;
+      this.pure = pure;
+  };
+  var Bind = function (__superclass_Prelude$dotApply_0, bind) {
+      this["__superclass_Prelude.Apply_0"] = __superclass_Prelude$dotApply_0;
+      this.bind = bind;
+  };
+  var Monad = function (__superclass_Prelude$dotApplicative_0, __superclass_Prelude$dotBind_1) {
+      this["__superclass_Prelude.Applicative_0"] = __superclass_Prelude$dotApplicative_0;
+      this["__superclass_Prelude.Bind_1"] = __superclass_Prelude$dotBind_1;
+  };
+  var Semigroup = function (append) {
+      this.append = append;
+  };
+  var Eq = function (eq) {
+      this.eq = eq;
+  };
+  var Show = function (show) {
+      this.show = show;
+  };
+  var $dollar = function (f) {
+      return function (x) {
+          return f(x);
+      };
+  };                                                                           
+  var unit = {};
+  var showString = new Show($foreign.showStringImpl);
+  var showInt = new Show($foreign.showIntImpl);
+  var show = function (dict) {
+      return dict.show;
+  };                                                                     
+  var semigroupoidFn = new Semigroupoid(function (f) {
+      return function (g) {
+          return function (x) {
+              return f(g(x));
+          };
+      };
+  });
+  var semigroupArray = new Semigroup($foreign.concatArray);
+  var pure = function (dict) {
+      return dict.pure;
+  };
+  var $$return = function (__dict_Applicative_2) {
+      return pure(__dict_Applicative_2);
+  };
+  var map = function (dict) {
+      return dict.map;
+  };
+  var $less$dollar$greater = function (__dict_Functor_5) {
+      return map(__dict_Functor_5);
+  };
+  var id = function (dict) {
+      return dict.id;
+  };
+  var functorArray = new Functor($foreign.arrayMap);
+  var flip = function (f) {
+      return function (b) {
+          return function (a) {
+              return f(a)(b);
+          };
+      };
+  }; 
+  var eqString = new Eq($foreign.refEq);
+  var eq = function (dict) {
+      return dict.eq;
+  };
+  var $eq$eq = function (__dict_Eq_7) {
+      return eq(__dict_Eq_7);
+  };
+  var $$const = function (a) {
+      return function (_3) {
+          return a;
+      };
+  };
+  var $$void = function (__dict_Functor_12) {
+      return function (fa) {
+          return $less$dollar$greater(__dict_Functor_12)($$const(unit))(fa);
+      };
+  };
+  var compose = function (dict) {
+      return dict.compose;
+  };
+  var $greater$greater$greater = function (__dict_Semigroupoid_15) {
+      return flip(compose(__dict_Semigroupoid_15));
+  };
+  var categoryFn = new Category(function () {
+      return semigroupoidFn;
+  }, function (x) {
+      return x;
+  });
+  var bind = function (dict) {
+      return dict.bind;
+  };
+  var liftM1 = function (__dict_Monad_23) {
+      return function (f) {
+          return function (a) {
+              return bind(__dict_Monad_23["__superclass_Prelude.Bind_1"]())(a)(function (_0) {
+                  return $$return(__dict_Monad_23["__superclass_Prelude.Applicative_0"]())(f(_0));
+              });
+          };
+      };
+  };
+  var $greater$greater$eq = function (__dict_Bind_24) {
+      return bind(__dict_Bind_24);
+  }; 
+  var apply = function (dict) {
+      return dict.apply;
+  };
+  var $less$times$greater = function (__dict_Apply_25) {
+      return apply(__dict_Apply_25);
+  };
+  var liftA1 = function (__dict_Applicative_26) {
+      return function (f) {
+          return function (a) {
+              return $less$times$greater(__dict_Applicative_26["__superclass_Prelude.Apply_0"]())(pure(__dict_Applicative_26)(f))(a);
+          };
+      };
+  }; 
+  var append = function (dict) {
+      return dict.append;
+  };
+  var $plus$plus = function (__dict_Semigroup_27) {
+      return append(__dict_Semigroup_27);
+  };
+  var $less$greater = function (__dict_Semigroup_28) {
+      return append(__dict_Semigroup_28);
+  };
+  var ap = function (__dict_Monad_30) {
+      return function (f) {
+          return function (a) {
+              return bind(__dict_Monad_30["__superclass_Prelude.Bind_1"]())(f)(function (_2) {
+                  return bind(__dict_Monad_30["__superclass_Prelude.Bind_1"]())(a)(function (_1) {
+                      return $$return(__dict_Monad_30["__superclass_Prelude.Applicative_0"]())(_2(_1));
+                  });
+              });
+          };
+      };
+  };
+  exports["Show"] = Show;
+  exports["Eq"] = Eq;
+  exports["Semigroup"] = Semigroup;
+  exports["Monad"] = Monad;
+  exports["Bind"] = Bind;
+  exports["Applicative"] = Applicative;
+  exports["Apply"] = Apply;
+  exports["Functor"] = Functor;
+  exports["Category"] = Category;
+  exports["Semigroupoid"] = Semigroupoid;
+  exports["show"] = show;
+  exports["=="] = $eq$eq;
+  exports["eq"] = eq;
+  exports["++"] = $plus$plus;
+  exports["<>"] = $less$greater;
+  exports["append"] = append;
+  exports["ap"] = ap;
+  exports["liftM1"] = liftM1;
+  exports["return"] = $$return;
+  exports[">>="] = $greater$greater$eq;
+  exports["bind"] = bind;
+  exports["liftA1"] = liftA1;
+  exports["pure"] = pure;
+  exports["<*>"] = $less$times$greater;
+  exports["apply"] = apply;
+  exports["void"] = $$void;
+  exports["<$>"] = $less$dollar$greater;
+  exports["map"] = map;
+  exports["id"] = id;
+  exports[">>>"] = $greater$greater$greater;
+  exports["compose"] = compose;
+  exports["const"] = $$const;
+  exports["flip"] = flip;
+  exports["$"] = $dollar;
+  exports["unit"] = unit;
+  exports["semigroupoidFn"] = semigroupoidFn;
+  exports["categoryFn"] = categoryFn;
+  exports["functorArray"] = functorArray;
+  exports["semigroupArray"] = semigroupArray;
+  exports["eqString"] = eqString;
+  exports["showInt"] = showInt;
+  exports["showString"] = showString;;
+ 
+})(PS["Prelude"] = PS["Prelude"] || {});
+(function(exports) {
+  /* global exports, require */
+  "use strict";
+
+  // module OpticUI.Internal.VirtualDOM
+
+  // VTree -> HTMLElement
+  exports.createElement = function () {
+    var vcreateElement = require('virtual-dom/create-element');
+    return function (vtree) {
+      return vcreateElement(vtree);
+    };
+  }();
+
+  // VTree -> VTree -> Patch
+  exports.diff = function () {
+    var vdiff = require('virtual-dom/diff');
+    return function (a) {
+      return function (b) {
+        return vdiff(a, b);
+      };
+    };
+  }();
+
+  // forall eff. Patch -> HTMLElement -> Eff (dom :: DOM | eff) HTMLElement
+  exports.patch = function () {
+    var vpatch = require('virtual-dom/patch');
+    return function (p) {
+      return function (node) {
+        return function () {
+          return vpatch(node, p);
+        };
+      };
+    };
+  }();
+
+  // String -> VTree
+  exports.vtext = function () {
+    var VText = require('virtual-dom/vnode/vtext');
+    return function (s) { return new VText(s); };
+  }();
+
+  // Nullable String -> String -> Nullable String -> Props -> Array VTree -> VTree
+  exports.vnode = function () {
+    var VirtualNode = require("virtual-dom/vnode/vnode");
+    var SoftSetHook = require("virtual-dom/virtual-hyperscript/hooks/soft-set-hook");
+    return function (ns) {
+      return function (name) {
+        return function (key) {
+          return function (props) {
+            return function (children) {
+              if (name === "input" && props.value !== undefined) {
+                props.value = new SoftSetHook(props.value);
+              }
+              return new VirtualNode(name, props, children, key, ns);
+            };
+          };
+        };
+      };
+    };
+  }();
+
+  // forall a. Fn2 String a Props
+  exports.prop = function (key, value) {
+    var props = {};
+    props[key] = value;
+    return props;
+  };
+
+  // Fn2 String String Props
+  exports.attrProp = function (key, value) {
+    var props = { attributes : {} };
+    props.attributes[key] = value;
+    return props;
+  };
+
+  // forall eff e. Fn2 String (e -> Eff eff Unit) Props
+  exports.handlerProp = function (key, f) {
+    var Hook  = function () {};
+    var props = {};
+    Hook.prototype.callback = function (e) {
+      f(e)();
+    };
+    Hook.prototype.hook = function (node) {
+      node.addEventListener(key, this.callback);
+    };
+    Hook.prototype.unhook = function (node) {
+      node.removeEventListener(key, this.callback);
+    };
+    props["opticui-hook-" + key] = new Hook(f);
+    return props;
+  };
+
+  // Fn2 Props Props Props
+  exports.concatProps = function () {
+    var hOP = Object.prototype.hasOwnProperty;
+    var copy = function (source, result) {
+      for (var key in source) {
+        if (hOP.call(source, key)) {
+          if (key === "attributes") {
+            var sourceAttrs = source[key];
+            var resultAttrs = result[key];
+
+            for (var attr in sourceAttrs) {
+              if (hOP.call(sourceAttrs, attr)) {
+                resultAttrs[attr] = sourceAttrs[attr];
+              }
+            }
+          } else {
+            result[key] = source[key];
+          }
+        }
+      }
+      return result;
+    };
+    return function (p, q) {
+      return copy(p, copy(q, { attributes: {} } ));
+    };
+  }();
+
+  // Props
+  exports.emptyProps = {};
+
+  //Fn2 String (HTMLElement -> Eff eff Unit) Props
+  exports.initializer = function(s, f){
+    var Hook = function () {};
+    Hook.prototype.hook = function (node) {
+      if(!node.initialized){
+        node.initialized = true;
+        f(node)();
+      }
+    };
+    var obj = {};
+    obj[s] = new Hook(f);
+    return obj;
+  };
+
+  //Fn2 String (HTMLElement -> Eff eff Unit) Props
+  exports.finalizer = function(s, f){
+    var Hook = function () {};
+    Hook.prototype.unhook = function (node) {
+      f(node)();
+    };
+    var obj = {};
+    obj[s] = new Hook(f);
+    return obj;
+  };
+ 
+})(PS["OpticUI.Internal.VirtualDOM"] = PS["OpticUI.Internal.VirtualDOM"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];     
+  var Monoid = function (__superclass_Prelude$dotSemigroup_0, mempty) {
+      this["__superclass_Prelude.Semigroup_0"] = __superclass_Prelude$dotSemigroup_0;
+      this.mempty = mempty;
+  };     
+  var monoidArray = new Monoid(function () {
+      return Prelude.semigroupArray;
+  }, [  ]);
+  var mempty = function (dict) {
+      return dict.mempty;
+  };
+  exports["Monoid"] = Monoid;
+  exports["mempty"] = mempty;
+  exports["monoidArray"] = monoidArray;;
+ 
+})(PS["Data.Monoid"] = PS["Data.Monoid"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Control.Monad.Eff
+
+  exports.returnE = function (a) {
+    return function () {
+      return a;
+    };
+  };
+
+  exports.bindE = function (a) {
+    return function (f) {
+      return function () {
+        return f(a())();
+      };
+    };
+  };
+
+  exports.runPure = function (f) {
+    return f();
+  };
+ 
+})(PS["Control.Monad.Eff"] = PS["Control.Monad.Eff"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Control.Monad.Eff"];
+  var Prelude = PS["Prelude"];     
+  var monadEff = new Prelude.Monad(function () {
+      return applicativeEff;
+  }, function () {
+      return bindEff;
+  });
+  var bindEff = new Prelude.Bind(function () {
+      return applyEff;
+  }, $foreign.bindE);
+  var applyEff = new Prelude.Apply(function () {
+      return functorEff;
+  }, Prelude.ap(monadEff));
+  var applicativeEff = new Prelude.Applicative(function () {
+      return applyEff;
+  }, $foreign.returnE);
+  var functorEff = new Prelude.Functor(Prelude.liftA1(applicativeEff));
+  exports["functorEff"] = functorEff;
+  exports["applyEff"] = applyEff;
+  exports["applicativeEff"] = applicativeEff;
+  exports["bindEff"] = bindEff;
+  exports["monadEff"] = monadEff;
+  exports["runPure"] = $foreign.runPure;;
+ 
+})(PS["Control.Monad.Eff"] = PS["Control.Monad.Eff"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports.runFn2 = function (fn) {
+    return function (a) {
+      return function (b) {
+        return fn(a, b);
+      };
+    };
+  };
+
+  exports.runFn4 = function (fn) {
+    return function (a) {
+      return function (b) {
+        return function (c) {
+          return function (d) {
+            return fn(a, b, c, d);
+          };
+        };
+      };
+    };
+  };
+ 
+})(PS["Data.Function"] = PS["Data.Function"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Function"];
+  var Prelude = PS["Prelude"];
+  exports["runFn4"] = $foreign.runFn4;
+  exports["runFn2"] = $foreign.runFn2;;
+ 
+})(PS["Data.Function"] = PS["Data.Function"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Foldable
+
+  exports.foldrArray = function (f) {
+    return function (init) {
+      return function (xs) {
+        var acc = init;
+        var len = xs.length;
+        for (var i = len - 1; i >= 0; i--) {
+          acc = f(xs[i])(acc);
+        }
+        return acc;
+      };
+    };
+  };
+
+  exports.foldlArray = function (f) {
+    return function (init) {
+      return function (xs) {
+        var acc = init;
+        var len = xs.length;
+        for (var i = 0; i < len; i++) {
+          acc = f(acc)(xs[i]);
+        }
+        return acc;
+      };
+    };
+  };
+ 
+})(PS["Data.Foldable"] = PS["Data.Foldable"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var $times$greater = function (__dict_Apply_1) {
+      return function (a) {
+          return function (b) {
+              return Prelude["<*>"](__dict_Apply_1)(Prelude["<$>"](__dict_Apply_1["__superclass_Prelude.Functor_0"]())(Prelude["const"](Prelude.id(Prelude.categoryFn)))(a))(b);
+          };
+      };
+  };
+  exports["*>"] = $times$greater;;
+ 
+})(PS["Control.Apply"] = PS["Control.Apply"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Alternative = PS["Control.Alternative"];
+  var Control_Extend = PS["Control.Extend"];
+  var Control_MonadPlus = PS["Control.MonadPlus"];
+  var Control_Plus = PS["Control.Plus"];
+  var Data_Functor_Invariant = PS["Data.Functor.Invariant"];
+  var Data_Monoid = PS["Data.Monoid"];     
+  var Nothing = (function () {
+      function Nothing() {
+
+      };
+      Nothing.value = new Nothing();
+      return Nothing;
+  })();
+  var Just = (function () {
+      function Just(value0) {
+          this.value0 = value0;
+      };
+      Just.create = function (value0) {
+          return new Just(value0);
+      };
+      return Just;
+  })();
+  var maybe = function (b) {
+      return function (f) {
+          return function (_0) {
+              if (_0 instanceof Nothing) {
+                  return b;
+              };
+              if (_0 instanceof Just) {
+                  return f(_0.value0);
+              };
+              throw new Error("Failed pattern match at Data.Maybe line 26, column 1 - line 27, column 1: " + [ b.constructor.name, f.constructor.name, _0.constructor.name ]);
+          };
+      };
+  };                                                
+  var functorMaybe = new Prelude.Functor(function (fn) {
+      return function (_2) {
+          if (_2 instanceof Just) {
+              return new Just(fn(_2.value0));
+          };
+          return Nothing.value;
+      };
+  });
+  var applyMaybe = new Prelude.Apply(function () {
+      return functorMaybe;
+  }, function (_3) {
+      return function (x) {
+          if (_3 instanceof Just) {
+              return Prelude["<$>"](functorMaybe)(_3.value0)(x);
+          };
+          if (_3 instanceof Nothing) {
+              return Nothing.value;
+          };
+          throw new Error("Failed pattern match at Data.Maybe line 121, column 1 - line 145, column 1: " + [ _3.constructor.name, x.constructor.name ]);
+      };
+  });
+  var bindMaybe = new Prelude.Bind(function () {
+      return applyMaybe;
+  }, function (_5) {
+      return function (k) {
+          if (_5 instanceof Just) {
+              return k(_5.value0);
+          };
+          if (_5 instanceof Nothing) {
+              return Nothing.value;
+          };
+          throw new Error("Failed pattern match at Data.Maybe line 180, column 1 - line 199, column 1: " + [ _5.constructor.name, k.constructor.name ]);
+      };
+  });
+  var applicativeMaybe = new Prelude.Applicative(function () {
+      return applyMaybe;
+  }, Just.create);
+  exports["Nothing"] = Nothing;
+  exports["Just"] = Just;
+  exports["maybe"] = maybe;
+  exports["functorMaybe"] = functorMaybe;
+  exports["applyMaybe"] = applyMaybe;
+  exports["applicativeMaybe"] = applicativeMaybe;
+  exports["bindMaybe"] = bindMaybe;;
+ 
+})(PS["Data.Maybe"] = PS["Data.Maybe"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Foldable"];
+  var Prelude = PS["Prelude"];
+  var Control_Apply = PS["Control.Apply"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Maybe_First = PS["Data.Maybe.First"];
+  var Data_Maybe_Last = PS["Data.Maybe.Last"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Monoid_Additive = PS["Data.Monoid.Additive"];
+  var Data_Monoid_Dual = PS["Data.Monoid.Dual"];
+  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
+  var Data_Monoid_Conj = PS["Data.Monoid.Conj"];
+  var Data_Monoid_Multiplicative = PS["Data.Monoid.Multiplicative"];     
+  var Foldable = function (foldMap, foldl, foldr) {
+      this.foldMap = foldMap;
+      this.foldl = foldl;
+      this.foldr = foldr;
+  };
+  var foldr = function (dict) {
+      return dict.foldr;
+  };
+  var foldl = function (dict) {
+      return dict.foldl;
+  };
+  var mconcat = function (__dict_Foldable_8) {
+      return function (__dict_Monoid_9) {
+          return foldl(__dict_Foldable_8)(Prelude["<>"](__dict_Monoid_9["__superclass_Prelude.Semigroup_0"]()))(Data_Monoid.mempty(__dict_Monoid_9));
+      };
+  }; 
+  var foldableArray = new Foldable(function (__dict_Monoid_19) {
+      return function (f) {
+          return function (xs) {
+              return foldr(foldableArray)(function (x) {
+                  return function (acc) {
+                      return Prelude["<>"](__dict_Monoid_19["__superclass_Prelude.Semigroup_0"]())(f(x))(acc);
+                  };
+              })(Data_Monoid.mempty(__dict_Monoid_19))(xs);
+          };
+      };
+  }, $foreign.foldlArray, $foreign.foldrArray);
+  var foldMap = function (dict) {
+      return dict.foldMap;
+  };
+  var find = function (__dict_Foldable_25) {
+      return function (p) {
+          return foldl(__dict_Foldable_25)(function (r) {
+              return function (x) {
+                  var _96 = p(x);
+                  if (_96) {
+                      return new Data_Maybe.Just(x);
+                  };
+                  if (!_96) {
+                      return r;
+                  };
+                  throw new Error("Failed pattern match at Data.Foldable line 181, column 1 - line 182, column 1: " + [ _96.constructor.name ]);
+              };
+          })(Data_Maybe.Nothing.value);
+      };
+  };
+  exports["Foldable"] = Foldable;
+  exports["find"] = find;
+  exports["mconcat"] = mconcat;
+  exports["foldMap"] = foldMap;
+  exports["foldl"] = foldl;
+  exports["foldr"] = foldr;
+  exports["foldableArray"] = foldableArray;;
+ 
+})(PS["Data.Foldable"] = PS["Data.Foldable"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Traversable
+
+  // jshint maxparams: 3
+
+  exports.traverseArrayImpl = function () {
+    function Cont (fn) {
+      this.fn = fn;
+    }
+
+    var emptyList = {};
+
+    var ConsCell = function (head, tail) {
+      this.head = head;
+      this.tail = tail;
+    };
+
+    function consList (x) {
+      return function (xs) {
+        return new ConsCell(x, xs);
+      };
+    }
+
+    function listToArray (list) {
+      var arr = [];
+      while (list !== emptyList) {
+        arr.push(list.head);
+        list = list.tail;
+      }
+      return arr;
+    }
+
+    return function (apply) {
+      return function (map) {
+        return function (pure) {
+          return function (f) {
+            var buildFrom = function (x, ys) {
+              return apply(map(consList)(f(x)))(ys);
+            };
+
+            var go = function (acc, currentLen, xs) {
+              if (currentLen === 0) {
+                return acc;
+              } else {
+                var last = xs[currentLen - 1];
+                return new Cont(function () {
+                  return go(buildFrom(last, acc), currentLen - 1, xs);
+                });
+              }
+            };
+
+            return function (array) {
+              var result = go(pure(emptyList), array.length, array);
+              while (result instanceof Cont) {
+                result = result.fn();
+              }
+
+              return map(listToArray)(result);
+            };
+          };
+        };
+      };
+    };
+  }();
+ 
+})(PS["Data.Traversable"] = PS["Data.Traversable"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Traversable"];
+  var Prelude = PS["Prelude"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Maybe_First = PS["Data.Maybe.First"];
+  var Data_Maybe_Last = PS["Data.Maybe.Last"];
+  var Data_Monoid_Additive = PS["Data.Monoid.Additive"];
+  var Data_Monoid_Dual = PS["Data.Monoid.Dual"];
+  var Data_Monoid_Multiplicative = PS["Data.Monoid.Multiplicative"];
+  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
+  var Data_Monoid_Conj = PS["Data.Monoid.Conj"];
+  var Traversable = function (__superclass_Data$dotFoldable$dotFoldable_1, __superclass_Prelude$dotFunctor_0, sequence, traverse) {
+      this["__superclass_Data.Foldable.Foldable_1"] = __superclass_Data$dotFoldable$dotFoldable_1;
+      this["__superclass_Prelude.Functor_0"] = __superclass_Prelude$dotFunctor_0;
+      this.sequence = sequence;
+      this.traverse = traverse;
+  };
+  var traverse = function (dict) {
+      return dict.traverse;
+  }; 
+  var traversableArray = new Traversable(function () {
+      return Data_Foldable.foldableArray;
+  }, function () {
+      return Prelude.functorArray;
+  }, function (__dict_Applicative_11) {
+      return traverse(traversableArray)(__dict_Applicative_11)(Prelude.id(Prelude.categoryFn));
+  }, function (__dict_Applicative_10) {
+      return $foreign.traverseArrayImpl(Prelude.apply(__dict_Applicative_10["__superclass_Prelude.Apply_0"]()))(Prelude.map((__dict_Applicative_10["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]()))(Prelude.pure(__dict_Applicative_10));
+  });
+  var sequence = function (dict) {
+      return dict.sequence;
+  }; 
+  var $$for = function (__dict_Applicative_22) {
+      return function (__dict_Traversable_23) {
+          return function (x) {
+              return function (f) {
+                  return traverse(__dict_Traversable_23)(__dict_Applicative_22)(f)(x);
+              };
+          };
+      };
+  };
+  exports["Traversable"] = Traversable;
+  exports["for"] = $$for;
+  exports["sequence"] = sequence;
+  exports["traverse"] = traverse;
+  exports["traversableArray"] = traversableArray;;
+ 
+})(PS["Data.Traversable"] = PS["Data.Traversable"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Extend = PS["Control.Extend"];
+  var Data_Bifoldable = PS["Data.Bifoldable"];
+  var Data_Bifunctor = PS["Data.Bifunctor"];
+  var Data_Bitraversable = PS["Data.Bitraversable"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Traversable = PS["Data.Traversable"];     
+  var Left = (function () {
+      function Left(value0) {
+          this.value0 = value0;
+      };
+      Left.create = function (value0) {
+          return new Left(value0);
+      };
+      return Left;
+  })();
+  var Right = (function () {
+      function Right(value0) {
+          this.value0 = value0;
+      };
+      Right.create = function (value0) {
+          return new Right(value0);
+      };
+      return Right;
+  })();
+  var functorEither = new Prelude.Functor(function (f) {
+      return function (_2) {
+          if (_2 instanceof Left) {
+              return new Left(_2.value0);
+          };
+          if (_2 instanceof Right) {
+              return new Right(f(_2.value0));
+          };
+          throw new Error("Failed pattern match at Data.Either line 52, column 1 - line 56, column 1: " + [ f.constructor.name, _2.constructor.name ]);
+      };
+  });
+  var either = function (f) {
+      return function (g) {
+          return function (_1) {
+              if (_1 instanceof Left) {
+                  return f(_1.value0);
+              };
+              if (_1 instanceof Right) {
+                  return g(_1.value0);
+              };
+              throw new Error("Failed pattern match at Data.Either line 28, column 1 - line 29, column 1: " + [ f.constructor.name, g.constructor.name, _1.constructor.name ]);
+          };
+      };
+  }; 
+  var applyEither = new Prelude.Apply(function () {
+      return functorEither;
+  }, function (_4) {
+      return function (r) {
+          if (_4 instanceof Left) {
+              return new Left(_4.value0);
+          };
+          if (_4 instanceof Right) {
+              return Prelude["<$>"](functorEither)(_4.value0)(r);
+          };
+          throw new Error("Failed pattern match at Data.Either line 92, column 1 - line 116, column 1: " + [ _4.constructor.name, r.constructor.name ]);
+      };
+  });
+  var bindEither = new Prelude.Bind(function () {
+      return applyEither;
+  }, either(function (e) {
+      return function (_0) {
+          return new Left(e);
+      };
+  })(function (a) {
+      return function (f) {
+          return f(a);
+      };
+  }));
+  var applicativeEither = new Prelude.Applicative(function () {
+      return applyEither;
+  }, Right.create);
+  exports["Left"] = Left;
+  exports["Right"] = Right;
+  exports["either"] = either;
+  exports["functorEither"] = functorEither;
+  exports["applyEither"] = applyEither;
+  exports["applicativeEither"] = applicativeEither;
+  exports["bindEither"] = bindEither;;
+ 
+})(PS["Data.Either"] = PS["Data.Either"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Foreign
+
+  // jshint maxparams: 3
+  exports.parseJSONImpl = function (left, right, str) {
+    try {
+      return right(JSON.parse(str));
+    } catch (e) {
+      return left(e.toString());
+    }
+  };
+
+  // jshint maxparams: 1
+  exports.toForeign = function (value) {
+    return value;
+  };
+
+  exports.unsafeFromForeign = function (value) {
+    return value;
+  };
+
+  exports.typeOf = function (value) {
+    return typeof value;
+  };
+
+  exports.tagOf = function (value) {
+    return Object.prototype.toString.call(value).slice(8, -1);
+  };
+
+  exports.isNull = function (value) {
+    return value === null;
+  };
+
+  exports.isUndefined = function (value) {
+    return value === undefined;
+  };
+ 
+})(PS["Data.Foreign"] = PS["Data.Foreign"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Int
+
+  exports.fromNumberImpl = function (just) {
+    return function (nothing) {
+      return function (n) {
+        /* jshint bitwise: false */
+        return (n | 0) === n ? just(n) : nothing;
+      };
+    };
+  };
+
+  exports.toNumber = function (n) {
+    return n;
+  };
+ 
+})(PS["Data.Int"] = PS["Data.Int"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Int"];
+  var Prelude = PS["Prelude"];
+  var Data_Int_Bits = PS["Data.Int.Bits"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Maybe_Unsafe = PS["Data.Maybe.Unsafe"];
+  var $$Math = PS["Math"];                                                                   
+  var fromNumber = $foreign.fromNumberImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
+  exports["fromNumber"] = fromNumber;
+  exports["toNumber"] = $foreign.toNumber;;
+ 
+})(PS["Data.Int"] = PS["Data.Int"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Foreign"];
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Int = PS["Data.Int"];
+  var Data_String = PS["Data.String"];     
+  var TypeMismatch = (function () {
+      function TypeMismatch(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      TypeMismatch.create = function (value0) {
+          return function (value1) {
+              return new TypeMismatch(value0, value1);
+          };
+      };
+      return TypeMismatch;
+  })();
+  var ErrorAtIndex = (function () {
+      function ErrorAtIndex(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      ErrorAtIndex.create = function (value0) {
+          return function (value1) {
+              return new ErrorAtIndex(value0, value1);
+          };
+      };
+      return ErrorAtIndex;
+  })();
+  var ErrorAtProperty = (function () {
+      function ErrorAtProperty(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      ErrorAtProperty.create = function (value0) {
+          return function (value1) {
+              return new ErrorAtProperty(value0, value1);
+          };
+      };
+      return ErrorAtProperty;
+  })();
+  var JSONError = (function () {
+      function JSONError(value0) {
+          this.value0 = value0;
+      };
+      JSONError.create = function (value0) {
+          return new JSONError(value0);
+      };
+      return JSONError;
+  })();
+  var unsafeReadTagged = function (tag) {
+      return function (value) {
+          if (Prelude["=="](Prelude.eqString)($foreign.tagOf(value))(tag)) {
+              return Prelude.pure(Data_Either.applicativeEither)($foreign.unsafeFromForeign(value));
+          };
+          return new Data_Either.Left(new TypeMismatch(tag, $foreign.tagOf(value)));
+      };
+  };
+  var showForeignError = new Prelude.Show(function (_0) {
+      if (_0 instanceof TypeMismatch) {
+          return "Type mismatch: expected " + (_0.value0 + (", found " + _0.value1));
+      };
+      if (_0 instanceof ErrorAtIndex) {
+          return "Error at array index " + (Prelude.show(Prelude.showInt)(_0.value0) + (": " + Prelude.show(showForeignError)(_0.value1)));
+      };
+      if (_0 instanceof ErrorAtProperty) {
+          return "Error at property " + (Prelude.show(Prelude.showString)(_0.value0) + (": " + Prelude.show(showForeignError)(_0.value1)));
+      };
+      if (_0 instanceof JSONError) {
+          return "JSON error: " + _0.value0;
+      };
+      throw new Error("Failed pattern match: " + [ _0.constructor.name ]);
+  });
+  var readString = unsafeReadTagged("String");
+  var parseJSON = function (json) {
+      return $foreign.parseJSONImpl(function (_32) {
+          return Data_Either.Left.create(JSONError.create(_32));
+      }, Data_Either.Right.create, json);
+  };
+  exports["TypeMismatch"] = TypeMismatch;
+  exports["ErrorAtIndex"] = ErrorAtIndex;
+  exports["ErrorAtProperty"] = ErrorAtProperty;
+  exports["JSONError"] = JSONError;
+  exports["readString"] = readString;
+  exports["unsafeReadTagged"] = unsafeReadTagged;
+  exports["parseJSON"] = parseJSON;
+  exports["showForeignError"] = showForeignError;
+  exports["isUndefined"] = $foreign.isUndefined;
+  exports["isNull"] = $foreign.isNull;
+  exports["typeOf"] = $foreign.typeOf;
+  exports["toForeign"] = $foreign.toForeign;;
+ 
+})(PS["Data.Foreign"] = PS["Data.Foreign"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  //------------------------------------------------------------------------------
+  // Array size ------------------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports.length = function (xs) {
+    return xs.length;
+  };
+
+  exports.snoc = function (l) {
+    return function (e) {
+      var l1 = l.slice();
+      l1.push(e);
+      return l1;
+    };
+  };
+
+  //------------------------------------------------------------------------------
+  // Non-indexed reads -----------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports["uncons'"] = function (empty) {
+    return function (next) {
+      return function (xs) {
+        return xs.length === 0 ? empty({}) : next(xs[0])(xs.slice(1));
+      };
+    };
+  };
+
+  //------------------------------------------------------------------------------
+  // Indexed operations ----------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports.indexImpl = function (just) {
+    return function (nothing) {
+      return function (xs) {
+        return function (i) {
+          return i < 0 || i >= xs.length ? nothing :  just(xs[i]);
+        };
+      };
+    };
+  };
+
+  exports._updateAt = function (just) {
+    return function (nothing) {
+      return function (i) {
+        return function (a) {
+          return function (l) {
+            if (i < 0 || i >= l.length) return nothing;
+            var l1 = l.slice();
+            l1[i] = a;
+            return just(l1);
+          };
+        };
+      };
+    };
+  };
+
+  //------------------------------------------------------------------------------
+  // Subarrays -------------------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports.slice = function (s) {
+    return function (e) {
+      return function (l) {
+        return l.slice(s, e);
+      };
+    };
+  };
+
+  //------------------------------------------------------------------------------
+  // Zipping ---------------------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports.zipWith = function (f) {
+    return function (xs) {
+      return function (ys) {
+        var l = xs.length < ys.length ? xs.length : ys.length;
+        var result = new Array(l);
+        for (var i = 0; i < l; i++) {
+          result[i] = f(xs[i])(ys[i]);
+        }
+        return result;
+      };
+    };
+  };
+ 
+})(PS["Data.Array"] = PS["Data.Array"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Control_Biapplicative = PS["Control.Biapplicative"];
+  var Control_Biapply = PS["Control.Biapply"];
+  var Control_Comonad = PS["Control.Comonad"];
+  var Control_Extend = PS["Control.Extend"];
+  var Control_Lazy = PS["Control.Lazy"];
+  var Data_Bifoldable = PS["Data.Bifoldable"];
+  var Data_Bifunctor = PS["Data.Bifunctor"];
+  var Data_Bitraversable = PS["Data.Bitraversable"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Functor_Invariant = PS["Data.Functor.Invariant"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Maybe_First = PS["Data.Maybe.First"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Traversable = PS["Data.Traversable"];     
+  var Tuple = (function () {
+      function Tuple(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Tuple.create = function (value0) {
+          return function (value1) {
+              return new Tuple(value0, value1);
+          };
+      };
+      return Tuple;
+  })();
+  var functorTuple = new Prelude.Functor(function (f) {
+      return function (_31) {
+          return new Tuple(_31.value0, f(_31.value1));
+      };
+  });                                                                                                   
+  var fst = function (_3) {
+      return _3.value0;
+  };
+  exports["Tuple"] = Tuple;
+  exports["fst"] = fst;
+  exports["functorTuple"] = functorTuple;;
+ 
+})(PS["Data.Tuple"] = PS["Data.Tuple"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Array"];
+  var Prelude = PS["Prelude"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Alternative = PS["Control.Alternative"];
+  var Control_Lazy = PS["Control.Lazy"];
+  var Control_MonadPlus = PS["Control.MonadPlus"];
+  var Control_Plus = PS["Control.Plus"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Functor_Invariant = PS["Data.Functor.Invariant"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Maybe_Unsafe = PS["Data.Maybe.Unsafe"];
+  var zipWithA = function (__dict_Applicative_0) {
+      return function (f) {
+          return function (xs) {
+              return function (ys) {
+                  return Data_Traversable.sequence(Data_Traversable.traversableArray)(__dict_Applicative_0)($foreign.zipWith(f)(xs)(ys));
+              };
+          };
+      };
+  };                                                  
+  var updateAt = $foreign._updateAt(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
+  var index = $foreign.indexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
+  var $bang$bang = index;
+  var foldM = function (__dict_Monad_10) {
+      return function (f) {
+          return function (a) {
+              return $foreign["uncons'"](function (_11) {
+                  return Prelude["return"](__dict_Monad_10["__superclass_Prelude.Applicative_0"]())(a);
+              })(function (b) {
+                  return function (bs) {
+                      return Prelude[">>="](__dict_Monad_10["__superclass_Prelude.Bind_1"]())(f(a)(b))(function (a$prime) {
+                          return foldM(__dict_Monad_10)(f)(a$prime)(bs);
+                      });
+                  };
+              });
+          };
+      };
+  };
+  exports["foldM"] = foldM;
+  exports["zipWithA"] = zipWithA;
+  exports["updateAt"] = updateAt;
+  exports["index"] = index;
+  exports["!!"] = $bang$bang;
+  exports["snoc"] = $foreign.snoc;;
+ 
+})(PS["Data.Array"] = PS["Data.Array"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Foreign.Index
+
+  // jshint maxparams: 4
+  exports.unsafeReadPropImpl = function (f, s, key, value) {
+    return value == null ? f : s(value[key]);
+  };
+
+  // jshint maxparams: 2
+  exports.unsafeHasOwnProperty = function (prop, value) {
+    return Object.prototype.hasOwnProperty.call(value, prop);
+  };
+
+  exports.unsafeHasProperty = function (prop, value) {
+    return prop in value;
+  };
+ 
+})(PS["Data.Foreign.Index"] = PS["Data.Foreign.Index"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Foreign.Index"];
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Int = PS["Data.Int"];     
+  var Index = function (errorAt, hasOwnProperty, hasProperty, ix) {
+      this.errorAt = errorAt;
+      this.hasOwnProperty = hasOwnProperty;
+      this.hasProperty = hasProperty;
+      this.ix = ix;
+  };
+  var unsafeReadProp = function (k) {
+      return function (value) {
+          return $foreign.unsafeReadPropImpl(new Data_Either.Left(new Data_Foreign.TypeMismatch("object", Data_Foreign.typeOf(value))), Prelude.pure(Data_Either.applicativeEither), k, value);
+      };
+  };
+  var prop = unsafeReadProp;
+  var ix = function (dict) {
+      return dict.ix;
+  };
+  var $bang = function (__dict_Index_0) {
+      return ix(__dict_Index_0);
+  };                         
+  var hasPropertyImpl = function (p) {
+      return function (value) {
+          if (Data_Foreign.isNull(value)) {
+              return false;
+          };
+          if (Data_Foreign.isUndefined(value)) {
+              return false;
+          };
+          if (Prelude["=="](Prelude.eqString)(Data_Foreign.typeOf(value))("object") || Prelude["=="](Prelude.eqString)(Data_Foreign.typeOf(value))("function")) {
+              return $foreign.unsafeHasProperty(p, value);
+          };
+          return false;
+      };
+  };
+  var hasProperty = function (dict) {
+      return dict.hasProperty;
+  };
+  var hasOwnPropertyImpl = function (p) {
+      return function (value) {
+          if (Data_Foreign.isNull(value)) {
+              return false;
+          };
+          if (Data_Foreign.isUndefined(value)) {
+              return false;
+          };
+          if (Prelude["=="](Prelude.eqString)(Data_Foreign.typeOf(value))("object") || Prelude["=="](Prelude.eqString)(Data_Foreign.typeOf(value))("function")) {
+              return $foreign.unsafeHasOwnProperty(p, value);
+          };
+          return false;
+      };
+  };                                                                                                                   
+  var indexString = new Index(Data_Foreign.ErrorAtProperty.create, hasOwnPropertyImpl, hasPropertyImpl, Prelude.flip(prop));
+  var hasOwnProperty = function (dict) {
+      return dict.hasOwnProperty;
+  };
+  var errorAt = function (dict) {
+      return dict.errorAt;
+  };
+  exports["Index"] = Index;
+  exports["errorAt"] = errorAt;
+  exports["hasOwnProperty"] = hasOwnProperty;
+  exports["hasProperty"] = hasProperty;
+  exports["!"] = $bang;
+  exports["ix"] = ix;
+  exports["prop"] = prop;
+  exports["indexString"] = indexString;;
+ 
+})(PS["Data.Foreign.Index"] = PS["Data.Foreign.Index"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Array = PS["Data.Array"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Index = PS["Data.Foreign.Index"];
+  var Data_Foreign_Null = PS["Data.Foreign.Null"];
+  var Data_Foreign_NullOrUndefined = PS["Data.Foreign.NullOrUndefined"];
+  var Data_Foreign_Undefined = PS["Data.Foreign.Undefined"];
+  var Data_Int = PS["Data.Int"];
+  var Data_Traversable = PS["Data.Traversable"];     
+  var IsForeign = function (read) {
+      this.read = read;
+  };
+  var stringIsForeign = new IsForeign(Data_Foreign.readString);
+  var read = function (dict) {
+      return dict.read;
+  };
+  var readWith = function (__dict_IsForeign_1) {
+      return function (f) {
+          return function (value) {
+              return Data_Either.either(function (_0) {
+                  return Data_Either.Left.create(f(_0));
+              })(Data_Either.Right.create)(read(__dict_IsForeign_1)(value));
+          };
+      };
+  };
+  var readProp = function (__dict_IsForeign_2) {
+      return function (__dict_Index_3) {
+          return function (prop) {
+              return function (value) {
+                  return Prelude[">>="](Data_Either.bindEither)(Data_Foreign_Index["!"](__dict_Index_3)(value)(prop))(readWith(__dict_IsForeign_2)(Data_Foreign_Index.errorAt(__dict_Index_3)(prop)));
+              };
+          };
+      };
+  };
+  exports["IsForeign"] = IsForeign;
+  exports["readProp"] = readProp;
+  exports["readWith"] = readWith;
+  exports["read"] = read;
+  exports["stringIsForeign"] = stringIsForeign;;
+ 
+})(PS["Data.Foreign.Class"] = PS["Data.Foreign.Class"] || {});
+(function(exports) {
+  "use strict";
+
+  // module Unsafe.Coerce
+
+  exports.unsafeCoerce = function(x) { return x; }
+ 
+})(PS["Unsafe.Coerce"] = PS["Unsafe.Coerce"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Unsafe.Coerce"];
+  exports["unsafeCoerce"] = $foreign.unsafeCoerce;;
+ 
+})(PS["Unsafe.Coerce"] = PS["Unsafe.Coerce"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.HTML.Types"];
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var DOM_Event_Types = PS["DOM.Event.Types"];
+  var DOM_Node_Types = PS["DOM.Node.Types"];
+  var Unsafe_Coerce = PS["Unsafe.Coerce"];     
+  var windowToEventTarget = Unsafe_Coerce.unsafeCoerce;                  
+  var htmlElementToNode = Unsafe_Coerce.unsafeCoerce;
+  exports["htmlElementToNode"] = htmlElementToNode;
+  exports["windowToEventTarget"] = windowToEventTarget;;
+ 
+})(PS["DOM.HTML.Types"] = PS["DOM.HTML.Types"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Nullable
+
+  exports["null"] = null;
+
+  exports.nullable = function(a, r, f) {
+      return a == null ? r : f(a);
+  };
+
+  exports.notNull = function(x) {
+      return x;
+  }; 
+ 
+})(PS["Data.Nullable"] = PS["Data.Nullable"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Nullable"];
+  var Prelude = PS["Prelude"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Function = PS["Data.Function"];     
+  var toNullable = Data_Maybe.maybe($foreign["null"])($foreign.notNull);
+  var toMaybe = function (n) {
+      return $foreign.nullable(n, Data_Maybe.Nothing.value, Data_Maybe.Just.create);
+  };
+  exports["toNullable"] = toNullable;
+  exports["toMaybe"] = toMaybe;;
+ 
+})(PS["Data.Nullable"] = PS["Data.Nullable"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["OpticUI.Internal.VirtualDOM"];
+  var Prelude = PS["Prelude"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Function = PS["Data.Function"];
+  var DOM = PS["DOM"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  var Data_Nullable = PS["Data.Nullable"];     
+  var semigroupProps = new Prelude.Semigroup(Data_Function.runFn2($foreign.concatProps));
+  var monoidProps = new Data_Monoid.Monoid(function () {
+      return semigroupProps;
+  }, $foreign.emptyProps);
+  exports["semigroupProps"] = semigroupProps;
+  exports["monoidProps"] = monoidProps;
+  exports["finalizer"] = $foreign.finalizer;
+  exports["initializer"] = $foreign.initializer;
+  exports["handlerProp"] = $foreign.handlerProp;
+  exports["attrProp"] = $foreign.attrProp;
+  exports["prop"] = $foreign.prop;
+  exports["vnode"] = $foreign.vnode;
+  exports["vtext"] = $foreign.vtext;
+  exports["patch"] = $foreign.patch;
+  exports["diff"] = $foreign.diff;
+  exports["createElement"] = $foreign.createElement;;
+ 
+})(PS["OpticUI.Internal.VirtualDOM"] = PS["OpticUI.Internal.VirtualDOM"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.Exists
+
+  exports.mkExists = function (fa) {
+    return fa;
+  };
+
+  exports.runExists = function (f) {
+    return function (fa) {
+      return f(fa);
+    };
+  };
+ 
+})(PS["Data.Exists"] = PS["Data.Exists"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Exists"];
+  var Prelude = PS["Prelude"];
+  exports["runExists"] = $foreign.runExists;
+  exports["mkExists"] = $foreign.mkExists;;
+ 
+})(PS["Data.Exists"] = PS["Data.Exists"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Exists = PS["Data.Exists"];
+  var OpticUI_Internal_VirtualDOM = PS["OpticUI.Internal.VirtualDOM"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Nullable = PS["Data.Nullable"];
+  var Data_Function = PS["Data.Function"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  var Control_Monad_Writer_Trans = PS["Control.Monad.Writer.Trans"];
+  var Unsafe_Coerce = PS["Unsafe.Coerce"];     
+  var PropE = (function () {
+      function PropE(value0) {
+          this.value0 = value0;
+      };
+      PropE.create = function (value0) {
+          return new PropE(value0);
+      };
+      return PropE;
+  })();
+  var AttrP = (function () {
+      function AttrP(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      AttrP.create = function (value0) {
+          return function (value1) {
+              return new AttrP(value0, value1);
+          };
+      };
+      return AttrP;
+  })();
+  var PropP = (function () {
+      function PropP(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      PropP.create = function (value0) {
+          return function (value1) {
+              return new PropP(value0, value1);
+          };
+      };
+      return PropP;
+  })();
+  var HandlerP = (function () {
+      function HandlerP(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      HandlerP.create = function (value0) {
+          return function (value1) {
+              return new HandlerP(value0, value1);
+          };
+      };
+      return HandlerP;
+  })();
+  var InitializerP = (function () {
+      function InitializerP(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      InitializerP.create = function (value0) {
+          return function (value1) {
+              return new InitializerP(value0, value1);
+          };
+      };
+      return InitializerP;
+  })();
+  var FinalizerP = (function () {
+      function FinalizerP(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      FinalizerP.create = function (value0) {
+          return function (value1) {
+              return new FinalizerP(value0, value1);
+          };
+      };
+      return FinalizerP;
+  })();
+  var Text = (function () {
+      function Text(value0) {
+          this.value0 = value0;
+      };
+      Text.create = function (value0) {
+          return new Text(value0);
+      };
+      return Text;
+  })();
+  var Element = (function () {
+      function Element(value0, value1, value2, value3) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+          this.value3 = value3;
+      };
+      Element.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return function (value3) {
+                      return new Element(value0, value1, value2, value3);
+                  };
+              };
+          };
+      };
+      return Element;
+  })();
+  var Markup = (function () {
+      function Markup(value0) {
+          this.value0 = value0;
+      };
+      Markup.create = function (value0) {
+          return new Markup(value0);
+      };
+      return Markup;
+  })();
+  var text = function (t) {
+      return new Markup([ new Text(t) ]);
+  };
+  var runInitializer = function (f) {
+      return function (init) {
+          return f(Unsafe_Coerce.unsafeCoerce(init));
+      };
+  };
+  var runFinalizer = function (f) {
+      return function (i) {
+          return f(Unsafe_Coerce.unsafeCoerce(i));
+      };
+  };
+  var runEventHandler = function (f) {
+      return function (h) {
+          return f(Unsafe_Coerce.unsafeCoerce(h));
+      };
+  };
+  var prop = function (n) {
+      return function (v) {
+          return new PropP(n, Data_Exists.mkExists(new PropE(v)));
+      };
+  };                                           
+  var mkEventHandler = Unsafe_Coerce.unsafeCoerce;
+  var markupSemigroup = new Prelude.Semigroup(function (_0) {
+      return function (_1) {
+          return new Markup(Prelude["++"](Prelude.semigroupArray)(_0.value0)(_1.value0));
+      };
+  });
+  var markupMonoid = new Data_Monoid.Monoid(function () {
+      return markupSemigroup;
+  }, new Markup([  ]));
+  var handle = function (n) {
+      return function (f) {
+          return new HandlerP(n, mkEventHandler(f));
+      };
+  };
+  var element = function (ns) {
+      return function (tag) {
+          return function (props) {
+              return function (childs) {
+                  return new Markup([ new Element(ns, tag, props, childs) ]);
+              };
+          };
+      };
+  };
+  var attr = function (n) {
+      return function (v) {
+          return new AttrP(n, v);
+      };
+  };
+  exports["PropE"] = PropE;
+  exports["AttrP"] = AttrP;
+  exports["PropP"] = PropP;
+  exports["HandlerP"] = HandlerP;
+  exports["InitializerP"] = InitializerP;
+  exports["FinalizerP"] = FinalizerP;
+  exports["Text"] = Text;
+  exports["Element"] = Element;
+  exports["Markup"] = Markup;
+  exports["runFinalizer"] = runFinalizer;
+  exports["runInitializer"] = runInitializer;
+  exports["runEventHandler"] = runEventHandler;
+  exports["mkEventHandler"] = mkEventHandler;
+  exports["handle"] = handle;
+  exports["prop"] = prop;
+  exports["attr"] = attr;
+  exports["text"] = text;
+  exports["element"] = element;
+  exports["markupSemigroup"] = markupSemigroup;
+  exports["markupMonoid"] = markupMonoid;;
+ 
+})(PS["OpticUI.Markup"] = PS["OpticUI.Markup"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];     
+  var Profunctor = function (dimap) {
+      this.dimap = dimap;
+  };
+  var profunctorFn = new Profunctor(function (a2b) {
+      return function (c2d) {
+          return function (b2c) {
+              return Prelude[">>>"](Prelude.semigroupoidFn)(a2b)(Prelude[">>>"](Prelude.semigroupoidFn)(b2c)(c2d));
+          };
+      };
+  });
+  var dimap = function (dict) {
+      return dict.dimap;
+  };
+  var rmap = function (__dict_Profunctor_1) {
+      return function (b2c) {
+          return dimap(__dict_Profunctor_1)(Prelude.id(Prelude.categoryFn))(b2c);
+      };
+  };
+  exports["Profunctor"] = Profunctor;
+  exports["rmap"] = rmap;
+  exports["dimap"] = dimap;
+  exports["profunctorFn"] = profunctorFn;;
+ 
+})(PS["Data.Profunctor"] = PS["Data.Profunctor"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Profunctor = PS["Data.Profunctor"];     
+  var Choice = function (__superclass_Data$dotProfunctor$dotProfunctor_0, left, right) {
+      this["__superclass_Data.Profunctor.Profunctor_0"] = __superclass_Data$dotProfunctor$dotProfunctor_0;
+      this.left = left;
+      this.right = right;
+  };
+  var right = function (dict) {
+      return dict.right;
+  };
+  var left = function (dict) {
+      return dict.left;
+  };
+  var choiceFn = new Choice(function () {
+      return Data_Profunctor.profunctorFn;
+  }, function (a2b) {
+      return function (_0) {
+          if (_0 instanceof Data_Either.Left) {
+              return Data_Either.Left.create(a2b(_0.value0));
+          };
+          if (_0 instanceof Data_Either.Right) {
+              return new Data_Either.Right(_0.value0);
+          };
+          throw new Error("Failed pattern match at Data.Profunctor.Choice line 17, column 1 - line 22, column 1: " + [ a2b.constructor.name, _0.constructor.name ]);
+      };
+  }, Prelude["<$>"](Data_Either.functorEither));
+  exports["Choice"] = Choice;
+  exports["right"] = right;
+  exports["left"] = left;
+  exports["choiceFn"] = choiceFn;;
+ 
+})(PS["Data.Profunctor.Choice"] = PS["Data.Profunctor.Choice"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Profunctor = PS["Data.Profunctor"];
+  var Data_Tuple = PS["Data.Tuple"];     
+  var Strong = function (__superclass_Data$dotProfunctor$dotProfunctor_0, first, second) {
+      this["__superclass_Data.Profunctor.Profunctor_0"] = __superclass_Data$dotProfunctor$dotProfunctor_0;
+      this.first = first;
+      this.second = second;
+  };
+  var strongFn = new Strong(function () {
+      return Data_Profunctor.profunctorFn;
+  }, function (a2b) {
+      return function (_0) {
+          return new Data_Tuple.Tuple(a2b(_0.value0), _0.value1);
+      };
+  }, Prelude["<$>"](Data_Tuple.functorTuple));
+  var second = function (dict) {
+      return dict.second;
+  };
+  var first = function (dict) {
+      return dict.first;
+  };
+  exports["Strong"] = Strong;
+  exports["second"] = second;
+  exports["first"] = first;
+  exports["strongFn"] = strongFn;;
+ 
+})(PS["Data.Profunctor.Strong"] = PS["Data.Profunctor.Strong"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Control_Comonad = PS["Control.Comonad"];
+  var Control_Extend = PS["Control.Extend"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Functor_Invariant = PS["Data.Functor.Invariant"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Traversable = PS["Data.Traversable"];     
+  var Identity = function (x) {
+      return x;
+  };
+  var runIdentity = function (_0) {
+      return _0;
+  };
+  var functorIdentity = new Prelude.Functor(function (f) {
+      return function (_23) {
+          return f(_23);
+      };
+  });
+  var applyIdentity = new Prelude.Apply(function () {
+      return functorIdentity;
+  }, function (_24) {
+      return function (_25) {
+          return _24(_25);
+      };
+  });
+  var bindIdentity = new Prelude.Bind(function () {
+      return applyIdentity;
+  }, function (_26) {
+      return function (f) {
+          return f(_26);
+      };
+  });
+  var applicativeIdentity = new Prelude.Applicative(function () {
+      return applyIdentity;
+  }, Identity);
+  var monadIdentity = new Prelude.Monad(function () {
+      return applicativeIdentity;
+  }, function () {
+      return bindIdentity;
+  });
+  exports["Identity"] = Identity;
+  exports["runIdentity"] = runIdentity;
+  exports["functorIdentity"] = functorIdentity;
+  exports["applyIdentity"] = applyIdentity;
+  exports["applicativeIdentity"] = applicativeIdentity;
+  exports["bindIdentity"] = bindIdentity;
+  exports["monadIdentity"] = monadIdentity;;
+ 
+})(PS["Data.Identity"] = PS["Data.Identity"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Tuple = PS["Data.Tuple"];     
+  var MonadState = function (__superclass_Prelude$dotMonad_0, state) {
+      this["__superclass_Prelude.Monad_0"] = __superclass_Prelude$dotMonad_0;
+      this.state = state;
+  };
+  var state = function (dict) {
+      return dict.state;
+  };
+  var modify = function (__dict_MonadState_1) {
+      return function (f) {
+          return state(__dict_MonadState_1)(function (s) {
+              return new Data_Tuple.Tuple(Prelude.unit, f(s));
+          });
+      };
+  };
+  var gets = function (__dict_MonadState_2) {
+      return function (f) {
+          return state(__dict_MonadState_2)(function (s) {
+              return new Data_Tuple.Tuple(f(s), s);
+          });
+      };
+  };
+  exports["MonadState"] = MonadState;
+  exports["modify"] = modify;
+  exports["gets"] = gets;
+  exports["state"] = state;;
+ 
+})(PS["Control.Monad.State.Class"] = PS["Control.Monad.State.Class"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];     
+  var MonadError = function (__superclass_Prelude$dotMonad_0, catchError, throwError) {
+      this["__superclass_Prelude.Monad_0"] = __superclass_Prelude$dotMonad_0;
+      this.catchError = catchError;
+      this.throwError = throwError;
+  };
+  var throwError = function (dict) {
+      return dict.throwError;
+  };                          
+  var catchError = function (dict) {
+      return dict.catchError;
+  };
+  exports["MonadError"] = MonadError;
+  exports["catchError"] = catchError;
+  exports["throwError"] = throwError;;
+ 
+})(PS["Control.Monad.Error.Class"] = PS["Control.Monad.Error.Class"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Either = PS["Data.Either"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Alternative = PS["Control.Alternative"];
+  var Control_Lazy = PS["Control.Lazy"];
+  var Control_Monad_Rec_Class = PS["Control.Monad.Rec.Class"];
+  var Control_Monad_Eff_Class = PS["Control.Monad.Eff.Class"];
+  var Control_Monad_Cont_Class = PS["Control.Monad.Cont.Class"];
+  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
+  var Control_Monad_Reader_Class = PS["Control.Monad.Reader.Class"];
+  var Control_Monad_Writer_Class = PS["Control.Monad.Writer.Class"];
+  var Control_Monad_State_Class = PS["Control.Monad.State.Class"];
+  var Control_Monad_Trans = PS["Control.Monad.Trans"];
+  var Control_MonadPlus = PS["Control.MonadPlus"];
+  var Control_Plus = PS["Control.Plus"];     
+  var StateT = function (x) {
+      return x;
+  };
+  var runStateT = function (_6) {
+      return _6;
+  };
+  var monadStateT = function (__dict_Monad_5) {
+      return new Prelude.Monad(function () {
+          return applicativeStateT(__dict_Monad_5);
+      }, function () {
+          return bindStateT(__dict_Monad_5);
+      });
+  };
+  var functorStateT = function (__dict_Monad_14) {
+      return new Prelude.Functor(Prelude.liftM1(monadStateT(__dict_Monad_14)));
+  };
+  var bindStateT = function (__dict_Monad_17) {
+      return new Prelude.Bind(function () {
+          return applyStateT(__dict_Monad_17);
+      }, function (_7) {
+          return function (f) {
+              return function (s) {
+                  return Prelude.bind(__dict_Monad_17["__superclass_Prelude.Bind_1"]())(_7(s))(function (_0) {
+                      return runStateT(f(_0.value0))(_0.value1);
+                  });
+              };
+          };
+      });
+  };
+  var applyStateT = function (__dict_Monad_18) {
+      return new Prelude.Apply(function () {
+          return functorStateT(__dict_Monad_18);
+      }, Prelude.ap(monadStateT(__dict_Monad_18)));
+  };
+  var applicativeStateT = function (__dict_Monad_19) {
+      return new Prelude.Applicative(function () {
+          return applyStateT(__dict_Monad_19);
+      }, function (a) {
+          return StateT(function (s) {
+              return Prelude["return"](__dict_Monad_19["__superclass_Prelude.Applicative_0"]())(new Data_Tuple.Tuple(a, s));
+          });
+      });
+  };
+  var monadStateStateT = function (__dict_Monad_6) {
+      return new Control_Monad_State_Class.MonadState(function () {
+          return monadStateT(__dict_Monad_6);
+      }, function (f) {
+          return StateT(function (_39) {
+              return Prelude["return"](__dict_Monad_6["__superclass_Prelude.Applicative_0"]())(f(_39));
+          });
+      });
+  };
+  exports["StateT"] = StateT;
+  exports["runStateT"] = runStateT;
+  exports["functorStateT"] = functorStateT;
+  exports["applyStateT"] = applyStateT;
+  exports["applicativeStateT"] = applicativeStateT;
+  exports["bindStateT"] = bindStateT;
+  exports["monadStateT"] = monadStateT;
+  exports["monadStateStateT"] = monadStateStateT;;
+ 
+})(PS["Control.Monad.State.Trans"] = PS["Control.Monad.State.Trans"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Identity = PS["Data.Identity"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Control_Monad_State_Class = PS["Control.Monad.State.Class"];
+  var Control_Monad_State_Trans = PS["Control.Monad.State.Trans"];
+  var runState = function (s) {
+      return function (_0) {
+          return Data_Identity.runIdentity(Control_Monad_State_Trans.runStateT(s)(_0));
+      };
+  };
+  var evalState = function (m) {
+      return function (s) {
+          return Data_Tuple.fst(runState(m)(s));
+      };
+  };
+  exports["evalState"] = evalState;
+  exports["runState"] = runState;;
+ 
+})(PS["Control.Monad.State"] = PS["Control.Monad.State"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Profunctor = PS["Data.Profunctor"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];     
+  var Star = function (x) {
+      return x;
+  };
+  var runStar = function (_3) {
+      return _3;
+  };
+  var profunctorStar = function (__dict_Functor_1) {
+      return new Data_Profunctor.Profunctor(function (f) {
+          return function (g) {
+              return function (_4) {
+                  return Prelude[">>>"](Prelude.semigroupoidFn)(f)(Prelude[">>>"](Prelude.semigroupoidFn)(_4)(Prelude.map(__dict_Functor_1)(g)));
+              };
+          };
+      });
+  };
+  var strongStar = function (__dict_Functor_0) {
+      return new Data_Profunctor_Strong.Strong(function () {
+          return profunctorStar(__dict_Functor_0);
+      }, function (_5) {
+          return function (_1) {
+              return Prelude.map(__dict_Functor_0)(function (_0) {
+                  return new Data_Tuple.Tuple(_0, _1.value1);
+              })(_5(_1.value0));
+          };
+      }, function (_6) {
+          return function (_2) {
+              return Prelude.map(__dict_Functor_0)(Data_Tuple.Tuple.create(_2.value0))(_6(_2.value1));
+          };
+      });
+  };
+  var choiceStar = function (__dict_Applicative_2) {
+      return new Data_Profunctor_Choice.Choice(function () {
+          return profunctorStar((__dict_Applicative_2["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]());
+      }, function (_7) {
+          return Star(Data_Either.either(function (_23) {
+              return Prelude.map((__dict_Applicative_2["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]())(Data_Either.Left.create)(_7(_23));
+          })(function (_24) {
+              return Prelude.pure(__dict_Applicative_2)(Data_Either.Right.create(_24));
+          }));
+      }, function (_8) {
+          return Star(Data_Either.either(function (_25) {
+              return Prelude.pure(__dict_Applicative_2)(Data_Either.Left.create(_25));
+          })(function (_26) {
+              return Prelude.map((__dict_Applicative_2["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]())(Data_Either.Right.create)(_8(_26));
+          }));
+      });
+  };
+  exports["Star"] = Star;
+  exports["runStar"] = runStar;
+  exports["profunctorStar"] = profunctorStar;
+  exports["strongStar"] = strongStar;
+  exports["choiceStar"] = choiceStar;;
+ 
+})(PS["Data.Profunctor.Star"] = PS["Data.Profunctor.Star"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];     
+  var Contravariant = function (cmap) {
+      this.cmap = cmap;
+  };
+  var cmap = function (dict) {
+      return dict.cmap;
+  };
+  exports["Contravariant"] = Contravariant;
+  exports["cmap"] = cmap;;
+ 
+})(PS["Data.Functor.Contravariant"] = PS["Data.Functor.Contravariant"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Profunctor = PS["Data.Profunctor"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Control_Monad_State = PS["Control.Monad.State"];
+  var Control_Monad_State_Class = PS["Control.Monad.State.Class"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Functor_Contravariant = PS["Data.Functor.Contravariant"];
+  var Data_Lens_Internal_Wander = PS["Data.Lens.Internal.Wander"];
+  var Control_Monad_State_Trans = PS["Control.Monad.State.Trans"];
+  var Data_Identity = PS["Data.Identity"];     
+  var Handler = function (x) {
+      return x;
+  };
+  var Sink = (function () {
+      function Sink(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Sink.create = function (value0) {
+          return function (value1) {
+              return new Sink(value0, value1);
+          };
+      };
+      return Sink;
+  })();
+  var withView = function (f) {
+      return function (_14) {
+          return function (s) {
+              return function (h) {
+                  return Prelude.map(Control_Monad_Eff.functorEff)(f)(_14(s)(h));
+              };
+          };
+      };
+  };
+  var $$with = function (f) {
+      return function (s) {
+          return function (h) {
+              var _30 = f(s)(h);
+              return _30(s)(h);
+          };
+      };
+  };
+  var uiSemigroup = function (__dict_Semigroup_0) {
+      return new Prelude.Semigroup(function (_22) {
+          return function (_23) {
+              return function (s) {
+                  return function (h) {
+                      return Prelude["<*>"](Control_Monad_Eff.applyEff)(Prelude["<$>"](Control_Monad_Eff.functorEff)(Prelude.append(__dict_Semigroup_0))(_22(s)(h)))(_23(s)(h));
+                  };
+              };
+          };
+      });
+  };
+  var uiMonoid = function (__dict_Monoid_1) {
+      return new Data_Monoid.Monoid(function () {
+          return uiSemigroup(__dict_Monoid_1["__superclass_Prelude.Semigroup_0"]());
+      }, function (_6) {
+          return function (_5) {
+              return Prelude.pure(Control_Monad_Eff.applicativeEff)(Data_Monoid.mempty(__dict_Monoid_1));
+          };
+      });
+  };
+  var ui = function (v) {
+      return function (_8) {
+          return function (_7) {
+              return Prelude.pure(Control_Monad_Eff.applicativeEff)(v);
+          };
+      };
+  };
+  var toSink = function (_16) {
+      return function (s) {
+          return new Sink(s, _16(s));
+      };
+  };
+  var runUI = function (_12) {
+      return _12;
+  };
+  var runSink = function (_15) {
+      return _15.value1;
+  };
+  var runHandler = function (_13) {
+      return _13;
+  };
+  var inline = function (go) {
+      return function (_10) {
+          return function (_9) {
+              return go;
+          };
+      };
+  };
+  var handlerContravariant = new Data_Functor_Contravariant.Contravariant(function (f) {
+      return function (_24) {
+          return function (_74) {
+              return _24(f(_74));
+          };
+      };
+  });
+  var sinkFunctor = new Prelude.Functor(function (f) {
+      return function (_25) {
+          return new Sink(f(_25.value0), function (_75) {
+              return _25.value1(Data_Functor_Contravariant.cmap(handlerContravariant)(f)(_75));
+          });
+      };
+  });
+  var sinkApply = function (__dict_Semigroup_3) {
+      return new Prelude.Apply(function () {
+          return sinkFunctor;
+      }, function (_26) {
+          return function (_27) {
+              return new Sink(_26.value0(_27.value0), function (h) {
+                  return Prelude["<*>"](Control_Monad_Eff.applyEff)(Prelude["<$>"](Control_Monad_Eff.functorEff)(Prelude.append(__dict_Semigroup_3))(_26.value1(Data_Functor_Contravariant.cmap(handlerContravariant)(function (_0) {
+                      return _0(_27.value0);
+                  })(h))))(_27.value1(Data_Functor_Contravariant.cmap(handlerContravariant)(Prelude["$"](_26.value0))(h)));
+              });
+          };
+      });
+  };
+  var sinkApplicative = function (__dict_Monoid_4) {
+      return new Prelude.Applicative(function () {
+          return sinkApply(__dict_Monoid_4["__superclass_Prelude.Semigroup_0"]());
+      }, function (x) {
+          return new Sink(x, function (_11) {
+              return Prelude.pure(Control_Monad_Eff.applicativeEff)(Data_Monoid.mempty(__dict_Monoid_4));
+          });
+      });
+  };
+  var uiProfunctor = new Data_Profunctor.Profunctor(function (f) {
+      return function (g) {
+          return function (_17) {
+              return function (s) {
+                  return function (h) {
+                      return _17(f(s))(Data_Functor_Contravariant.cmap(handlerContravariant)(g)(h));
+                  };
+              };
+          };
+      };
+  });
+  var uiChoice = function (__dict_Monoid_2) {
+      return new Data_Profunctor_Choice.Choice(function () {
+          return uiProfunctor;
+      }, function (_18) {
+          return function (s) {
+              return function (h) {
+                  return Data_Either.either(Prelude.flip(_18)(Data_Functor_Contravariant.cmap(handlerContravariant)(Data_Either.Left.create)(h)))(function (_1) {
+                      return Prelude.pure(Control_Monad_Eff.applicativeEff)(Data_Monoid.mempty(__dict_Monoid_2));
+                  })(s);
+              };
+          };
+      }, function (_19) {
+          return function (s) {
+              return function (h) {
+                  return Data_Either.either(function (_2) {
+                      return Prelude.pure(Control_Monad_Eff.applicativeEff)(Data_Monoid.mempty(__dict_Monoid_2));
+                  })(Prelude.flip(_19)(Data_Functor_Contravariant.cmap(handlerContravariant)(Data_Either.Right.create)(h)))(s);
+              };
+          };
+      });
+  };
+  var uiStrong = new Data_Profunctor_Strong.Strong(function () {
+      return uiProfunctor;
+  }, function (_20) {
+      return function (_3) {
+          return function (h) {
+              return _20(_3.value0)(Data_Functor_Contravariant.cmap(handlerContravariant)(function (r) {
+                  return new Data_Tuple.Tuple(r, _3.value1);
+              })(h));
+          };
+      };
+  }, function (_21) {
+      return function (_4) {
+          return function (h) {
+              return _21(_4.value1)(Data_Functor_Contravariant.cmap(handlerContravariant)(function (r) {
+                  return new Data_Tuple.Tuple(_4.value0, r);
+              })(h));
+          };
+      };
+  });
+  var fromSink = function (f) {
+      return function (_76) {
+          return runSink(f(_76));
+      };
+  };
+  var foreach = function (__dict_Monoid_6) {
+      return function (__dict_Traversable_7) {
+          return function (f) {
+              var indices = function (g) {
+                  return function (t) {
+                      return Control_Monad_State.evalState(Data_Traversable.traverse(__dict_Traversable_7)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(function (x) {
+                          return Control_Monad_State_Class.state(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(function (i) {
+                              return new Data_Tuple.Tuple(g(i)(x), i + 1 | 0);
+                          });
+                      })(t))(0);
+                  };
+              };
+              return fromSink(function (_78) {
+                  return Data_Traversable.sequence(__dict_Traversable_7)(sinkApplicative(__dict_Monoid_6))(indices(function (_79) {
+                      return toSink(f(_79));
+                  })(_78));
+              });
+          };
+      };
+  };
+  exports["Handler"] = Handler;
+  exports["inline"] = inline;
+  exports["foreach"] = foreach;
+  exports["withView"] = withView;
+  exports["with"] = $$with;
+  exports["ui"] = ui;
+  exports["runUI"] = runUI;
+  exports["runHandler"] = runHandler;
+  exports["uiProfunctor"] = uiProfunctor;
+  exports["uiChoice"] = uiChoice;
+  exports["uiStrong"] = uiStrong;
+  exports["uiSemigroup"] = uiSemigroup;
+  exports["uiMonoid"] = uiMonoid;
+  exports["handlerContravariant"] = handlerContravariant;;
+ 
+})(PS["OpticUI.Core"] = PS["OpticUI.Core"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];     
+  var when = function (__dict_Monad_0) {
+      return function (_0) {
+          return function (m) {
+              if (_0) {
+                  return m;
+              };
+              if (!_0) {
+                  return Prelude["return"](__dict_Monad_0["__superclass_Prelude.Applicative_0"]())(Prelude.unit);
+              };
+              throw new Error("Failed pattern match at Control.Monad line 8, column 1 - line 9, column 1: " + [ _0.constructor.name, m.constructor.name ]);
+          };
+      };
+  };
+  exports["when"] = when;;
+ 
+})(PS["Control.Monad"] = PS["Control.Monad"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Control.Monad.Eff.Ref
+
+  exports.newRef = function (val) {
+    return function () {
+      return { value: val };
+    };
+  };
+
+  exports.readRef = function (ref) {
+    return function () {
+      return ref.value;
+    };
+  };
+
+  exports.writeRef = function (ref) {
+    return function (val) {
+      return function () {
+        ref.value = val;
+        return {};
+      };
+    };
+  };
+ 
+})(PS["Control.Monad.Eff.Ref"] = PS["Control.Monad.Eff.Ref"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Control.Monad.Eff.Ref"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  exports["writeRef"] = $foreign.writeRef;
+  exports["readRef"] = $foreign.readRef;
+  exports["newRef"] = $foreign.newRef;;
+ 
+})(PS["Control.Monad.Eff.Ref"] = PS["Control.Monad.Eff.Ref"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports._copyEff = function (m) {
+    return function () {
+      var r = {};
+      for (var k in m) {
+        if (m.hasOwnProperty(k)) {
+          r[k] = m[k];
+        }
+      }
+      return r;
+    };
+  };
+
+  exports.empty = {};
+
+  exports.runST = function (f) {
+    return f;
+  };
+
+  // jshint maxparams: 4
+  exports._lookup = function (no, yes, k, m) {
+    return k in m ? yes(m[k]) : no;
+  };
+
+  function _collect (f) {
+    return function (m) {
+      var r = [];
+      for (var k in m) {
+        if (m.hasOwnProperty(k)) {
+          r.push(f(k)(m[k]));
+        }
+      }
+      return r;
+    };
+  }  
+ 
+})(PS["Data.StrMap"] = PS["Data.StrMap"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module Data.StrMap.ST
+
+  exports["new"] = function () {
+    return {};
+  };
+
+  exports.poke = function (m) {
+    return function (k) {
+      return function (v) {
+        return function () {
+          m[k] = v;
+          return m;
+        };
+      };
+    };
+  };
+ 
+})(PS["Data.StrMap.ST"] = PS["Data.StrMap.ST"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.StrMap.ST"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_ST = PS["Control.Monad.ST"];
+  var Data_Maybe = PS["Data.Maybe"];
+  exports["poke"] = $foreign.poke;
+  exports["new"] = $foreign["new"];;
+ 
+})(PS["Data.StrMap.ST"] = PS["Data.StrMap.ST"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.StrMap"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_List = PS["Data.List"];
+  var Control_Monad_ST = PS["Control.Monad.ST"];
+  var Data_StrMap_ST = PS["Data.StrMap.ST"];
+  var thawST = $foreign._copyEff;
+  var pureST = function (f) {
+      return Control_Monad_Eff.runPure($foreign.runST(f));
+  };
+  var singleton = function (k) {
+      return function (v) {
+          return pureST(function __do() {
+              var _1 = Data_StrMap_ST["new"]();
+              Data_StrMap_ST.poke(_1)(k)(v)();
+              return Prelude["return"](Control_Monad_Eff.applicativeEff)(_1)();
+          });
+      };
+  };
+  var mutate = function (f) {
+      return function (m) {
+          return pureST(function __do() {
+              var _0 = thawST(m)();
+              f(_0)();
+              return Prelude["return"](Control_Monad_Eff.applicativeEff)(_0)();
+          });
+      };
+  };                                                                                 
+  var lookup = Data_Function.runFn4($foreign._lookup)(Data_Maybe.Nothing.value)(Data_Maybe.Just.create);
+  var insert = function (k) {
+      return function (v) {
+          return mutate(function (s) {
+              return Data_StrMap_ST.poke(s)(k)(v);
+          });
+      };
+  };
+  exports["thawST"] = thawST;
+  exports["lookup"] = lookup;
+  exports["insert"] = insert;
+  exports["singleton"] = singleton;
+  exports["empty"] = $foreign.empty;;
+ 
+})(PS["Data.StrMap"] = PS["Data.StrMap"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module DOM.Event.EventTarget
+
+  exports.eventListener = function (fn) {
+    return function (event) {
+      return fn(event)();
+    };
+  };
+
+  exports.addEventListener = function (type) {
+    return function (listener) {
+      return function (useCapture) {
+        return function (target) {
+          return function () {
+            target.addEventListener(type, listener, useCapture);
+            return {};
+          };
+        };
+      };
+    };
+  };
+ 
+})(PS["DOM.Event.EventTarget"] = PS["DOM.Event.EventTarget"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports.error = function (msg) {
+    return new Error(msg);
+  };
+
+  exports.message = function (e) {
+    return e.message;
+  };
+ 
+})(PS["Control.Monad.Eff.Exception"] = PS["Control.Monad.Eff.Exception"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Control.Monad.Eff.Exception"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  exports["message"] = $foreign.message;
+  exports["error"] = $foreign.error;;
+ 
+})(PS["Control.Monad.Eff.Exception"] = PS["Control.Monad.Eff.Exception"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.Event.EventTarget"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var DOM = PS["DOM"];
+  var DOM_Event_Types = PS["DOM.Event.Types"];
+  exports["addEventListener"] = $foreign.addEventListener;
+  exports["eventListener"] = $foreign.eventListener;;
+ 
+})(PS["DOM.Event.EventTarget"] = PS["DOM.Event.EventTarget"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var DOM_Event_Types = PS["DOM.Event.Types"];
+  var load = "load";
+  exports["load"] = load;;
+ 
+})(PS["DOM.Event.EventTypes"] = PS["DOM.Event.EventTypes"] || {});
+(function(exports) {
+  /* global exports, window */
+  "use strict";
+
+  // module DOM.HTML
+
+  exports.window = function () {
+    return window;
+  };
+ 
+})(PS["DOM.HTML"] = PS["DOM.HTML"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.HTML"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var DOM = PS["DOM"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  exports["window"] = $foreign.window;;
+ 
+})(PS["DOM.HTML"] = PS["DOM.HTML"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module DOM.HTML.Document
+
+  exports.body = function (doc) {
+    return function () {
+      return doc.body;
+    };
+  };
+ 
+})(PS["DOM.HTML.Document"] = PS["DOM.HTML.Document"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.HTML.Document"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Nullable = PS["Data.Nullable"];
+  var DOM = PS["DOM"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  exports["body"] = $foreign.body;;
+ 
+})(PS["DOM.HTML.Document"] = PS["DOM.HTML.Document"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  // module DOM.HTML.Window
+
+  exports.document = function (window) {
+    return function () {
+      return window.document;
+    };
+  };
+ 
+})(PS["DOM.HTML.Window"] = PS["DOM.HTML.Window"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.HTML.Window"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var DOM = PS["DOM"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  exports["document"] = $foreign.document;;
+ 
+})(PS["DOM.HTML.Window"] = PS["DOM.HTML.Window"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports.appendChild = function (node) {
+    return function (parent) {
+      return function () {
+        return parent.appendChild(node);
+      };
+    };
+  };
+ 
+})(PS["DOM.Node.Node"] = PS["DOM.Node.Node"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.Node.Node"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Enum = PS["Data.Enum"];
+  var Data_Nullable = PS["Data.Nullable"];
+  var Data_Maybe_Unsafe = PS["Data.Maybe.Unsafe"];
+  var DOM = PS["DOM"];
+  var DOM_Node_NodeType = PS["DOM.Node.NodeType"];
+  var DOM_Node_Types = PS["DOM.Node.Types"];
+  exports["appendChild"] = $foreign.appendChild;;
+ 
+})(PS["DOM.Node.Node"] = PS["DOM.Node.Node"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var OpticUI_Internal_VirtualDOM = PS["OpticUI.Internal.VirtualDOM"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Control_Monad = PS["Control.Monad"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Monad_State = PS["Control.Monad.State"];
+  var Control_Monad_State_Class = PS["Control.Monad.State.Class"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Exists = PS["Data.Exists"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Nullable = PS["Data.Nullable"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Array = PS["Data.Array"];
+  var Data_StrMap = PS["Data.StrMap"];
+  var DOM = PS["DOM"];
+  var DOM_Event_EventTarget = PS["DOM.Event.EventTarget"];
+  var DOM_Event_EventTypes = PS["DOM.Event.EventTypes"];
+  var DOM_HTML = PS["DOM.HTML"];
+  var DOM_HTML_Document = PS["DOM.HTML.Document"];
+  var DOM_Node_Element = PS["DOM.Node.Element"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  var DOM_HTML_Window = PS["DOM.HTML.Window"];
+  var DOM_Node_Node = PS["DOM.Node.Node"];
+  var Control_Monad_State_Trans = PS["Control.Monad.State.Trans"];
+  var Data_Identity = PS["Data.Identity"];     
+  var onLoad = function (go) {
+      return function __do() {
+          var _19 = DOM_HTML.window();
+          return (function () {
+              var et = DOM_HTML_Types.windowToEventTarget(_19);
+              return DOM_Event_EventTarget.addEventListener(DOM_Event_EventTypes.load)(DOM_Event_EventTarget.eventListener(function (_24) {
+                  return go;
+              }))(false)(et);
+          })()();
+      };
+  };
+  var findProp = function (getter) {
+      return function (setter) {
+          return function (key) {
+              return function (newprop) {
+                  return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Control_Monad_State_Class.gets(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(getter))(function (_18) {
+                      var _31 = Data_StrMap.lookup(key)(_18);
+                      if (_31 instanceof Data_Maybe.Nothing) {
+                          return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Control_Monad_State_Class.modify(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(setter(Data_StrMap.insert(key)(newprop)(_18))))(function () {
+                              return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(newprop);
+                          });
+                      };
+                      if (_31 instanceof Data_Maybe.Just) {
+                          return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(_31.value0);
+                      };
+                      throw new Error("Failed pattern match at OpticUI.Run line 95, column 1 - line 100, column 1: " + [ _31.constructor.name ]);
+                  });
+              };
+          };
+      };
+  };
+  var toVProp = function (_27) {
+      if (_27 instanceof OpticUI_Markup.AttrP) {
+          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.attrProp(_27.value0, _27.value1));
+      };
+      if (_27 instanceof OpticUI_Markup.HandlerP) {
+          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Markup.runEventHandler(function (f) {
+              return OpticUI_Internal_VirtualDOM.handlerProp(_27.value0, f);
+          })(_27.value1));
+      };
+      if (_27 instanceof OpticUI_Markup.PropP) {
+          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(Data_Exists.runExists(function (_23) {
+              return OpticUI_Internal_VirtualDOM.prop(_27.value0, _23.value0);
+          })(_27.value1));
+      };
+      if (_27 instanceof OpticUI_Markup.InitializerP) {
+          return findProp(function (_0) {
+              return _0.initializers;
+          })(function (is) {
+              return function (_1) {
+                  var _42 = {};
+                  for (var _43 in _1) {
+                      if (_1.hasOwnProperty(_43)) {
+                          _42[_43] = _1[_43];
+                      };
+                  };
+                  _42.initializers = is;
+                  return _42;
+              };
+          })(_27.value0)(OpticUI_Markup.runInitializer(function (i) {
+              return OpticUI_Internal_VirtualDOM.initializer(_27.value0, i);
+          })(_27.value1));
+      };
+      if (_27 instanceof OpticUI_Markup.FinalizerP) {
+          return findProp(function (_2) {
+              return _2.finalizers;
+          })(function (fs) {
+              return function (_3) {
+                  var _46 = {};
+                  for (var _47 in _3) {
+                      if (_3.hasOwnProperty(_47)) {
+                          _46[_47] = _3[_47];
+                      };
+                  };
+                  _46.finalizers = fs;
+                  return _46;
+              };
+          })(_27.value0)(OpticUI_Markup.runFinalizer(function (i) {
+              return OpticUI_Internal_VirtualDOM.finalizer(_27.value0, i);
+          })(_27.value1));
+      };
+      throw new Error("Failed pattern match at OpticUI.Run line 83, column 1 - line 84, column 1: " + [ _27.constructor.name ]);
+  };
+  var toVTree = function (_26) {
+      if (_26 instanceof OpticUI_Markup.Text) {
+          return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.vtext(_26.value0));
+      };
+      if (_26 instanceof OpticUI_Markup.Element) {
+          return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Data_Array.foldM(Control_Monad_State_Trans.monadStateT(Data_Identity.monadIdentity))(function (acc) {
+              return function (prop) {
+                  return Prelude["<$>"](Control_Monad_State_Trans.functorStateT(Data_Identity.monadIdentity))(Prelude.append(OpticUI_Internal_VirtualDOM.semigroupProps)(acc))(toVProp(prop));
+              };
+          })(Data_Monoid.mempty(OpticUI_Internal_VirtualDOM.monoidProps))(_26.value2))(function (_17) {
+              return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(toVTree)(_26.value3.value0))(function (_16) {
+                  return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.vnode(Data_Nullable.toNullable(_26.value0))(_26.value1)(Data_Nullable.toNullable(Data_Maybe.Nothing.value))(_17)(_16));
+              });
+          });
+      };
+      throw new Error("Failed pattern match: " + [ _26.constructor.name ]);
+  };
+  var buildVTree = function (_25) {
+      return function (memo) {
+          var n = Data_Nullable.toNullable(Data_Maybe.Nothing.value);
+          var _61 = Control_Monad_State.runState(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(toVTree)(_25.value0))(memo);
+          return new Data_Tuple.Tuple(OpticUI_Internal_VirtualDOM.vnode(n)("div")(n)(Data_Monoid.mempty(OpticUI_Internal_VirtualDOM.monoidProps))(_61.value0), _61.value1);
+      };
+  };
+  var appendToBody = function (e) {
+      return function __do() {
+          var _22 = DOM_HTML.window();
+          var _21 = DOM_HTML_Window.document(_22)();
+          var _20 = Prelude["<$>"](Control_Monad_Eff.functorEff)(Data_Nullable.toMaybe)(DOM_HTML_Document.body(_21))();
+          return (function () {
+              if (_20 instanceof Data_Maybe.Nothing) {
+                  return Prelude.pure(Control_Monad_Eff.applicativeEff)(Prelude.unit);
+              };
+              if (_20 instanceof Data_Maybe.Just) {
+                  return Prelude["void"](Control_Monad_Eff.functorEff)(DOM_Node_Node.appendChild(DOM_HTML_Types.htmlElementToNode(e))(DOM_HTML_Types.htmlElementToNode(_20.value0)));
+              };
+              throw new Error("Failed pattern match at OpticUI.Run line 116, column 1 - line 117, column 1: " + [ _20.constructor.name ]);
+          })()();
+      };
+  };
+  var animate = function (s0) {
+      return function (ui) {
+          var v0 = OpticUI_Internal_VirtualDOM.vtext("");
+          var n0 = OpticUI_Internal_VirtualDOM.createElement(v0);
+          return function __do() {
+              var _15 = Control_Monad_Eff_Ref.newRef(v0)();
+              var _14 = Control_Monad_Eff_Ref.newRef(n0)();
+              var _13 = Control_Monad_Eff_Ref.newRef(0)();
+              var _12 = Control_Monad_Eff_Ref.newRef({
+                  initializers: Data_StrMap.empty, 
+                  finalizers: Data_StrMap.empty
+              })();
+              return (function () {
+                  var checkGen = function (g) {
+                      return function (go) {
+                          return function __do() {
+                              var _4 = Control_Monad_Eff_Ref.readRef(_13)();
+                              return Control_Monad.when(Control_Monad_Eff.monadEff)(g === _4)(function __do() {
+                                  Control_Monad_Eff_Ref.writeRef(_13)(_4 + 1 | 0)();
+                                  return go();
+                              })();
+                          };
+                      };
+                  };
+                  var step = function (gen) {
+                      return function (s) {
+                          return checkGen(gen)(function __do() {
+                              var _11 = Control_Monad_Eff_Ref.readRef(_15)();
+                              var _10 = Control_Monad_Eff_Ref.readRef(_12)();
+                              var _9 = Prelude["<$>"](Control_Monad_Eff.functorEff)(function (tree) {
+                                  return buildVTree(tree)(_10);
+                              })(OpticUI_Core.runUI(ui)(s)(OpticUI_Core.Handler(step(gen + 1 | 0))))();
+                              var _8 = Control_Monad_Eff_Ref.writeRef(_12)(_9.value1)();
+                              var _7 = Control_Monad_Eff_Ref.writeRef(_15)(_9.value0)();
+                              var _6 = Control_Monad_Eff_Ref.readRef(_14)();
+                              var _5 = OpticUI_Internal_VirtualDOM.patch(OpticUI_Internal_VirtualDOM.diff(_11)(_9.value0))(_6)();
+                              return Control_Monad_Eff_Ref.writeRef(_14)(_5)();
+                          });
+                      };
+                  };
+                  return onLoad(function __do() {
+                      appendToBody(n0)();
+                      return step(0)(s0)();
+                  });
+              })()();
+          };
+      };
+  };
+  exports["appendToBody"] = appendToBody;
+  exports["onLoad"] = onLoad;
+  exports["findProp"] = findProp;
+  exports["toVProp"] = toVProp;
+  exports["toVTree"] = toVTree;
+  exports["buildVTree"] = buildVTree;
+  exports["animate"] = animate;;
+ 
+})(PS["OpticUI.Run"] = PS["OpticUI.Run"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Bifoldable = PS["Data.Bifoldable"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Functor_Contravariant = PS["Data.Functor.Contravariant"];
+  var Data_Functor_Invariant = PS["Data.Functor.Invariant"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Traversable = PS["Data.Traversable"];     
+  var Const = function (x) {
+      return x;
+  };
+  var getConst = function (_0) {
+      return _0;
+  };
+  var functorConst = new Prelude.Functor(function (_10) {
+      return function (_11) {
+          return _11;
+      };
+  });
+  var applyConst = function (__dict_Semigroup_10) {
+      return new Prelude.Apply(function () {
+          return functorConst;
+      }, function (_12) {
+          return function (_13) {
+              return Prelude["<>"](__dict_Semigroup_10)(_12)(_13);
+          };
+      });
+  };
+  var applicativeConst = function (__dict_Monoid_11) {
+      return new Prelude.Applicative(function () {
+          return applyConst(__dict_Monoid_11["__superclass_Prelude.Semigroup_0"]());
+      }, function (_16) {
+          return Data_Monoid.mempty(__dict_Monoid_11);
+      });
+  };
+  exports["Const"] = Const;
+  exports["getConst"] = getConst;
+  exports["functorConst"] = functorConst;
+  exports["applyConst"] = applyConst;
+  exports["applicativeConst"] = applicativeConst;;
+ 
+})(PS["Data.Const"] = PS["Data.Const"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Const = PS["Data.Const"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
+  var Data_Functor_Contravariant = PS["Data.Functor.Contravariant"];     
+  var view = function (l) {
+      return function (s) {
+          return Data_Const.getConst(Data_Profunctor_Star.runStar(l(Data_Const.Const))(s));
+      };
+  };
+  exports["view"] = view;;
+ 
+})(PS["Data.Lens.Getter"] = PS["Data.Lens.Getter"] || {});
+(function(exports) {
+  /* global exports */
+  /* global XMLHttpRequest */
+  /* global module */
+  "use strict";
+
+  // module Network.HTTP.Affjax
+
+  // jshint maxparams: 5
+  exports._ajax = function (mkHeader, options, canceler, errback, callback) {
+    var platformSpecific = { };
+    if (typeof module !== "undefined" && module.require) {
+      // We are on node.js
+      platformSpecific.newXHR = function () {
+        var XHR = module.require("xhr2");
+        return new XHR();
+      };
+
+      platformSpecific.fixupUrl = function (url) {
+        var urllib = module.require("url");
+        var u = urllib.parse(url);
+        u.protocol = u.protocol || "http:";
+        u.hostname = u.hostname || "localhost";
+        return urllib.format(u);
+      };
+
+      platformSpecific.getResponse = function (xhr) {
+        return xhr.response;
+      };
+    } else {
+      // We are in the browser
+      platformSpecific.newXHR = function () {
+        return new XMLHttpRequest();
+      };
+
+      platformSpecific.fixupUrl = function (url) {
+        return url || "/";
+      };
+
+      platformSpecific.getResponse = function (xhr) {
+        return xhr.response;
+      };
+    }
+
+    return function () {
+      var xhr = platformSpecific.newXHR();
+      var fixedUrl = platformSpecific.fixupUrl(options.url);
+      xhr.open(options.method || "GET", fixedUrl, true, options.username, options.password);
+      if (options.headers) {
+        for (var i = 0, header; (header = options.headers[i]) != null; i++) {
+          xhr.setRequestHeader(header.field, header.value);
+        }
+      }
+      xhr.onerror = function () {
+        errback(new Error("AJAX request failed: " + options.method + " " + options.url))();
+      };
+      xhr.onload = function () {
+        callback({
+          status: xhr.status,
+          headers: xhr.getAllResponseHeaders().split("\n")
+            .filter(function (header) {
+              return header.length > 0;
+            })
+            .map(function (header) {
+              var i = header.indexOf(":");
+              return mkHeader(header.substring(0, i))(header.substring(i + 2));
+            }),
+          response: platformSpecific.getResponse(xhr)
+        })();
+      };
+      xhr.responseType = options.responseType;
+      xhr.send(options.content);
+      return canceler(xhr);
+    };
+  };
+
+  // jshint maxparams: 4
+  exports._cancelAjax = function (xhr, cancelError, errback, callback) {
+    return function () {
+      try { xhr.abort(); } catch (e) { return callback(false)(); }
+      return callback(true)();
+    };
+  };
+
+ 
+})(PS["Network.HTTP.Affjax"] = PS["Network.HTTP.Affjax"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var $eq$less$less = function (__dict_Bind_1) {
+      return function (f) {
+          return function (m) {
+              return Prelude[">>="](__dict_Bind_1)(m)(f);
+          };
+      };
+  };
+  var $less$eq$less = function (__dict_Bind_2) {
+      return function (f) {
+          return function (g) {
+              return function (a) {
+                  return $eq$less$less(__dict_Bind_2)(f)(g(a));
+              };
+          };
+      };
+  };
+  exports["<=<"] = $less$eq$less;
+  exports["=<<"] = $eq$less$less;;
+ 
+})(PS["Control.Bind"] = PS["Control.Bind"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports._makeAff = function (cb) {
+    return function(success, error) {
+      return cb(function(e) {
+        return function() {
+          error(e);
+        };
+      })(function(v) {
+        return function() {
+          try {
+            success(v);
+          } catch (e) {
+            error(e);
+          }
+        };
+      })();
+    }
+  }
+
+  exports._pure = function (nonCanceler, v) {
+    return function(success, error) {
+      try {
+        success(v);
+      } catch (e) {
+        error(e);
+      }
+
+      return nonCanceler;
+    };
+  }
+
+  exports._throwError = function (nonCanceler, e) {
+    return function(success, error) {
+      error(e);
+
+      return nonCanceler;
+    };
+  }
+
+  exports._fmap = function (f, aff) {
+    return function(success, error) {
+      return aff(function(v) {
+        try {
+          success(f(v));
+        } catch (e) {
+          error(e);
+        }
+      }, error);
+    };
+  }
+
+  exports._bind = function (alwaysCanceler, aff, f) {
+    return function(success, error) {
+      var canceler1, canceler2;
+
+      var isCanceled    = false;
+      var requestCancel = false;
+
+      var onCanceler = function(){};
+
+      canceler1 = aff(function(v) {
+        if (requestCancel) {
+          isCanceled = true;
+
+          return alwaysCanceler;
+        } else {
+          canceler2 = f(v)(success, error);
+
+          onCanceler(canceler2);
+
+          return canceler2;
+        }
+      }, error);
+
+      return function(e) {
+        return function(s, f) {
+          requestCancel = true;
+
+          if (canceler2 !== undefined) {
+            return canceler2(e)(s, f);
+          } else {
+            return canceler1(e)(function(bool) {
+              if (bool || isCanceled) {
+                try {
+                  s(true);
+                } catch (e) {
+                  f(e);
+                }
+              } else {
+                onCanceler = function(canceler) {
+                  canceler(e)(s, f);
+                };
+              }
+            }, f);
+          }
+        };
+      };
+    };
+  }
+
+  exports._attempt = function (Left, Right, aff) {
+    return function(success, error) {
+      return aff(function(v) {
+        try {
+          success(Right(v));
+        } catch (e) {
+          error(e);
+        }
+      }, function(e) {
+        try {
+          success(Left(e));
+        } catch (e) {
+          error(e);
+        }
+      });
+    };
+  }
+
+  exports._runAff = function (errorT, successT, aff) {
+    return function() {
+      return aff(function(v) {
+        try {
+          successT(v)();
+        } catch (e) {
+          errorT(e)();
+        }
+      }, function(e) {
+        errorT(e)();
+      });
+    };
+  }
+ 
+})(PS["Control.Monad.Aff"] = PS["Control.Monad.Aff"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Control.Monad.Aff"];
+  var Prelude = PS["Prelude"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Alternative = PS["Control.Alternative"];
+  var Control_Monad_Cont_Class = PS["Control.Monad.Cont.Class"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Class = PS["Control.Monad.Eff.Class"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Control_Monad_Eff_Unsafe = PS["Control.Monad.Eff.Unsafe"];
+  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
+  var Control_Monad_Rec_Class = PS["Control.Monad.Rec.Class"];
+  var Control_MonadPlus = PS["Control.MonadPlus"];
+  var Control_Plus = PS["Control.Plus"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var runAff = function (ex) {
+      return function (f) {
+          return function (aff) {
+              return $foreign._runAff(ex, f, aff);
+          };
+      };
+  };
+  var makeAff$prime = function (h) {
+      return $foreign._makeAff(h);
+  };
+  var functorAff = new Prelude.Functor(function (f) {
+      return function (fa) {
+          return $foreign._fmap(f, fa);
+      };
+  });
+  var attempt = function (aff) {
+      return $foreign._attempt(Data_Either.Left.create, Data_Either.Right.create, aff);
+  };
+  var applyAff = new Prelude.Apply(function () {
+      return functorAff;
+  }, function (ff) {
+      return function (fa) {
+          return $foreign._bind(alwaysCanceler, ff, function (f) {
+              return Prelude["<$>"](functorAff)(f)(fa);
+          });
+      };
+  });
+  var applicativeAff = new Prelude.Applicative(function () {
+      return applyAff;
+  }, function (v) {
+      return $foreign._pure(nonCanceler, v);
+  });
+  var nonCanceler = Prelude["const"](Prelude.pure(applicativeAff)(false));
+  var alwaysCanceler = Prelude["const"](Prelude.pure(applicativeAff)(true));
+  var makeAff = function (h) {
+      return makeAff$prime(function (e) {
+          return function (a) {
+              return Prelude["<$>"](Control_Monad_Eff.functorEff)(Prelude["const"](nonCanceler))(h(e)(a));
+          };
+      });
+  };                                                       
+  var bindAff = new Prelude.Bind(function () {
+      return applyAff;
+  }, function (fa) {
+      return function (f) {
+          return $foreign._bind(alwaysCanceler, fa, f);
+      };
+  });
+  var monadAff = new Prelude.Monad(function () {
+      return applicativeAff;
+  }, function () {
+      return bindAff;
+  });
+  var monadErrorAff = new Control_Monad_Error_Class.MonadError(function () {
+      return monadAff;
+  }, function (aff) {
+      return function (ex) {
+          return Prelude[">>="](bindAff)(attempt(aff))(Data_Either.either(ex)(Prelude.pure(applicativeAff)));
+      };
+  }, function (e) {
+      return $foreign._throwError(nonCanceler, e);
+  });
+  exports["runAff"] = runAff;
+  exports["nonCanceler"] = nonCanceler;
+  exports["makeAff'"] = makeAff$prime;
+  exports["makeAff"] = makeAff;
+  exports["attempt"] = attempt;
+  exports["functorAff"] = functorAff;
+  exports["applyAff"] = applyAff;
+  exports["applicativeAff"] = applicativeAff;
+  exports["bindAff"] = bindAff;
+  exports["monadAff"] = monadAff;
+  exports["monadErrorAff"] = monadErrorAff;;
+ 
+})(PS["Control.Monad.Aff"] = PS["Control.Monad.Aff"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var DOM_File_Types = PS["DOM.File.Types"];
+  var DOM_Node_Types = PS["DOM.Node.Types"];
+  var DOM_XHR_Types = PS["DOM.XHR.Types"];
+  var Unsafe_Coerce = PS["Unsafe.Coerce"];
+  var Data_ArrayBuffer_Types = PS["Data.ArrayBuffer.Types"];     
+  var Requestable = function (toRequest) {
+      this.toRequest = toRequest;
+  };
+  var toRequest = function (dict) {
+      return dict.toRequest;
+  };                                                                       
+  var requestableString = new Requestable(Unsafe_Coerce.unsafeCoerce);
+  exports["Requestable"] = Requestable;
+  exports["toRequest"] = toRequest;
+  exports["requestableString"] = requestableString;;
+ 
+})(PS["Network.HTTP.Affjax.Request"] = PS["Network.HTTP.Affjax.Request"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var DOM_File_Types = PS["DOM.File.Types"];
+  var DOM_Node_Types = PS["DOM.Node.Types"];
+  var DOM_XHR_Types = PS["DOM.XHR.Types"];
+  var Data_ArrayBuffer_Types = PS["Data.ArrayBuffer.Types"];     
+  var ArrayBufferResponse = (function () {
+      function ArrayBufferResponse() {
+
+      };
+      ArrayBufferResponse.value = new ArrayBufferResponse();
+      return ArrayBufferResponse;
+  })();
+  var BlobResponse = (function () {
+      function BlobResponse() {
+
+      };
+      BlobResponse.value = new BlobResponse();
+      return BlobResponse;
+  })();
+  var DocumentResponse = (function () {
+      function DocumentResponse() {
+
+      };
+      DocumentResponse.value = new DocumentResponse();
+      return DocumentResponse;
+  })();
+  var JSONResponse = (function () {
+      function JSONResponse() {
+
+      };
+      JSONResponse.value = new JSONResponse();
+      return JSONResponse;
+  })();
+  var StringResponse = (function () {
+      function StringResponse() {
+
+      };
+      StringResponse.value = new StringResponse();
+      return StringResponse;
+  })();
+  var Respondable = function (fromResponse, responseType) {
+      this.fromResponse = fromResponse;
+      this.responseType = responseType;
+  }; 
+  var responseTypeToString = function (_0) {
+      if (_0 instanceof ArrayBufferResponse) {
+          return "arraybuffer";
+      };
+      if (_0 instanceof BlobResponse) {
+          return "blob";
+      };
+      if (_0 instanceof DocumentResponse) {
+          return "document";
+      };
+      if (_0 instanceof JSONResponse) {
+          return "text";
+      };
+      if (_0 instanceof StringResponse) {
+          return "text";
+      };
+      throw new Error("Failed pattern match at Network.HTTP.Affjax.Response line 41, column 1 - line 42, column 1: " + [ _0.constructor.name ]);
+  };
+  var responseType = function (dict) {
+      return dict.responseType;
+  };                                                                                                                 
+  var responsableString = new Respondable(Data_Foreign.readString, StringResponse.value);                               
+  var fromResponse = function (dict) {
+      return dict.fromResponse;
+  };
+  exports["ArrayBufferResponse"] = ArrayBufferResponse;
+  exports["BlobResponse"] = BlobResponse;
+  exports["DocumentResponse"] = DocumentResponse;
+  exports["JSONResponse"] = JSONResponse;
+  exports["StringResponse"] = StringResponse;
+  exports["Respondable"] = Respondable;
+  exports["fromResponse"] = fromResponse;
+  exports["responseType"] = responseType;
+  exports["responseTypeToString"] = responseTypeToString;
+  exports["responsableString"] = responsableString;;
+ 
+})(PS["Network.HTTP.Affjax.Response"] = PS["Network.HTTP.Affjax.Response"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];     
+  var DELETE = (function () {
+      function DELETE() {
+
+      };
+      DELETE.value = new DELETE();
+      return DELETE;
+  })();
+  var GET = (function () {
+      function GET() {
+
+      };
+      GET.value = new GET();
+      return GET;
+  })();
+  var HEAD = (function () {
+      function HEAD() {
+
+      };
+      HEAD.value = new HEAD();
+      return HEAD;
+  })();
+  var OPTIONS = (function () {
+      function OPTIONS() {
+
+      };
+      OPTIONS.value = new OPTIONS();
+      return OPTIONS;
+  })();
+  var PATCH = (function () {
+      function PATCH() {
+
+      };
+      PATCH.value = new PATCH();
+      return PATCH;
+  })();
+  var POST = (function () {
+      function POST() {
+
+      };
+      POST.value = new POST();
+      return POST;
+  })();
+  var PUT = (function () {
+      function PUT() {
+
+      };
+      PUT.value = new PUT();
+      return PUT;
+  })();
+  var MOVE = (function () {
+      function MOVE() {
+
+      };
+      MOVE.value = new MOVE();
+      return MOVE;
+  })();
+  var COPY = (function () {
+      function COPY() {
+
+      };
+      COPY.value = new COPY();
+      return COPY;
+  })();
+  var CustomMethod = (function () {
+      function CustomMethod(value0) {
+          this.value0 = value0;
+      };
+      CustomMethod.create = function (value0) {
+          return new CustomMethod(value0);
+      };
+      return CustomMethod;
+  })();
+  var showMethod = new Prelude.Show(function (_3) {
+      if (_3 instanceof DELETE) {
+          return "DELETE";
+      };
+      if (_3 instanceof GET) {
+          return "GET";
+      };
+      if (_3 instanceof HEAD) {
+          return "HEAD";
+      };
+      if (_3 instanceof OPTIONS) {
+          return "OPTIONS";
+      };
+      if (_3 instanceof PATCH) {
+          return "PATCH";
+      };
+      if (_3 instanceof POST) {
+          return "POST";
+      };
+      if (_3 instanceof PUT) {
+          return "PUT";
+      };
+      if (_3 instanceof MOVE) {
+          return "MOVE";
+      };
+      if (_3 instanceof COPY) {
+          return "COPY";
+      };
+      if (_3 instanceof CustomMethod) {
+          return "(CustomMethod " + (Prelude.show(Prelude.showString)(_3.value0) + ")");
+      };
+      throw new Error("Failed pattern match at Network.HTTP.Method line 29, column 1 - line 41, column 1: " + [ _3.constructor.name ]);
+  });
+  var methodToString = function (_0) {
+      if (_0 instanceof CustomMethod) {
+          return _0.value0;
+      };
+      return Prelude.show(showMethod)(_0);
+  };
+  exports["DELETE"] = DELETE;
+  exports["GET"] = GET;
+  exports["HEAD"] = HEAD;
+  exports["OPTIONS"] = OPTIONS;
+  exports["PATCH"] = PATCH;
+  exports["POST"] = POST;
+  exports["PUT"] = PUT;
+  exports["MOVE"] = MOVE;
+  exports["COPY"] = COPY;
+  exports["CustomMethod"] = CustomMethod;
+  exports["methodToString"] = methodToString;
+  exports["showMethod"] = showMethod;;
+ 
+})(PS["Network.HTTP.Method"] = PS["Network.HTTP.Method"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var mimeTypeToString = function (_0) {
+      return _0;
+  };
+  exports["mimeTypeToString"] = mimeTypeToString;;
+ 
+})(PS["Network.HTTP.MimeType"] = PS["Network.HTTP.MimeType"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Network_HTTP_MimeType = PS["Network.HTTP.MimeType"];     
+  var Accept = (function () {
+      function Accept(value0) {
+          this.value0 = value0;
+      };
+      Accept.create = function (value0) {
+          return new Accept(value0);
+      };
+      return Accept;
+  })();
+  var ContentType = (function () {
+      function ContentType(value0) {
+          this.value0 = value0;
+      };
+      ContentType.create = function (value0) {
+          return new ContentType(value0);
+      };
+      return ContentType;
+  })();
+  var RequestHeader = (function () {
+      function RequestHeader(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      RequestHeader.create = function (value0) {
+          return function (value1) {
+              return new RequestHeader(value0, value1);
+          };
+      };
+      return RequestHeader;
+  })();
+  var requestHeaderValue = function (_1) {
+      if (_1 instanceof Accept) {
+          return Network_HTTP_MimeType.mimeTypeToString(_1.value0);
+      };
+      if (_1 instanceof ContentType) {
+          return Network_HTTP_MimeType.mimeTypeToString(_1.value0);
+      };
+      if (_1 instanceof RequestHeader) {
+          return _1.value1;
+      };
+      throw new Error("Failed pattern match at Network.HTTP.RequestHeader line 28, column 1 - line 29, column 1: " + [ _1.constructor.name ]);
+  };
+  var requestHeaderName = function (_0) {
+      if (_0 instanceof Accept) {
+          return "Accept";
+      };
+      if (_0 instanceof ContentType) {
+          return "Content-Type";
+      };
+      if (_0 instanceof RequestHeader) {
+          return _0.value0;
+      };
+      throw new Error("Failed pattern match at Network.HTTP.RequestHeader line 23, column 1 - line 24, column 1: " + [ _0.constructor.name ]);
+  };
+  exports["Accept"] = Accept;
+  exports["ContentType"] = ContentType;
+  exports["RequestHeader"] = RequestHeader;
+  exports["requestHeaderValue"] = requestHeaderValue;
+  exports["requestHeaderName"] = requestHeaderName;;
+ 
+})(PS["Network.HTTP.RequestHeader"] = PS["Network.HTTP.RequestHeader"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];     
+  var ResponseHeader = (function () {
+      function ResponseHeader(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      ResponseHeader.create = function (value0) {
+          return function (value1) {
+              return new ResponseHeader(value0, value1);
+          };
+      };
+      return ResponseHeader;
+  })();
+  var responseHeader = function (field) {
+      return function (value) {
+          return new ResponseHeader(field, value);
+      };
+  };
+  exports["responseHeader"] = responseHeader;;
+ 
+})(PS["Network.HTTP.ResponseHeader"] = PS["Network.HTTP.ResponseHeader"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Network.HTTP.Affjax"];
+  var Prelude = PS["Prelude"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Bind = PS["Control.Bind"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Aff_Par = PS["Control.Monad.Aff.Par"];
+  var Control_Monad_Aff_AVar = PS["Control.Monad.Aff.AVar"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Class = PS["Control.Monad.Eff.Class"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Int = PS["Data.Int"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Nullable = PS["Data.Nullable"];
+  var DOM_XHR_Types = PS["DOM.XHR.Types"];
+  var $$Math = PS["Math"];
+  var Network_HTTP_Affjax_Request = PS["Network.HTTP.Affjax.Request"];
+  var Network_HTTP_Affjax_Response = PS["Network.HTTP.Affjax.Response"];
+  var Network_HTTP_Method = PS["Network.HTTP.Method"];
+  var Network_HTTP_RequestHeader = PS["Network.HTTP.RequestHeader"];
+  var Network_HTTP_ResponseHeader = PS["Network.HTTP.ResponseHeader"];
+  var Network_HTTP_StatusCode = PS["Network.HTTP.StatusCode"];
+  var cancelAjax = function (xhr) {
+      return function (err) {
+          return Control_Monad_Aff.makeAff(function (eb) {
+              return function (cb) {
+                  return $foreign._cancelAjax(xhr, err, eb, cb);
+              };
+          });
+      };
+  };
+  var affjax$prime = function (__dict_Requestable_1) {
+      return function (__dict_Respondable_2) {
+          return function (req) {
+              return function (eb) {
+                  return function (cb) {
+                      var req$prime = {
+                          method: Network_HTTP_Method.methodToString(req.method), 
+                          url: req.url, 
+                          headers: Prelude["<$>"](Prelude.functorArray)(function (h) {
+                              return {
+                                  field: Network_HTTP_RequestHeader.requestHeaderName(h), 
+                                  value: Network_HTTP_RequestHeader.requestHeaderValue(h)
+                              };
+                          })(req.headers), 
+                          content: Data_Nullable.toNullable(Prelude["<$>"](Data_Maybe.functorMaybe)(Network_HTTP_Affjax_Request.toRequest(__dict_Requestable_1))(req.content)), 
+                          responseType: Network_HTTP_Affjax_Response.responseTypeToString(Network_HTTP_Affjax_Response.responseType(__dict_Respondable_2)), 
+                          username: Data_Nullable.toNullable(req.username), 
+                          password: Data_Nullable.toNullable(req.password)
+                      };
+                      var fromResponse$prime = (function () {
+                          var _32 = Network_HTTP_Affjax_Response.responseType(__dict_Respondable_2);
+                          if (_32 instanceof Network_HTTP_Affjax_Response.JSONResponse) {
+                              return Control_Bind["<=<"](Data_Either.bindEither)(Network_HTTP_Affjax_Response.fromResponse(__dict_Respondable_2))(Control_Bind["<=<"](Data_Either.bindEither)(Data_Foreign.parseJSON)(Data_Foreign.readString));
+                          };
+                          return Network_HTTP_Affjax_Response.fromResponse(__dict_Respondable_2);
+                      })();
+                      var cb$prime = function (res) {
+                          var _35 = Prelude["<$>"](Data_Either.functorEither)(function (_0) {
+                              var _33 = {};
+                              for (var _34 in res) {
+                                  if (res.hasOwnProperty(_34)) {
+                                      _33[_34] = res[_34];
+                                  };
+                              };
+                              _33.response = _0;
+                              return _33;
+                          })(fromResponse$prime(res.response));
+                          if (_35 instanceof Data_Either.Left) {
+                              return eb(Control_Monad_Eff_Exception.error(Prelude.show(Data_Foreign.showForeignError)(_35.value0)));
+                          };
+                          if (_35 instanceof Data_Either.Right) {
+                              return cb(_35.value0);
+                          };
+                          throw new Error("Failed pattern match at Network.HTTP.Affjax line 197, column 1 - line 202, column 1: " + [ _35.constructor.name ]);
+                      };
+                      return $foreign._ajax(Network_HTTP_ResponseHeader.responseHeader, req$prime, cancelAjax, eb, cb$prime);
+                  };
+              };
+          };
+      };
+  };
+  var affjax = function (__dict_Requestable_3) {
+      return function (__dict_Respondable_4) {
+          return function (_51) {
+              return Control_Monad_Aff["makeAff'"](affjax$prime(__dict_Requestable_3)(__dict_Respondable_4)(_51));
+          };
+      };
+  };
+  exports["affjax"] = affjax;;
+ 
+})(PS["Network.HTTP.Affjax"] = PS["Network.HTTP.Affjax"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Const = PS["Data.Const"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
+  var Data_Maybe = PS["Data.Maybe"];     
+  var over = function (l) {
+      return l;
+  };
+  var set = function (l) {
+      return function (b) {
+          return over(l)(Prelude["const"](b));
+      };
+  };
+  exports["set"] = set;
+  exports["over"] = over;;
+ 
+})(PS["Data.Lens.Setter"] = PS["Data.Lens.Setter"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  var Data_Foreign_Index = PS["Data.Foreign.Index"];                  
+  var valueA = OpticUI_Markup.prop("value");                    
+  var typeA = OpticUI_Markup.attr("type");                              
+  var tr = OpticUI_Markup.element(Data_Maybe.Nothing.value)("tr");      
+  var th = OpticUI_Markup.element(Data_Maybe.Nothing.value)("th");            
+  var td = OpticUI_Markup.element(Data_Maybe.Nothing.value)("td");
+  var tbody = OpticUI_Markup.element(Data_Maybe.Nothing.value)("tbody");
+  var table = OpticUI_Markup.element(Data_Maybe.Nothing.value)("table");
+  var onClick = function (h) {
+      return OpticUI_Markup.handle("click")(h);
+  };                                                                
+  var input_ = function (ps) {
+      return OpticUI_Markup.element(Data_Maybe.Nothing.value)("input")(ps)(Data_Monoid.mempty(OpticUI_Markup.markupMonoid));
+  };                                                              
+  var getProp = function (__dict_IsForeign_0) {
+      return function (p_1) {
+          return function (_1) {
+              return Data_Either.either(Prelude["const"](Data_Maybe.Nothing.value))(Data_Maybe.Just.create)(Data_Foreign_Class.readProp(__dict_IsForeign_0)(Data_Foreign_Index.indexString)(p_1)(Data_Foreign.toForeign((function (_0) {
+                  return _0.target;
+              })(_1))));
+          };
+      };
+  };
+  var onInput = function (__dict_IsForeign_1) {
+      return function (h) {
+          return OpticUI_Markup.handle("input")(function (e) {
+              return h(e)(getProp(__dict_IsForeign_1)("value")(e));
+          });
+      };
+  };                                                                       
+  var div = OpticUI_Markup.element(Data_Maybe.Nothing.value)("div");  
+  var classA = OpticUI_Markup.attr("class");                              
+  var button = OpticUI_Markup.element(Data_Maybe.Nothing.value)("button");
+  exports["getProp"] = getProp;
+  exports["onInput"] = onInput;
+  exports["onClick"] = onClick;
+  exports["valueA"] = valueA;
+  exports["typeA"] = typeA;
+  exports["classA"] = classA;
+  exports["tr"] = tr;
+  exports["th"] = th;
+  exports["td"] = td;
+  exports["tbody"] = tbody;
+  exports["table"] = table;
+  exports["input_"] = input_;
+  exports["div"] = div;
+  exports["button"] = button;;
+ 
+})(PS["OpticUI.Markup.HTML"] = PS["OpticUI.Markup.HTML"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var DOM = PS["DOM"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];     
+  var textField = function (as) {
+      return OpticUI_Core["with"](function (s) {
+          return function (h) {
+              var inpH = function (_0) {
+                  return function (_2) {
+                      return OpticUI_Core.runHandler(h)(Data_Maybe.maybe("")(Prelude.id(Prelude.categoryFn))(_2));
+                  };
+              };
+              var bs = [ OpticUI_Markup_HTML.valueA(s), OpticUI_Markup_HTML.typeA("text"), OpticUI_Markup_HTML.onInput(Data_Foreign_Class.stringIsForeign)(inpH) ];
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.input_(Prelude["++"](Prelude.semigroupArray)(as)(bs)));
+          };
+      });
+  };
+  exports["textField"] = textField;;
+ 
+})(PS["OpticUI.Components"] = PS["OpticUI.Components"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Monoid = PS["Data.Monoid"];     
+  var Async = (function () {
+      function Async(value0) {
+          this.value0 = value0;
+      };
+      Async.create = function (value0) {
+          return new Async(value0);
+      };
+      return Async;
+  })();
+  var onResult = function (__dict_Monoid_0) {
+      return function (s) {
+          return function (f) {
+              return OpticUI_Core["with"](function (_4) {
+                  return function (_3) {
+                      return OpticUI_Core.inline(function __do() {
+                          Control_Monad_Eff_Ref.writeRef(_4.value0)(Data_Either.either(f)(s))();
+                          return Data_Monoid.mempty(__dict_Monoid_0);
+                      });
+                  };
+              });
+          };
+      };
+  };
+  var async = function (go) {
+      return function __do() {
+          var _2 = Control_Monad_Eff_Ref.newRef(Prelude["const"](Prelude.pure(Control_Monad_Eff.applicativeEff)(Prelude.unit)))();
+          return (function () {
+              var s = function (a) {
+                  return function __do() {
+                      var _0 = Control_Monad_Eff_Ref.readRef(_2)();
+                      return _0(new Data_Either.Right(a))();
+                  };
+              };
+              var f = function (e) {
+                  return function __do() {
+                      var _1 = Control_Monad_Eff_Ref.readRef(_2)();
+                      return _1(new Data_Either.Left(e))();
+                  };
+              };
+              return function __do() {
+                  Control_Monad_Aff.runAff(f)(s)(go)();
+                  return new Async(_2);
+              };
+          })()();
+      };
+  };
+  exports["Async"] = Async;
+  exports["async"] = async;
+  exports["onResult"] = onResult;;
+ 
+})(PS["OpticUI.Components.Async"] = PS["OpticUI.Components.Async"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Const = PS["Data.Const"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Maybe_First = PS["Data.Maybe.First"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
+  var Data_Lens_Internal_Tagged = PS["Data.Lens.Internal.Tagged"];
+  var Data_Lens_Internal_Market = PS["Data.Lens.Internal.Market"];
+  var Control_MonadPlus = PS["Control.MonadPlus"];
+  var Data_Profunctor = PS["Data.Profunctor"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];
+  var prism = function (to) {
+      return function (fro) {
+          return function (__dict_Choice_0) {
+              return function (pab) {
+                  return Data_Profunctor.dimap(__dict_Choice_0["__superclass_Data.Profunctor.Profunctor_0"]())(fro)(Data_Either.either(Prelude.id(Prelude.categoryFn))(Prelude.id(Prelude.categoryFn)))(Data_Profunctor_Choice.right(__dict_Choice_0)(Data_Profunctor.rmap(__dict_Choice_0["__superclass_Data.Profunctor.Profunctor_0"]())(to)(pab)));
+              };
+          };
+      };
+  };
+  var prism$prime = function (to) {
+      return function (fro) {
+          return function (__dict_Choice_1) {
+              return prism(to)(function (s) {
+                  return Data_Maybe.maybe(new Data_Either.Left(s))(Data_Either.Right.create)(fro(s));
+              })(__dict_Choice_1);
+          };
+      };
+  };
+  exports["prism'"] = prism$prime;
+  exports["prism"] = prism;;
+ 
+})(PS["Data.Lens.Prism"] = PS["Data.Lens.Prism"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
+  var Data_Lens_Internal_Shop = PS["Data.Lens.Internal.Shop"];
+  var Data_Profunctor = PS["Data.Profunctor"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var lens$prime = function (to) {
+      return function (__dict_Strong_0) {
+          return function (pab) {
+              return Data_Profunctor.dimap(__dict_Strong_0["__superclass_Data.Profunctor.Profunctor_0"]())(to)(function (_0) {
+                  return _0.value1(_0.value0);
+              })(Data_Profunctor_Strong.first(__dict_Strong_0)(pab));
+          };
+      };
+  };
+  var lens = function (get) {
+      return function (set) {
+          return function (__dict_Strong_1) {
+              return lens$prime(function (s) {
+                  return new Data_Tuple.Tuple(get(s), function (b) {
+                      return set(s)(b);
+                  });
+              })(__dict_Strong_1);
+          };
+      };
+  };
+  exports["lens"] = lens;;
+ 
+})(PS["Data.Lens.Lens"] = PS["Data.Lens.Lens"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
+  var Data_Lens_Prism = PS["Data.Lens.Prism"];
+  var Data_Lens_Lens = PS["Data.Lens.Lens"];
+  var Data_Lens_Internal_Void = PS["Data.Lens.Internal.Void"];
+  var _Just = function (__dict_Choice_5) {
+      return Data_Lens_Prism.prism(Data_Maybe.Just.create)(Data_Maybe.maybe(new Data_Either.Left(Data_Maybe.Nothing.value))(Data_Either.Right.create))(__dict_Choice_5);
+  };
+  exports["_Just"] = _Just;;
+ 
+})(PS["Data.Lens.Common"] = PS["Data.Lens.Common"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Generic"];
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Array = PS["Data.Array"];
+  var Data_String = PS["Data.String"];     
+  var Proxy = (function () {
+      function Proxy() {
+
+      };
+      Proxy.value = new Proxy();
+      return Proxy;
+  })();
+  var SProd = (function () {
+      function SProd(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SProd.create = function (value0) {
+          return function (value1) {
+              return new SProd(value0, value1);
+          };
+      };
+      return SProd;
+  })();
+  var SRecord = (function () {
+      function SRecord(value0) {
+          this.value0 = value0;
+      };
+      SRecord.create = function (value0) {
+          return new SRecord(value0);
+      };
+      return SRecord;
+  })();
+  var SNumber = (function () {
+      function SNumber(value0) {
+          this.value0 = value0;
+      };
+      SNumber.create = function (value0) {
+          return new SNumber(value0);
+      };
+      return SNumber;
+  })();
+  var SBoolean = (function () {
+      function SBoolean(value0) {
+          this.value0 = value0;
+      };
+      SBoolean.create = function (value0) {
+          return new SBoolean(value0);
+      };
+      return SBoolean;
+  })();
+  var SInt = (function () {
+      function SInt(value0) {
+          this.value0 = value0;
+      };
+      SInt.create = function (value0) {
+          return new SInt(value0);
+      };
+      return SInt;
+  })();
+  var SString = (function () {
+      function SString(value0) {
+          this.value0 = value0;
+      };
+      SString.create = function (value0) {
+          return new SString(value0);
+      };
+      return SString;
+  })();
+  var SArray = (function () {
+      function SArray(value0) {
+          this.value0 = value0;
+      };
+      SArray.create = function (value0) {
+          return new SArray(value0);
+      };
+      return SArray;
+  })();
+  var SigProd = (function () {
+      function SigProd(value0) {
+          this.value0 = value0;
+      };
+      SigProd.create = function (value0) {
+          return new SigProd(value0);
+      };
+      return SigProd;
+  })();
+  var SigRecord = (function () {
+      function SigRecord(value0) {
+          this.value0 = value0;
+      };
+      SigRecord.create = function (value0) {
+          return new SigRecord(value0);
+      };
+      return SigRecord;
+  })();
+  var SigNumber = (function () {
+      function SigNumber() {
+
+      };
+      SigNumber.value = new SigNumber();
+      return SigNumber;
+  })();
+  var SigBoolean = (function () {
+      function SigBoolean() {
+
+      };
+      SigBoolean.value = new SigBoolean();
+      return SigBoolean;
+  })();
+  var SigInt = (function () {
+      function SigInt() {
+
+      };
+      SigInt.value = new SigInt();
+      return SigInt;
+  })();
+  var SigString = (function () {
+      function SigString() {
+
+      };
+      SigString.value = new SigString();
+      return SigString;
+  })();
+  var SigArray = (function () {
+      function SigArray(value0) {
+          this.value0 = value0;
+      };
+      SigArray.create = function (value0) {
+          return new SigArray(value0);
+      };
+      return SigArray;
+  })();
+  var Generic = function (fromSpine, toSignature, toSpine) {
+      this.fromSpine = fromSpine;
+      this.toSignature = toSignature;
+      this.toSpine = toSpine;
+  };
+  var toSpine = function (dict) {
+      return dict.toSpine;
+  };
+  var toSignature = function (dict) {
+      return dict.toSignature;
+  };
+  var genericString = new Generic(function (_10) {
+      if (_10 instanceof SString) {
+          return new Data_Maybe.Just(_10.value0);
+      };
+      return Data_Maybe.Nothing.value;
+  }, function (_9) {
+      return SigString.value;
+  }, function (x) {
+      return new SString(x);
+  });
+  var fromSpine = function (dict) {
+      return dict.fromSpine;
+  };
+  var anyProxy = Proxy.value;
+  exports["Proxy"] = Proxy;
+  exports["SigProd"] = SigProd;
+  exports["SigRecord"] = SigRecord;
+  exports["SigNumber"] = SigNumber;
+  exports["SigBoolean"] = SigBoolean;
+  exports["SigInt"] = SigInt;
+  exports["SigString"] = SigString;
+  exports["SigArray"] = SigArray;
+  exports["SProd"] = SProd;
+  exports["SRecord"] = SRecord;
+  exports["SNumber"] = SNumber;
+  exports["SBoolean"] = SBoolean;
+  exports["SInt"] = SInt;
+  exports["SString"] = SString;
+  exports["SArray"] = SArray;
+  exports["Generic"] = Generic;
+  exports["anyProxy"] = anyProxy;
+  exports["fromSpine"] = fromSpine;
+  exports["toSignature"] = toSignature;
+  exports["toSpine"] = toSpine;
+  exports["genericString"] = genericString;;
+ 
+})(PS["Data.Generic"] = PS["Data.Generic"] || {});
+(function(exports) {
+  // module Data.Argonaut.Core
+
+  function id(x) {
+      return x;
+  } 
+
+  exports.fromBoolean = id;
+  exports.fromNumber = id;
+  exports.fromString = id;
+  exports.fromArray = id;
+  exports.fromObject = id;
+
+  exports.jsonNull = null;
+
+  exports._stringify = function(j) {
+      return JSON.stringify(j);
+  };
+
+  exports._foldJson = function(isNull, isBool, isNum, isStr, isArr, isObj, j) {
+      if (j == null) return isNull(null);
+      else if (typeof j === 'boolean') return isBool(j);
+      else if (typeof j === 'number') return isNum(j);
+      else if (typeof j === 'string') return isStr(j);
+      else if (Object.prototype.toString.call(j) === '[object Array]')
+          return isArr(j);
+      else return isObj(j);
+  };
+
+  function _compare(EQ, GT, LT, a, b) {
+      function isArray(a) {
+          return Object.prototype.toString.call(a) === '[object Array]';
+      }
+      function keys(o) {
+          var a = [];
+          for (var k in o) {
+              a.push(k);
+          }
+          return a;
+      }
+
+      if (a == null) {
+          if (b == null) return EQ;
+          else return LT;
+      } else if (typeof a === 'boolean') {
+          if (typeof b === 'boolean') {
+              // boolean / boolean
+              if (a === b) return EQ;
+              else if (a == false) return LT;
+              else return GT;
+          } else if (b == null) return GT;
+          else return LT;
+      } else if (typeof a === 'number') {
+          if (typeof b === 'number') {
+              if (a === b) return EQ;
+              else if (a < b) return LT;
+              else return GT;
+          } else if (b == null) return GT;
+          else if (typeof b === 'boolean') return GT;
+          else return LT;
+      } else if (typeof a === 'string') {
+          if (typeof b === 'string') {
+              if (a === b) return EQ;
+              else if (a < b) return LT;
+              else return GT;
+          } else if (b == null) return GT;
+          else if (typeof b === 'boolean') return GT;
+          else if (typeof b === 'number') return GT;
+          else return LT;
+      } else if (isArray(a)) {
+          if (isArray(b)) {
+              for (var i = 0; i < Math.min(a.length, b.length); i++) {
+                  var c = _compare(EQ, GT, LT, a[i], b[i]);
+                
+                  if (c !== EQ) return c;
+              }
+              if (a.length === b.length) return EQ;
+              else if (a.length < b.length) return LT;
+              else return GT;
+          } else if (b == null) return GT;
+          else if (typeof b === 'boolean') return GT;
+          else if (typeof b === 'number') return GT;
+          else if (typeof b === 'string') return GT;
+          else return LT;
+      }
+      else {
+          if (b == null) return GT;
+          else if (typeof b === 'boolean') return GT;
+          else if (typeof b === 'number') return GT;
+          else if (typeof b === 'string') return GT;
+          else if (isArray(b)) return GT;
+          else {
+              var akeys = keys(a);
+              var bkeys = keys(b);
+            
+              var keys = akeys.concat(bkeys).sort();
+            
+              for (var i = 0; i < keys.length; i++) {
+                  var k = keys[i];
+                
+                  if (a[k] === undefined) return LT;
+                  else if (b[k] === undefined) return GT;
+                
+                  var c = _compare(EQ, GT, LT, a[k], b[k]);
+                
+                  if (c !== EQ) return c;
+              }
+            
+              if (akeys.length === bkeys.length) return EQ;
+              else if (akeys.length < bkeys.length) return LT;
+              else return GT;
+          }
+      }
+  };                          
+ 
+})(PS["Data.Argonaut.Core"] = PS["Data.Argonaut.Core"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Argonaut.Core"];
+  var Prelude = PS["Prelude"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Function = PS["Data.Function"];
+  var Data_StrMap = PS["Data.StrMap"];     
+  var verbJsonType = function (def) {
+      return function (f) {
+          return function (fold) {
+              return fold(def)(f);
+          };
+      };
+  };
+  var toJsonType = verbJsonType(Data_Maybe.Nothing.value)(Data_Maybe.Just.create);
+  var showJson = new Prelude.Show($foreign._stringify);        
+  var foldJsonString = function (d) {
+      return function (f) {
+          return function (j) {
+              return $foreign._foldJson(Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), f, Prelude["const"](d), Prelude["const"](d), j);
+          };
+      };
+  };                                        
+  var toString = toJsonType(foldJsonString);
+  var foldJsonObject = function (d) {
+      return function (f) {
+          return function (j) {
+              return $foreign._foldJson(Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), f, j);
+          };
+      };
+  };                                        
+  var toObject = toJsonType(foldJsonObject);
+  var foldJsonNumber = function (d) {
+      return function (f) {
+          return function (j) {
+              return $foreign._foldJson(Prelude["const"](d), Prelude["const"](d), f, Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), j);
+          };
+      };
+  };                                        
+  var toNumber = toJsonType(foldJsonNumber);
+  var foldJsonNull = function (d) {
+      return function (f) {
+          return function (j) {
+              return $foreign._foldJson(f, Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), j);
+          };
+      };
+  };                                    
+  var foldJsonBoolean = function (d) {
+      return function (f) {
+          return function (j) {
+              return $foreign._foldJson(Prelude["const"](d), f, Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), j);
+          };
+      };
+  };                                          
+  var toBoolean = toJsonType(foldJsonBoolean);
+  var foldJsonArray = function (d) {
+      return function (f) {
+          return function (j) {
+              return $foreign._foldJson(Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), Prelude["const"](d), f, Prelude["const"](d), j);
+          };
+      };
+  };                                      
+  var toArray = toJsonType(foldJsonArray);
+  exports["toObject"] = toObject;
+  exports["toArray"] = toArray;
+  exports["toString"] = toString;
+  exports["toNumber"] = toNumber;
+  exports["toBoolean"] = toBoolean;
+  exports["foldJsonObject"] = foldJsonObject;
+  exports["foldJsonArray"] = foldJsonArray;
+  exports["foldJsonString"] = foldJsonString;
+  exports["foldJsonNumber"] = foldJsonNumber;
+  exports["foldJsonBoolean"] = foldJsonBoolean;
+  exports["foldJsonNull"] = foldJsonNull;
+  exports["showJson"] = showJson;
+  exports["jsonNull"] = $foreign.jsonNull;
+  exports["fromObject"] = $foreign.fromObject;
+  exports["fromArray"] = $foreign.fromArray;
+  exports["fromString"] = $foreign.fromString;
+  exports["fromNumber"] = $foreign.fromNumber;
+  exports["fromBoolean"] = $foreign.fromBoolean;;
+ 
+})(PS["Data.Argonaut.Core"] = PS["Data.Argonaut.Core"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];
+  var Data_String = PS["Data.String"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_List = PS["Data.List"];
+  var Data_Int = PS["Data.Int"];
+  var Data_Unfoldable = PS["Data.Unfoldable"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Generic = PS["Data.Generic"];
+  var Data_StrMap = PS["Data.StrMap"];
+  var Data_Map = PS["Data.Map"];     
+  var EncodeJson = function (encodeJson) {
+      this.encodeJson = encodeJson;
+  };
+  var encodeJsonUnit = new EncodeJson(Prelude["const"](Data_Argonaut_Core.jsonNull));
+  var encodeJsonJson = new EncodeJson(Prelude.id(Prelude.categoryFn));
+  var encodeJsonJString = new EncodeJson(Data_Argonaut_Core.fromString);
+  var encodeJson = function (dict) {
+      return dict.encodeJson;
+  };
+  var encodeJsonArray = function (__dict_EncodeJson_0) {
+      return new EncodeJson(function (json) {
+          return Data_Argonaut_Core.fromArray(Prelude["<$>"](Prelude.functorArray)(encodeJson(__dict_EncodeJson_0))(json));
+      });
+  };
+  var gEncodeJson$prime = function (spine) {
+      var addField = function (field) {
+          return Data_StrMap.insert(field.recLabel)(gEncodeJson$prime(field.recValue(Prelude.unit)));
+      };
+      if (spine instanceof Data_Generic.SInt) {
+          return Data_Argonaut_Core.fromNumber(Data_Int.toNumber(spine.value0));
+      };
+      if (spine instanceof Data_Generic.SString) {
+          return Data_Argonaut_Core.fromString(spine.value0);
+      };
+      if (spine instanceof Data_Generic.SNumber) {
+          return Data_Argonaut_Core.fromNumber(spine.value0);
+      };
+      if (spine instanceof Data_Generic.SBoolean) {
+          return Data_Argonaut_Core.fromBoolean(spine.value0);
+      };
+      if (spine instanceof Data_Generic.SArray) {
+          return Data_Argonaut_Core.fromArray(Prelude["<$>"](Prelude.functorArray)(function (_23) {
+              return gEncodeJson$prime(_23(Prelude.unit));
+          })(spine.value0));
+      };
+      if (spine instanceof Data_Generic.SProd) {
+          return Data_Argonaut_Core.fromObject(Data_StrMap.insert("tag")(encodeJson(encodeJsonJString)(spine.value0))(Data_StrMap.singleton("values")(encodeJson(encodeJsonArray(encodeJsonJson))(Prelude["<$>"](Prelude.functorArray)(function (_24) {
+              return gEncodeJson$prime(_24(Prelude.unit));
+          })(spine.value1)))));
+      };
+      if (spine instanceof Data_Generic.SRecord) {
+          return Data_Argonaut_Core.fromObject(Data_Foldable.foldr(Data_Foldable.foldableArray)(addField)(Data_StrMap.empty)(spine.value0));
+      };
+      throw new Error("Failed pattern match: " + [ spine.constructor.name ]);
+  };
+  var gEncodeJson = function (__dict_Generic_11) {
+      return function (_25) {
+          return gEncodeJson$prime(Data_Generic.toSpine(__dict_Generic_11)(_25));
+      };
+  };
+  exports["EncodeJson"] = EncodeJson;
+  exports["gEncodeJson"] = gEncodeJson;
+  exports["encodeJson"] = encodeJson;
+  exports["encodeJsonUnit"] = encodeJsonUnit;
+  exports["encodeJsonJString"] = encodeJsonJString;
+  exports["encodeJsonJson"] = encodeJsonJson;
+  exports["encodeJsonArray"] = encodeJsonArray;;
+ 
+})(PS["Data.Argonaut.Encode"] = PS["Data.Argonaut.Encode"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];
+  var Data_Array = PS["Data.Array"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Int = PS["Data.Int"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_String = PS["Data.String"];
+  var Data_List = PS["Data.List"];
+  var Control_Alt = PS["Control.Alt"];
+  var Control_Bind = PS["Control.Bind"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Generic = PS["Data.Generic"];
+  var Data_StrMap = PS["Data.StrMap"];
+  var Data_Map = PS["Data.Map"];     
+  var DecodeJson = function (decodeJson) {
+      this.decodeJson = decodeJson;
+  };
+  var gDecodeJson$prime = function (signature) {
+      return function (json) {
+          var mFail = function (msg) {
+              return Data_Maybe.maybe(new Data_Either.Left(msg))(Data_Either.Right.create);
+          };
+          if (signature instanceof Data_Generic.SigNumber) {
+              return Prelude["<$>"](Data_Either.functorEither)(Data_Generic.SNumber.create)(mFail("Expected a number")(Data_Argonaut_Core.toNumber(json)));
+          };
+          if (signature instanceof Data_Generic.SigInt) {
+              return Prelude["<$>"](Data_Either.functorEither)(Data_Generic.SInt.create)(mFail("Expected an integer number")(Control_Bind["=<<"](Data_Maybe.bindMaybe)(Data_Int.fromNumber)(Data_Argonaut_Core.toNumber(json))));
+          };
+          if (signature instanceof Data_Generic.SigString) {
+              return Prelude["<$>"](Data_Either.functorEither)(Data_Generic.SString.create)(mFail("Expected a string")(Data_Argonaut_Core.toString(json)));
+          };
+          if (signature instanceof Data_Generic.SigBoolean) {
+              return Prelude["<$>"](Data_Either.functorEither)(Data_Generic.SBoolean.create)(mFail("Expected a boolean")(Data_Argonaut_Core.toBoolean(json)));
+          };
+          if (signature instanceof Data_Generic.SigArray) {
+              return Prelude.bind(Data_Either.bindEither)(mFail("Expected an array")(Data_Argonaut_Core.toArray(json)))(function (_1) {
+                  return Prelude["<$>"](Data_Either.functorEither)(Data_Generic.SArray.create)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Data_Either.applicativeEither)(function (_43) {
+                      return Prelude.map(Data_Either.functorEither)(Prelude["const"])(gDecodeJson$prime(signature.value0(Prelude.unit))(_43));
+                  })(_1));
+              });
+          };
+          if (signature instanceof Data_Generic.SigRecord) {
+              return Prelude.bind(Data_Either.bindEither)(mFail("Expected an object")(Data_Argonaut_Core.toObject(json)))(function (_4) {
+                  return Prelude["<$>"](Data_Either.functorEither)(Data_Generic.SRecord.create)(Data_Traversable["for"](Data_Either.applicativeEither)(Data_Traversable.traversableArray)(signature.value0)(function (_12) {
+                      return Prelude.bind(Data_Either.bindEither)(mFail("'" + (_12.recLabel + "' property missing"))(Data_StrMap.lookup(_12.recLabel)(_4)))(function (_3) {
+                          return Prelude.bind(Data_Either.bindEither)(gDecodeJson$prime(_12.recValue(Prelude.unit))(_3))(function (_2) {
+                              return Prelude.pure(Data_Either.applicativeEither)({
+                                  recLabel: _12.recLabel, 
+                                  recValue: Prelude["const"](_2)
+                              });
+                          });
+                      });
+                  }));
+              });
+          };
+          if (signature instanceof Data_Generic.SigProd) {
+              return Prelude.bind(Data_Either.bindEither)(mFail("Expected an object")(Data_Argonaut_Core.toObject(json)))(function (_8) {
+                  return Prelude.bind(Data_Either.bindEither)(mFail("'tag' string property is missing")(Control_Bind["=<<"](Data_Maybe.bindMaybe)(Data_Argonaut_Core.toString)(Data_StrMap.lookup("tag")(_8))))(function (_7) {
+                      var _27 = Data_Foldable.find(Data_Foldable.foldableArray)(function (_44) {
+                          return Prelude["=="](Prelude.eqString)(_7)((function (_0) {
+                              return _0.sigConstructor;
+                          })(_44));
+                      })(signature.value0);
+                      if (_27 instanceof Data_Maybe.Nothing) {
+                          return new Data_Either.Left("'" + (_7 + "' isn't a valid constructor"));
+                      };
+                      if (_27 instanceof Data_Maybe.Just) {
+                          return Prelude.bind(Data_Either.bindEither)(mFail("'values' array is missing")(Control_Bind["=<<"](Data_Maybe.bindMaybe)(Data_Argonaut_Core.toArray)(Data_StrMap.lookup("values")(_8))))(function (_6) {
+                              return Prelude.bind(Data_Either.bindEither)(Data_Array.zipWithA(Data_Either.applicativeEither)(function (k) {
+                                  return gDecodeJson$prime(k(Prelude.unit));
+                              })(_27.value0.sigValues)(_6))(function (_5) {
+                                  return Prelude.pure(Data_Either.applicativeEither)(new Data_Generic.SProd(_7, Prelude["<$>"](Prelude.functorArray)(Prelude["const"])(_5)));
+                              });
+                          });
+                      };
+                      throw new Error("Failed pattern match: " + [ _27.constructor.name ]);
+                  });
+              });
+          };
+          throw new Error("Failed pattern match: " + [ signature.constructor.name ]);
+      };
+  };
+  var gDecodeJson = function (__dict_Generic_0) {
+      return function (json) {
+          return Control_Bind["=<<"](Data_Either.bindEither)(function (_45) {
+              return Data_Maybe.maybe(new Data_Either.Left("fromSpine failed"))(Data_Either.Right.create)(Data_Generic.fromSpine(__dict_Generic_0)(_45));
+          })(gDecodeJson$prime(Data_Generic.toSignature(__dict_Generic_0)(Data_Generic.Proxy.value))(json));
+      };
+  };                                                                                                                                        
+  var decodeJsonNull = new DecodeJson(Data_Argonaut_Core.foldJsonNull(new Data_Either.Left("Not null."))(Prelude["const"](new Data_Either.Right(Prelude.unit))));
+  var decodeJson = function (dict) {
+      return dict.decodeJson;
+  };
+  var decodeMaybe = function (__dict_DecodeJson_9) {
+      return function (json) {
+          return Data_Either.either(Prelude["const"](Data_Maybe.Nothing.value))(Prelude.pure(Data_Maybe.applicativeMaybe))(decodeJson(__dict_DecodeJson_9)(json));
+      };
+  };
+  var decodeArray = function (__dict_DecodeJson_12) {
+      return new DecodeJson(function (json) {
+          return Data_Maybe.maybe(new Data_Either.Left("Couldn't decode."))(Data_Either.Right.create)(Prelude.bind(Data_Maybe.bindMaybe)(Data_Argonaut_Core.toArray(json))(function (_10) {
+              return Data_Traversable.traverse(Data_Traversable.traversableArray)(Data_Maybe.applicativeMaybe)(decodeMaybe(__dict_DecodeJson_12))(_10);
+          }));
+      });
+  };
+  exports["DecodeJson"] = DecodeJson;
+  exports["decodeMaybe"] = decodeMaybe;
+  exports["gDecodeJson"] = gDecodeJson;
+  exports["decodeJson"] = decodeJson;
+  exports["decodeJsonNull"] = decodeJsonNull;
+  exports["decodeArray"] = decodeArray;;
+ 
+})(PS["Data.Argonaut.Decode"] = PS["Data.Argonaut.Decode"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Data_Lens_Lens = PS["Data.Lens.Lens"];
+  var Prelude = PS["Prelude"];
+  var Klikhut_SQL = PS["Klikhut.SQL"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Data_Generic = PS["Data.Generic"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign_Index = PS["Data.Foreign.Index"];     
+  var Photobooth = (function () {
+      function Photobooth(value0) {
+          this.value0 = value0;
+      };
+      Photobooth.create = function (value0) {
+          return new Photobooth(value0);
+      };
+      return Photobooth;
+  })();
+  var genericPhotobooth = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "Photobooth" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(Photobooth.create))((function (r) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 3) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (alias_1) {
+                      return function (computername_1) {
+                          return function (defaultprofile_1) {
+                              return {
+                                  alias: alias_1, 
+                                  computername: computername_1, 
+                                  defaultprofile: defaultprofile_1
+                              };
+                          };
+                      };
+                  }))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[2]).recValue(Prelude.unit)));
+              };
+              return Data_Maybe.Nothing.value;
+          })($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd([ {
+          sigConstructor: "Photobooth", 
+          sigValues: [ function ($dollarq_1) {
+              return new Data_Generic.SigRecord([ {
+                  recLabel: "alias", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "computername", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "defaultprofile", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              } ]);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      return new Data_Generic.SProd("Photobooth", [ function ($dollarq) {
+          return new Data_Generic.SRecord([ {
+              recLabel: "alias", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.alias);
+              }
+          }, {
+              recLabel: "computername", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.computername);
+              }
+          }, {
+              recLabel: "defaultprofile", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.defaultprofile);
+              }
+          } ]);
+      } ]);
+  });                                                                    
+  var encodeJsonPhotobooth = new Data_Argonaut_Encode.EncodeJson(Data_Argonaut_Encode.gEncodeJson(genericPhotobooth));
+  var decodeJsonPhotobooth = new Data_Argonaut_Decode.DecodeJson(Data_Argonaut_Decode.gDecodeJson(genericPhotobooth));                                                                                                          
+  var _defaultprofile = function (__dict_Strong_0) {
+      return Data_Lens_Lens.lens(function (_6) {
+          return _6.defaultprofile;
+      })(function (_7) {
+          return function (_8) {
+              var _30 = {};
+              for (var _31 in _7) {
+                  if (_7.hasOwnProperty(_31)) {
+                      _30[_31] = _7[_31];
+                  };
+              };
+              _30.defaultprofile = _8;
+              return _30;
+          };
+      })(__dict_Strong_0);
+  };
+  var _computername = function (__dict_Strong_1) {
+      return Data_Lens_Lens.lens(function (_0) {
+          return _0.computername;
+      })(function (_1) {
+          return function (_2) {
+              var _32 = {};
+              for (var _33 in _1) {
+                  if (_1.hasOwnProperty(_33)) {
+                      _32[_33] = _1[_33];
+                  };
+              };
+              _32.computername = _2;
+              return _32;
+          };
+      })(__dict_Strong_1);
+  };
+  var _alias = function (__dict_Strong_2) {
+      return Data_Lens_Lens.lens(function (_3) {
+          return _3.alias;
+      })(function (_4) {
+          return function (_5) {
+              var _34 = {};
+              for (var _35 in _4) {
+                  if (_4.hasOwnProperty(_35)) {
+                      _34[_35] = _4[_35];
+                  };
+              };
+              _34.alias = _5;
+              return _34;
+          };
+      })(__dict_Strong_2);
+  };
+  var _Photobooth = Data_Lens_Lens.lens(function (_12) {
+      return _12.value0;
+  })(function (_13) {
+      return function (a) {
+          return new Photobooth(a);
+      };
+  });
+  exports["Photobooth"] = Photobooth;
+  exports["_Photobooth"] = _Photobooth;
+  exports["_defaultprofile"] = _defaultprofile;
+  exports["_alias"] = _alias;
+  exports["_computername"] = _computername;
+  exports["genericPhotobooth"] = genericPhotobooth;
+  exports["encodeJsonPhotobooth"] = encodeJsonPhotobooth;
+  exports["decodeJsonPhotobooth"] = decodeJsonPhotobooth;;
+ 
+})(PS["Klikhut.Model.Photobooth"] = PS["Klikhut.Model.Photobooth"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Network_HTTP_MimeType = PS["Network.HTTP.MimeType"];
+  var applicationJSON = "application/json";
+  exports["applicationJSON"] = applicationJSON;;
+ 
+})(PS["Network.HTTP.MimeType.Common"] = PS["Network.HTTP.MimeType.Common"] || {});
+(function(exports) {
+  // module Data.Argonaut.Parser
+
+  exports._jsonParser = function(fail, succ, s) {
+      try {
+          return succ(JSON.parse(s));
+      }
+      catch(e) {
+          return fail(e.message);
+      }
+  };
+ 
+})(PS["Data.Argonaut.Parser"] = PS["Data.Argonaut.Parser"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Argonaut.Parser"];
+  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Either = PS["Data.Either"];     
+  var jsonParser = function (j) {
+      return $foreign._jsonParser(Data_Either.Left.create, Data_Either.Right.create, j);
+  };
+  exports["jsonParser"] = jsonParser;;
+ 
+})(PS["Data.Argonaut.Parser"] = PS["Data.Argonaut.Parser"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];     
+  var Printer = function (printJson) {
+      this.printJson = printJson;
+  };
+  var printerString = new Printer(Prelude.show(Data_Argonaut_Core.showJson));
+  var printJson = function (dict) {
+      return dict.printJson;
+  };
+  exports["Printer"] = Printer;
+  exports["printJson"] = printJson;
+  exports["printerString"] = printerString;;
+ 
+})(PS["Data.Argonaut.Printer"] = PS["Data.Argonaut.Printer"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Network_HTTP_RequestHeader = PS["Network.HTTP.RequestHeader"];
+  var Network_HTTP_MimeType_Common = PS["Network.HTTP.MimeType.Common"];
+  var Network_HTTP_Method = PS["Network.HTTP.Method"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Data_Argonaut_Parser = PS["Data.Argonaut.Parser"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Printer = PS["Data.Argonaut.Printer"];
+  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Data_Either = PS["Data.Either"];
+  var Node_Express_Types = PS["Node.Express.Types"];
+  var Data_String_Regex = PS["Data.String.Regex"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
+  var Network_HTTP_Affjax_Request = PS["Network.HTTP.Affjax.Request"];
+  var Network_HTTP_Affjax_Response = PS["Network.HTTP.Affjax.Response"];     
+  var Endpoint = (function () {
+      function Endpoint(value0) {
+          this.value0 = value0;
+      };
+      Endpoint.create = function (value0) {
+          return new Endpoint(value0);
+      };
+      return Endpoint;
+  })();
+  var putPhotobooths = new Endpoint({
+      method: Network_HTTP_Method.PUT.value, 
+      serverUrl: "/api/photobooths", 
+      mkClientUrl: Prelude["const"]("/api/photobooths")
+  });
+  var postPhotobooths = new Endpoint({
+      method: Network_HTTP_Method.POST.value, 
+      serverUrl: "/api/photobooths", 
+      mkClientUrl: Prelude["const"]("/api/photobooths")
+  });
+  var parseOrThrow = function (__dict_DecodeJson_0) {
+      return function (a) {
+          var throwStr = function (str) {
+              return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error(str));
+          };
+          return Data_Either.either(throwStr)(function (json) {
+              return Data_Either.either(throwStr)(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Argonaut_Decode.decodeJson(__dict_DecodeJson_0)(json));
+          })(Data_Argonaut_Parser.jsonParser(a));
+      };
+  };
+  var getPhotobooths = new Endpoint({
+      method: Network_HTTP_Method.GET.value, 
+      serverUrl: "/api/photobooths", 
+      mkClientUrl: Prelude["const"]("/api/photobooths")
+  });
+  var execEndpoint = function (__dict_EncodeJson_1) {
+      return function (__dict_DecodeJson_2) {
+          return function (__dict_EncodeJson_3) {
+              return function (__dict_DecodeJson_4) {
+                  return function (_1) {
+                      return function (a) {
+                          return function (b) {
+                              var opts = {
+                                  method: _1.value0.method, 
+                                  url: _1.value0.mkClientUrl(a), 
+                                  headers: [ new Network_HTTP_RequestHeader.ContentType(Network_HTTP_MimeType_Common.applicationJSON) ], 
+                                  content: Data_Maybe.Just.create(Data_Argonaut_Printer.printJson(Data_Argonaut_Printer.printerString)(Data_Argonaut_Encode.encodeJson(__dict_EncodeJson_1)(b))), 
+                                  username: Data_Maybe.Nothing.value, 
+                                  password: Data_Maybe.Nothing.value
+                              };
+                              return Prelude[">>="](Control_Monad_Aff.bindAff)(Network_HTTP_Affjax.affjax(Network_HTTP_Affjax_Request.requestableString)(Network_HTTP_Affjax_Response.responsableString)(opts))(Prelude[">>>"](Prelude.semigroupoidFn)(function (_0) {
+                                  return _0.response;
+                              })(parseOrThrow(__dict_DecodeJson_4)));
+                          };
+                      };
+                  };
+              };
+          };
+      };
+  };
+  exports["Endpoint"] = Endpoint;
+  exports["parseOrThrow"] = parseOrThrow;
+  exports["putPhotobooths"] = putPhotobooths;
+  exports["postPhotobooths"] = postPhotobooths;
+  exports["getPhotobooths"] = getPhotobooths;
+  exports["execEndpoint"] = execEndpoint;;
+ 
+})(PS["Klikhut.Endpoint"] = PS["Klikhut.Endpoint"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Data_Lens_Prism = PS["Data.Lens.Prism"];
+  var Prelude = PS["Prelude"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];     
+  var Initial = (function () {
+      function Initial() {
+
+      };
+      Initial.value = new Initial();
+      return Initial;
+  })();
+  var Busy = (function () {
+      function Busy(value0) {
+          this.value0 = value0;
+      };
+      Busy.create = function (value0) {
+          return new Busy(value0);
+      };
+      return Busy;
+  })();
+  var Errored = (function () {
+      function Errored(value0) {
+          this.value0 = value0;
+      };
+      Errored.create = function (value0) {
+          return new Errored(value0);
+      };
+      return Errored;
+  })();
+  var Done = (function () {
+      function Done(value0) {
+          this.value0 = value0;
+      };
+      Done.create = function (value0) {
+          return new Done(value0);
+      };
+      return Done;
+  })();
+  var _Initial = function (__dict_Choice_0) {
+      var l = function (_0) {
+          if (_0 instanceof Initial) {
+              return new Data_Maybe.Just(Prelude.unit);
+          };
+          return Data_Maybe.Nothing.value;
+      };
+      return Data_Lens_Prism["prism'"](Prelude["const"](Initial.value))(l)(__dict_Choice_0);
+  };
+  var _Errored = function (__dict_Choice_1) {
+      var l = function (_2) {
+          if (_2 instanceof Errored) {
+              return new Data_Maybe.Just(_2.value0);
+          };
+          return Data_Maybe.Nothing.value;
+      };
+      return Data_Lens_Prism["prism'"](Errored.create)(l)(__dict_Choice_1);
+  };
+  var _Done = function (__dict_Choice_2) {
+      var l = function (_3) {
+          if (_3 instanceof Done) {
+              return new Data_Maybe.Just(_3.value0);
+          };
+          return Data_Maybe.Nothing.value;
+      };
+      return Data_Lens_Prism["prism'"](Done.create)(l)(__dict_Choice_2);
+  };
+  var _Busy = function (__dict_Choice_3) {
+      var l = function (_1) {
+          if (_1 instanceof Busy) {
+              return new Data_Maybe.Just(_1.value0);
+          };
+          return Data_Maybe.Nothing.value;
+      };
+      return Data_Lens_Prism["prism'"](Busy.create)(l)(__dict_Choice_3);
+  };
+  exports["Initial"] = Initial;
+  exports["Busy"] = Busy;
+  exports["Errored"] = Errored;
+  exports["Done"] = Done;
+  exports["_Done"] = _Done;
+  exports["_Errored"] = _Errored;
+  exports["_Busy"] = _Busy;
+  exports["_Initial"] = _Initial;;
+ 
+})(PS["Klikhut.Async"] = PS["Klikhut.Async"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Data_Lens_Lens = PS["Data.Lens.Lens"];
+  var Prelude = PS["Prelude"];
+  var Data_Lens = PS["Data.Lens"];
+  var Klikhut_Async = PS["Klikhut.Async"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var DOM = PS["DOM"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
+  var Data_Maybe = PS["Data.Maybe"];     
+  var PhotoboothsPage = (function () {
+      function PhotoboothsPage() {
+
+      };
+      PhotoboothsPage.value = new PhotoboothsPage();
+      return PhotoboothsPage;
+  })();
+  var EventsPage = (function () {
+      function EventsPage(value0) {
+          this.value0 = value0;
+      };
+      EventsPage.create = function (value0) {
+          return new EventsPage(value0);
+      };
+      return EventsPage;
+  })();
+  var initialState = {
+      route: PhotoboothsPage.value, 
+      photobooths: Klikhut_Async.Initial.value, 
+      photoboothsPage: {
+          newPb: {
+              model: {
+                  computername: "", 
+                  alias: "", 
+                  defaultprofile: ""
+              }, 
+              state: Klikhut_Async.Initial.value
+          }, 
+          editing: Data_Maybe.Nothing.value
+      }
+  };
+  var _state = function (__dict_Strong_0) {
+      return Data_Lens_Lens.lens(function (_9) {
+          return _9.state;
+      })(function (_10) {
+          return function (_11) {
+              var _29 = {};
+              for (var _30 in _10) {
+                  if (_10.hasOwnProperty(_30)) {
+                      _29[_30] = _10[_30];
+                  };
+              };
+              _29.state = _11;
+              return _29;
+          };
+      })(__dict_Strong_0);
+  };
+  var _saving = function (__dict_Strong_1) {
+      return Data_Lens_Lens.lens(function (_21) {
+          return _21.saving;
+      })(function (_22) {
+          return function (_23) {
+              var _31 = {};
+              for (var _32 in _22) {
+                  if (_22.hasOwnProperty(_32)) {
+                      _31[_32] = _22[_32];
+                  };
+              };
+              _31.saving = _23;
+              return _31;
+          };
+      })(__dict_Strong_1);
+  };
+  var _route = function (__dict_Strong_2) {
+      return Data_Lens_Lens.lens(function (_24) {
+          return _24.route;
+      })(function (_25) {
+          return function (_26) {
+              var _33 = {};
+              for (var _34 in _25) {
+                  if (_25.hasOwnProperty(_34)) {
+                      _33[_34] = _25[_34];
+                  };
+              };
+              _33.route = _26;
+              return _33;
+          };
+      })(__dict_Strong_2);
+  };
+  var _photoboothsEditing = Data_Lens_Lens.lens(function (_27) {
+      return {
+          photobooths: _27.photobooths, 
+          editing: _27.editing
+      };
+  })(function (old) {
+      return function (_28) {
+          var _41 = {};
+          for (var _42 in old) {
+              if (old.hasOwnProperty(_42)) {
+                  _41[_42] = old[_42];
+              };
+          };
+          _41.photobooths = _28.photobooths;
+          _41.editing = _28.editing;
+          return _41;
+      };
+  });
+  var _photobooths = function (__dict_Strong_4) {
+      return Data_Lens_Lens.lens(function (_0) {
+          return _0.photobooths;
+      })(function (_1) {
+          return function (_2) {
+              var _45 = {};
+              for (var _46 in _1) {
+                  if (_1.hasOwnProperty(_46)) {
+                      _45[_46] = _1[_46];
+                  };
+              };
+              _45.photobooths = _2;
+              return _45;
+          };
+      })(__dict_Strong_4);
+  };
+  var _pbPage = function (__dict_Strong_5) {
+      return Data_Lens_Lens.lens(function (obj) {
+          return {
+              photobooths: obj.photobooths, 
+              newPb: obj.photoboothsPage.newPb, 
+              editing: obj.photoboothsPage.editing, 
+              route: obj.route
+          };
+      })(function (old) {
+          return function (obj) {
+              var _47 = {};
+              for (var _48 in old) {
+                  if (old.hasOwnProperty(_48)) {
+                      _47[_48] = old[_48];
+                  };
+              };
+              _47.photobooths = obj.photobooths;
+              _47.photoboothsPage = {
+                  newPb: obj.newPb, 
+                  editing: obj.editing
+              };
+              _47.route = obj.route;
+              return _47;
+          };
+      })(__dict_Strong_5);
+  };
+  var _newPb = function (__dict_Strong_6) {
+      return Data_Lens_Lens.lens(function (_3) {
+          return _3.newPb;
+      })(function (_4) {
+          return function (_5) {
+              var _49 = {};
+              for (var _50 in _4) {
+                  if (_4.hasOwnProperty(_50)) {
+                      _49[_50] = _4[_50];
+                  };
+              };
+              _49.newPb = _5;
+              return _49;
+          };
+      })(__dict_Strong_6);
+  };
+  var _model = function (__dict_Strong_7) {
+      return Data_Lens_Lens.lens(function (_6) {
+          return _6.model;
+      })(function (_7) {
+          return function (_8) {
+              var _51 = {};
+              for (var _52 in _7) {
+                  if (_7.hasOwnProperty(_52)) {
+                      _51[_52] = _7[_52];
+                  };
+              };
+              _51.model = _8;
+              return _51;
+          };
+      })(__dict_Strong_7);
+  };
+  var _editing = function (__dict_Strong_9) {
+      return Data_Lens_Lens.lens(function (_12) {
+          return _12.editing;
+      })(function (_13) {
+          return function (_14) {
+              var _55 = {};
+              for (var _56 in _13) {
+                  if (_13.hasOwnProperty(_56)) {
+                      _55[_56] = _13[_56];
+                  };
+              };
+              _55.editing = _14;
+              return _55;
+          };
+      })(__dict_Strong_9);
+  };
+  exports["PhotoboothsPage"] = PhotoboothsPage;
+  exports["EventsPage"] = EventsPage;
+  exports["_pbPage"] = _pbPage;
+  exports["_route"] = _route;
+  exports["_saving"] = _saving;
+  exports["_editing"] = _editing;
+  exports["_state"] = _state;
+  exports["_model"] = _model;
+  exports["_newPb"] = _newPb;
+  exports["_photoboothsEditing"] = _photoboothsEditing;
+  exports["_photobooths"] = _photobooths;
+  exports["initialState"] = initialState;;
+ 
+})(PS["ClientState"] = PS["ClientState"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Data_Lens_Setter = PS["Data.Lens.Setter"];
+  var Data_Lens_Getter = PS["Data.Lens.Getter"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Components = PS["OpticUI.Components"];
+  var OpticUI = PS["OpticUI"];
+  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Apply = PS["Control.Apply"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Lens_Common = PS["Data.Lens.Common"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Array = PS["Data.Array"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Prelude = PS["Prelude"];
+  var DOM = PS["DOM"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
+  var Klikhut_Endpoint = PS["Klikhut.Endpoint"];
+  var Klikhut_Types = PS["Klikhut.Types"];
+  var Klikhut_Async = PS["Klikhut.Async"];
+  var ClientState = PS["ClientState"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Const = PS["Data.Const"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];     
+  var LoadAll = (function () {
+      function LoadAll() {
+
+      };
+      LoadAll.value = new LoadAll();
+      return LoadAll;
+  })();
+  var Loaded = (function () {
+      function Loaded(value0) {
+          this.value0 = value0;
+      };
+      Loaded.create = function (value0) {
+          return new Loaded(value0);
+      };
+      return Loaded;
+  })();
+  var LoadingFailed = (function () {
+      function LoadingFailed(value0) {
+          this.value0 = value0;
+      };
+      LoadingFailed.create = function (value0) {
+          return new LoadingFailed(value0);
+      };
+      return LoadingFailed;
+  })();
+  var SaveNew = (function () {
+      function SaveNew() {
+
+      };
+      SaveNew.value = new SaveNew();
+      return SaveNew;
+  })();
+  var NewSaved = (function () {
+      function NewSaved() {
+
+      };
+      NewSaved.value = new NewSaved();
+      return NewSaved;
+  })();
+  var NewSaveFailed = (function () {
+      function NewSaveFailed(value0) {
+          this.value0 = value0;
+      };
+      NewSaveFailed.create = function (value0) {
+          return new NewSaveFailed(value0);
+      };
+      return NewSaveFailed;
+  })();
+  var StartEdit = (function () {
+      function StartEdit(value0) {
+          this.value0 = value0;
+      };
+      StartEdit.create = function (value0) {
+          return new StartEdit(value0);
+      };
+      return StartEdit;
+  })();
+  var CancelEdit = (function () {
+      function CancelEdit() {
+
+      };
+      CancelEdit.value = new CancelEdit();
+      return CancelEdit;
+  })();
+  var SaveEdit = (function () {
+      function SaveEdit() {
+
+      };
+      SaveEdit.value = new SaveEdit();
+      return SaveEdit;
+  })();
+  var EditSaved = (function () {
+      function EditSaved() {
+
+      };
+      EditSaved.value = new EditSaved();
+      return EditSaved;
+  })();
+  var EditSaveFailed = (function () {
+      function EditSaveFailed(value0) {
+          this.value0 = value0;
+      };
+      EditSaveFailed.create = function (value0) {
+          return new EditSaveFailed(value0);
+      };
+      return EditSaveFailed;
+  })();
+  var ToEvents = (function () {
+      function ToEvents(value0) {
+          this.value0 = value0;
+      };
+      ToEvents.create = function (value0) {
+          return new ToEvents(value0);
+      };
+      return ToEvents;
+  })();
+  var updatePB = function (pb) {
+      return Klikhut_Endpoint.execEndpoint(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Klikhut_Endpoint.putPhotobooths)(Prelude.unit)(pb);
+  };
+  var showPB = function (handle) {
+      return function (_13) {
+          return function (i) {
+              if (_13 instanceof Data_Maybe.Just && i === _13.value0) {
+                  return OpticUI_Core["with"](function (_9) {
+                      return function (h) {
+                          return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_9.value0.computername))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Klikhut_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Klikhut_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._defaultprofile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning"), OpticUI_Markup_HTML.onClick(function (_7) {
+                              return handle(CancelEdit.value);
+                          }) ])(OpticUI_Markup.text("Cancel")), OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-success"), OpticUI_Markup_HTML.onClick(function (_8) {
+                              return handle(SaveEdit.value);
+                          }) ])(OpticUI_Markup.text("Save")) ]))) ]));
+                      };
+                  });
+              };
+              return OpticUI_Core["with"](function (_12) {
+                  return function (h) {
+                      return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_12.value0.computername)), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_12.value0.alias)), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_12.value0.defaultprofile)), Data_Maybe.maybe(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_10) {
+                          return handle(new StartEdit(i));
+                      }) ])(OpticUI_Markup.text("Edit"))))(Prelude["const"](Data_Monoid.mempty(OpticUI_Markup.markupMonoid)))(_13), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_11) {
+                          return handle(new ToEvents(_12.value0.computername));
+                      }) ])(OpticUI_Markup.text("Zie events"))) ])));
+                  };
+              });
+          };
+      };
+  };
+  var saveNewPb = function (pb) {
+      return Klikhut_Endpoint.execEndpoint(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Klikhut_Endpoint.postPhotobooths)(Prelude.unit)(pb);
+  };
+  var makeNewPbButton = function (handle) {
+      return OpticUI_Core["with"](function (newPb) {
+          return function (h) {
+              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_2) {
+                  return handle(SaveNew.value);
+              }) ])(OpticUI_Markup.text("Save shit")))), Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning") ])(OpticUI_Markup.text("Saving PB"))), OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_3) {
+                  return handle(NewSaved.value);
+              })(function (_44) {
+                  return handle(NewSaveFailed.create(_44));
+              }) ])), Klikhut_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
+                  return function (_4) {
+                      return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger") ])(OpticUI_Markup.text("Failed!"))), OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Photobooths failed to get saved: " + Control_Monad_Eff_Exception.message(err)))) ]);
+                  };
+              })) ]);
+          };
+      });
+  };
+  var makeNewPb = function (handle) {
+      return OpticUI_Core["with"](function (model) {
+          return function (h) {
+              return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._defaultprofile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._state(OpticUI_Core.uiStrong)(makeNewPbButton(handle))) ]));
+          };
+      });
+  };
+  var loadPbs = Klikhut_Endpoint.execEndpoint(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Data_Argonaut_Encode.encodeJsonArray(Klikhut_Model_Photobooth.encodeJsonPhotobooth))(Data_Argonaut_Decode.decodeArray(Klikhut_Model_Photobooth.decodeJsonPhotobooth))(Klikhut_Endpoint.getPhotobooths)(Prelude.unit)(Prelude.unit);
+  var listPhotobooths = function (handle) {
+      return function (selInd) {
+          return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ ClientState._photobooths(OpticUI_Core.uiStrong)(OpticUI_Core["with"](function (pbs) {
+              return function (h) {
+                  return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.inline(Control_Apply["*>"](Control_Monad_Eff.applyEff)(handle(LoadAll.value))(Prelude["return"](Control_Monad_Eff.applicativeEff)(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Nothing loaded yet"))))))), Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))), OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_45) {
+                      return handle(Loaded.create(_45));
+                  })(function (_46) {
+                      return handle(LoadingFailed.create(_46));
+                  }) ])), Klikhut_Async._Done(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.foreach(OpticUI_Markup.markupMonoid)(Data_Traversable.traversableArray)(showPB(handle)(selInd))), Klikhut_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
+                      return function (_5) {
+                          return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(err)))));
+                      };
+                  })) ]);
+              };
+          })), ClientState._editing(OpticUI_Core.uiStrong)(Data_Lens_Common._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(ClientState._saving(OpticUI_Core.uiStrong)(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_6) {
+              return handle(EditSaved.value);
+          })(function (_47) {
+              return handle(EditSaveFailed.create(_47));
+          }))))) ]);
+      };
+  };
+  var photoboothsPage = OpticUI_Core["with"](function (s) {
+      return function (h) {
+          var handle = function (_14) {
+              if (_14 instanceof LoadAll) {
+                  return function __do() {
+                      var a = OpticUI_Components_Async.async(loadPbs)();
+                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._photobooths(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Busy(a))(s))();
+                  };
+              };
+              if (_14 instanceof SaveNew) {
+                  return function __do() {
+                      var a = OpticUI_Components_Async.async(saveNewPb(new Klikhut_Model_Photobooth.Photobooth(Data_Lens_Getter.view(function (_48) {
+                          return ClientState._newPb(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(_48));
+                      })(s))))();
+                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_49) {
+                          return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_49));
+                      })(new Klikhut_Async.Busy(a))(s))();
+                  };
+              };
+              if (_14 instanceof Loaded) {
+                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._photobooths(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Done(_14.value0))(s));
+              };
+              if (_14 instanceof LoadingFailed) {
+                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._photobooths(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Errored(_14.value0))(s));
+              };
+              if (_14 instanceof NewSaveFailed) {
+                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_50) {
+                      return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_50));
+                  })(new Klikhut_Async.Errored(_14.value0))(s));
+              };
+              if (_14 instanceof NewSaved) {
+                  var $$new = Klikhut_Model_Photobooth.Photobooth.create(Data_Lens_Getter.view(function (_51) {
+                      return ClientState._newPb(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(_51));
+                  })(s));
+                  var updates = function (_52) {
+                      return Data_Lens_Setter.over(function (_53) {
+                          return ClientState._photobooths(Data_Profunctor_Strong.strongFn)(Klikhut_Async._Done(Data_Profunctor_Choice.choiceFn)(_53));
+                      })(function (arr) {
+                          return Data_Array.snoc(arr)($$new);
+                      })(Data_Lens_Setter.set(function (_54) {
+                          return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._model(Data_Profunctor_Strong.strongFn)(_54));
+                      })({
+                          computername: "", 
+                          alias: "", 
+                          defaultprofile: ""
+                      })(Data_Lens_Setter.set(function (_55) {
+                          return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_55));
+                      })(Klikhut_Async.Initial.value)(_52)));
+                  };
+                  return OpticUI_Core.runHandler(h)(updates(s));
+              };
+              if (_14 instanceof StartEdit) {
+                  return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (pb) {
+                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(new Data_Maybe.Just({
+                          index: _14.value0, 
+                          previous: pb, 
+                          saving: Klikhut_Async.Initial.value
+                      }))(s));
+                  })(Data_Array["!!"](Data_Lens_Getter.view(function (_56) {
+                      return ClientState._photobooths(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(Klikhut_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_Monoid.monoidArray)))(_56));
+                  })(s))(_14.value0));
+              };
+              if (_14 instanceof CancelEdit) {
+                  return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (_0) {
+                      var updates = function (_57) {
+                          return Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(Data_Lens_Setter.over(function (_58) {
+                              return ClientState._photobooths(Data_Profunctor_Strong.strongFn)(Klikhut_Async._Done(Data_Profunctor_Choice.choiceFn)(_58));
+                          })(function (pbs) {
+                              return Data_Maybe.maybe(pbs)(Prelude.id(Prelude.categoryFn))(Data_Array.updateAt(_0.index)(_0.previous)(pbs));
+                          })(_57));
+                      };
+                      return OpticUI_Core.runHandler(h)(updates(s));
+                  })(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s));
+              };
+              if (_14 instanceof SaveEdit) {
+                  return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (pb) {
+                      return function __do() {
+                          var a = OpticUI_Components_Async.async(updatePB(pb))();
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_59) {
+                              return ClientState._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Common._Just(Data_Profunctor_Choice.choiceFn)(ClientState._saving(Data_Profunctor_Strong.strongFn)(_59)));
+                          })(new Klikhut_Async.Busy(a))(s))();
+                      };
+                  })(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (_1) {
+                      return Data_Array["!!"](Data_Lens_Getter.view(function (_60) {
+                          return ClientState._photobooths(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(Klikhut_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_Monoid.monoidArray)))(_60));
+                      })(s))(_1.index);
+                  }));
+              };
+              if (_14 instanceof EditSaved) {
+                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(s));
+              };
+              if (_14 instanceof EditSaveFailed) {
+                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_61) {
+                      return ClientState._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Common._Just(Data_Profunctor_Choice.choiceFn)(ClientState._saving(Data_Profunctor_Strong.strongFn)(_61)));
+                  })(new Klikhut_Async.Errored(_14.value0))(s));
+              };
+              if (_14 instanceof ToEvents) {
+                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._route(Data_Profunctor_Strong.strongFn))(new ClientState.EventsPage(_14.value0))(s));
+              };
+              throw new Error("Failed pattern match at Klikhut.Client.PhotoboothsPage line 53, column 7 - line 54, column 7: " + [ _14.constructor.name ]);
+          };
+          return OpticUI_Core.withView(function (_62) {
+              return OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("container") ])(OpticUI_Markup_HTML.table([ OpticUI_Markup_HTML.classA("table crud-table") ])(OpticUI_Markup_HTML.tbody([  ])(_62)));
+          })(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Name")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Alias")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Default Profile")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Actions")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Link")) ]))), ClientState._photoboothsEditing(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (ed) {
+              return Prelude["return"](Data_Maybe.applicativeMaybe)(ed.index);
+          }))), ClientState._newPb(OpticUI_Core.uiStrong)(makeNewPb(handle)) ]));
+      };
+  });
+  exports["photoboothsPage"] = photoboothsPage;;
+ 
+})(PS["Klikhut.Client.PhotoboothsPage"] = PS["Klikhut.Client.PhotoboothsPage"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Prelude = PS["Prelude"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Components = PS["OpticUI.Components"];
+  var OpticUI = PS["OpticUI"];
+  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];     
+  var eventsPage = function (cn) {
+      return OpticUI_Core["with"](function (s) {
+          return function (h) {
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.div([  ])(OpticUI_Markup.text(cn)));
+          };
+      });
+  };
+  exports["eventsPage"] = eventsPage;;
+ 
+})(PS["Klikhut.Client.EventsPage"] = PS["Klikhut.Client.EventsPage"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Run = PS["OpticUI.Run"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Data_Lens_Getter = PS["Data.Lens.Getter"];
+  var Prelude = PS["Prelude"];
+  var OpticUI = PS["OpticUI"];
+  var Data_Lens = PS["Data.Lens"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var DOM = PS["DOM"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Klikhut_Client_PhotoboothsPage = PS["Klikhut.Client.PhotoboothsPage"];
+  var Klikhut_Client_EventsPage = PS["Klikhut.Client.EventsPage"];
+  var ClientState = PS["ClientState"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Const = PS["Data.Const"];     
+  var main = OpticUI_Run.animate(ClientState.initialState)(OpticUI_Core["with"](function (s) {
+      return function (h) {
+          var _0 = Data_Lens_Getter.view(ClientState._route(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s);
+          if (_0 instanceof ClientState.PhotoboothsPage) {
+              return ClientState._pbPage(OpticUI_Core.uiStrong)(Klikhut_Client_PhotoboothsPage.photoboothsPage);
+          };
+          if (_0 instanceof ClientState.EventsPage) {
+              return Klikhut_Client_EventsPage.eventsPage(_0.value0);
+          };
+          throw new Error("Failed pattern match at Client line 19, column 1 - line 20, column 1: " + [ _0.constructor.name ]);
+      };
+  }));
+  exports["main"] = main;;
+ 
+})(PS["Client"] = PS["Client"] || {});
+
+PS["Client"].main();
+
+},{"virtual-dom/create-element":5,"virtual-dom/diff":6,"virtual-dom/patch":7,"virtual-dom/virtual-hyperscript/hooks/soft-set-hook":14,"virtual-dom/vnode/vnode":22,"virtual-dom/vnode/vtext":24}],2:[function(require,module,exports){
+
+},{}],3:[function(require,module,exports){
+(function (global){
+var topLevel = typeof global !== 'undefined' ? global :
+    typeof window !== 'undefined' ? window : {}
+var minDoc = require('min-document');
+
+if (typeof document !== 'undefined') {
+    module.exports = document;
+} else {
+    var doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'];
+
+    if (!doccy) {
+        doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'] = minDoc;
+    }
+
+    module.exports = doccy;
+}
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"min-document":2}],4:[function(require,module,exports){
+"use strict";
+
+module.exports = function isObject(x) {
+	return typeof x === "object" && x !== null;
+};
+
+},{}],5:[function(require,module,exports){
+var createElement = require("./vdom/create-element.js")
+
+module.exports = createElement
+
+},{"./vdom/create-element.js":9}],6:[function(require,module,exports){
+var diff = require("./vtree/diff.js")
+
+module.exports = diff
+
+},{"./vtree/diff.js":26}],7:[function(require,module,exports){
+var patch = require("./vdom/patch.js")
+
+module.exports = patch
+
+},{"./vdom/patch.js":12}],8:[function(require,module,exports){
+var isObject = require("is-object")
+var isHook = require("../vnode/is-vhook.js")
+
+module.exports = applyProperties
+
+function applyProperties(node, props, previous) {
+    for (var propName in props) {
+        var propValue = props[propName]
+
+        if (propValue === undefined) {
+            removeProperty(node, propName, propValue, previous);
+        } else if (isHook(propValue)) {
+            removeProperty(node, propName, propValue, previous)
+            if (propValue.hook) {
+                propValue.hook(node,
+                    propName,
+                    previous ? previous[propName] : undefined)
+            }
+        } else {
+            if (isObject(propValue)) {
+                patchObject(node, props, previous, propName, propValue);
+            } else {
+                node[propName] = propValue
+            }
+        }
+    }
+}
+
+function removeProperty(node, propName, propValue, previous) {
+    if (previous) {
+        var previousValue = previous[propName]
+
+        if (!isHook(previousValue)) {
+            if (propName === "attributes") {
+                for (var attrName in previousValue) {
+                    node.removeAttribute(attrName)
+                }
+            } else if (propName === "style") {
+                for (var i in previousValue) {
+                    node.style[i] = ""
+                }
+            } else if (typeof previousValue === "string") {
+                node[propName] = ""
+            } else {
+                node[propName] = null
+            }
+        } else if (previousValue.unhook) {
+            previousValue.unhook(node, propName, propValue)
+        }
+    }
+}
+
+function patchObject(node, props, previous, propName, propValue) {
+    var previousValue = previous ? previous[propName] : undefined
+
+    // Set attributes
+    if (propName === "attributes") {
+        for (var attrName in propValue) {
+            var attrValue = propValue[attrName]
+
+            if (attrValue === undefined) {
+                node.removeAttribute(attrName)
+            } else {
+                node.setAttribute(attrName, attrValue)
+            }
+        }
+
+        return
+    }
+
+    if(previousValue && isObject(previousValue) &&
+        getPrototype(previousValue) !== getPrototype(propValue)) {
+        node[propName] = propValue
+        return
+    }
+
+    if (!isObject(node[propName])) {
+        node[propName] = {}
+    }
+
+    var replacer = propName === "style" ? "" : undefined
+
+    for (var k in propValue) {
+        var value = propValue[k]
+        node[propName][k] = (value === undefined) ? replacer : value
+    }
+}
+
+function getPrototype(value) {
+    if (Object.getPrototypeOf) {
+        return Object.getPrototypeOf(value)
+    } else if (value.__proto__) {
+        return value.__proto__
+    } else if (value.constructor) {
+        return value.constructor.prototype
+    }
+}
+
+},{"../vnode/is-vhook.js":17,"is-object":4}],9:[function(require,module,exports){
+var document = require("global/document")
+
+var applyProperties = require("./apply-properties")
+
+var isVNode = require("../vnode/is-vnode.js")
+var isVText = require("../vnode/is-vtext.js")
+var isWidget = require("../vnode/is-widget.js")
+var handleThunk = require("../vnode/handle-thunk.js")
+
+module.exports = createElement
+
+function createElement(vnode, opts) {
+    var doc = opts ? opts.document || document : document
+    var warn = opts ? opts.warn : null
+
+    vnode = handleThunk(vnode).a
+
+    if (isWidget(vnode)) {
+        return vnode.init()
+    } else if (isVText(vnode)) {
+        return doc.createTextNode(vnode.text)
+    } else if (!isVNode(vnode)) {
+        if (warn) {
+            warn("Item is not a valid virtual dom node", vnode)
+        }
+        return null
+    }
+
+    var node = (vnode.namespace === null) ?
+        doc.createElement(vnode.tagName) :
+        doc.createElementNS(vnode.namespace, vnode.tagName)
+
+    var props = vnode.properties
+    applyProperties(node, props)
+
+    var children = vnode.children
+
+    for (var i = 0; i < children.length; i++) {
+        var childNode = createElement(children[i], opts)
+        if (childNode) {
+            node.appendChild(childNode)
+        }
+    }
+
+    return node
+}
+
+},{"../vnode/handle-thunk.js":15,"../vnode/is-vnode.js":18,"../vnode/is-vtext.js":19,"../vnode/is-widget.js":20,"./apply-properties":8,"global/document":3}],10:[function(require,module,exports){
+// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
+// We don't want to read all of the DOM nodes in the tree so we use
+// the in-order tree indexing to eliminate recursion down certain branches.
+// We only recurse into a DOM node if we know that it contains a child of
+// interest.
+
+var noChild = {}
+
+module.exports = domIndex
+
+function domIndex(rootNode, tree, indices, nodes) {
+    if (!indices || indices.length === 0) {
+        return {}
+    } else {
+        indices.sort(ascending)
+        return recurse(rootNode, tree, indices, nodes, 0)
+    }
+}
+
+function recurse(rootNode, tree, indices, nodes, rootIndex) {
+    nodes = nodes || {}
+
+
+    if (rootNode) {
+        if (indexInRange(indices, rootIndex, rootIndex)) {
+            nodes[rootIndex] = rootNode
+        }
+
+        var vChildren = tree.children
+
+        if (vChildren) {
+
+            var childNodes = rootNode.childNodes
+
+            for (var i = 0; i < tree.children.length; i++) {
+                rootIndex += 1
+
+                var vChild = vChildren[i] || noChild
+                var nextIndex = rootIndex + (vChild.count || 0)
+
+                // skip recursion down the tree if there are no nodes down here
+                if (indexInRange(indices, rootIndex, nextIndex)) {
+                    recurse(childNodes[i], vChild, indices, nodes, rootIndex)
+                }
+
+                rootIndex = nextIndex
+            }
+        }
+    }
+
+    return nodes
+}
+
+// Binary search for an index in the interval [left, right]
+function indexInRange(indices, left, right) {
+    if (indices.length === 0) {
+        return false
+    }
+
+    var minIndex = 0
+    var maxIndex = indices.length - 1
+    var currentIndex
+    var currentItem
+
+    while (minIndex <= maxIndex) {
+        currentIndex = ((maxIndex + minIndex) / 2) >> 0
+        currentItem = indices[currentIndex]
+
+        if (minIndex === maxIndex) {
+            return currentItem >= left && currentItem <= right
+        } else if (currentItem < left) {
+            minIndex = currentIndex + 1
+        } else  if (currentItem > right) {
+            maxIndex = currentIndex - 1
+        } else {
+            return true
+        }
+    }
+
+    return false;
+}
+
+function ascending(a, b) {
+    return a > b ? 1 : -1
+}
+
+},{}],11:[function(require,module,exports){
+var applyProperties = require("./apply-properties")
+
+var isWidget = require("../vnode/is-widget.js")
+var VPatch = require("../vnode/vpatch.js")
+
+var updateWidget = require("./update-widget")
+
+module.exports = applyPatch
+
+function applyPatch(vpatch, domNode, renderOptions) {
+    var type = vpatch.type
+    var vNode = vpatch.vNode
+    var patch = vpatch.patch
+
+    switch (type) {
+        case VPatch.REMOVE:
+            return removeNode(domNode, vNode)
+        case VPatch.INSERT:
+            return insertNode(domNode, patch, renderOptions)
+        case VPatch.VTEXT:
+            return stringPatch(domNode, vNode, patch, renderOptions)
+        case VPatch.WIDGET:
+            return widgetPatch(domNode, vNode, patch, renderOptions)
+        case VPatch.VNODE:
+            return vNodePatch(domNode, vNode, patch, renderOptions)
+        case VPatch.ORDER:
+            reorderChildren(domNode, patch)
+            return domNode
+        case VPatch.PROPS:
+            applyProperties(domNode, patch, vNode.properties)
+            return domNode
+        case VPatch.THUNK:
+            return replaceRoot(domNode,
+                renderOptions.patch(domNode, patch, renderOptions))
+        default:
+            return domNode
+    }
+}
+
+function removeNode(domNode, vNode) {
+    var parentNode = domNode.parentNode
+
+    if (parentNode) {
+        parentNode.removeChild(domNode)
+    }
+
+    destroyWidget(domNode, vNode);
+
+    return null
+}
+
+function insertNode(parentNode, vNode, renderOptions) {
+    var newNode = renderOptions.render(vNode, renderOptions)
+
+    if (parentNode) {
+        parentNode.appendChild(newNode)
+    }
+
+    return parentNode
+}
+
+function stringPatch(domNode, leftVNode, vText, renderOptions) {
+    var newNode
+
+    if (domNode.nodeType === 3) {
+        domNode.replaceData(0, domNode.length, vText.text)
+        newNode = domNode
+    } else {
+        var parentNode = domNode.parentNode
+        newNode = renderOptions.render(vText, renderOptions)
+
+        if (parentNode && newNode !== domNode) {
+            parentNode.replaceChild(newNode, domNode)
+        }
+    }
+
+    return newNode
+}
+
+function widgetPatch(domNode, leftVNode, widget, renderOptions) {
+    var updating = updateWidget(leftVNode, widget)
+    var newNode
+
+    if (updating) {
+        newNode = widget.update(leftVNode, domNode) || domNode
+    } else {
+        newNode = renderOptions.render(widget, renderOptions)
+    }
+
+    var parentNode = domNode.parentNode
+
+    if (parentNode && newNode !== domNode) {
+        parentNode.replaceChild(newNode, domNode)
+    }
+
+    if (!updating) {
+        destroyWidget(domNode, leftVNode)
+    }
+
+    return newNode
+}
+
+function vNodePatch(domNode, leftVNode, vNode, renderOptions) {
+    var parentNode = domNode.parentNode
+    var newNode = renderOptions.render(vNode, renderOptions)
+
+    if (parentNode && newNode !== domNode) {
+        parentNode.replaceChild(newNode, domNode)
+    }
+
+    return newNode
+}
+
+function destroyWidget(domNode, w) {
+    if (typeof w.destroy === "function" && isWidget(w)) {
+        w.destroy(domNode)
+    }
+}
+
+function reorderChildren(domNode, moves) {
+    var childNodes = domNode.childNodes
+    var keyMap = {}
+    var node
+    var remove
+    var insert
+
+    for (var i = 0; i < moves.removes.length; i++) {
+        remove = moves.removes[i]
+        node = childNodes[remove.from]
+        if (remove.key) {
+            keyMap[remove.key] = node
+        }
+        domNode.removeChild(node)
+    }
+
+    var length = childNodes.length
+    for (var j = 0; j < moves.inserts.length; j++) {
+        insert = moves.inserts[j]
+        node = keyMap[insert.key]
+        // this is the weirdest bug i've ever seen in webkit
+        domNode.insertBefore(node, insert.to >= length++ ? null : childNodes[insert.to])
+    }
+}
+
+function replaceRoot(oldRoot, newRoot) {
+    if (oldRoot && newRoot && oldRoot !== newRoot && oldRoot.parentNode) {
+        oldRoot.parentNode.replaceChild(newRoot, oldRoot)
+    }
+
+    return newRoot;
+}
+
+},{"../vnode/is-widget.js":20,"../vnode/vpatch.js":23,"./apply-properties":8,"./update-widget":13}],12:[function(require,module,exports){
+var document = require("global/document")
+var isArray = require("x-is-array")
+
+var render = require("./create-element")
+var domIndex = require("./dom-index")
+var patchOp = require("./patch-op")
+module.exports = patch
+
+function patch(rootNode, patches, renderOptions) {
+    renderOptions = renderOptions || {}
+    renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch
+        ? renderOptions.patch
+        : patchRecursive
+    renderOptions.render = renderOptions.render || render
+
+    return renderOptions.patch(rootNode, patches, renderOptions)
+}
+
+function patchRecursive(rootNode, patches, renderOptions) {
+    var indices = patchIndices(patches)
+
+    if (indices.length === 0) {
+        return rootNode
+    }
+
+    var index = domIndex(rootNode, patches.a, indices)
+    var ownerDocument = rootNode.ownerDocument
+
+    if (!renderOptions.document && ownerDocument !== document) {
+        renderOptions.document = ownerDocument
+    }
+
+    for (var i = 0; i < indices.length; i++) {
+        var nodeIndex = indices[i]
+        rootNode = applyPatch(rootNode,
+            index[nodeIndex],
+            patches[nodeIndex],
+            renderOptions)
+    }
+
+    return rootNode
+}
+
+function applyPatch(rootNode, domNode, patchList, renderOptions) {
+    if (!domNode) {
+        return rootNode
+    }
+
+    var newNode
+
+    if (isArray(patchList)) {
+        for (var i = 0; i < patchList.length; i++) {
+            newNode = patchOp(patchList[i], domNode, renderOptions)
+
+            if (domNode === rootNode) {
+                rootNode = newNode
+            }
+        }
+    } else {
+        newNode = patchOp(patchList, domNode, renderOptions)
+
+        if (domNode === rootNode) {
+            rootNode = newNode
+        }
+    }
+
+    return rootNode
+}
+
+function patchIndices(patches) {
+    var indices = []
+
+    for (var key in patches) {
+        if (key !== "a") {
+            indices.push(Number(key))
+        }
+    }
+
+    return indices
+}
+
+},{"./create-element":9,"./dom-index":10,"./patch-op":11,"global/document":3,"x-is-array":27}],13:[function(require,module,exports){
+var isWidget = require("../vnode/is-widget.js")
+
+module.exports = updateWidget
+
+function updateWidget(a, b) {
+    if (isWidget(a) && isWidget(b)) {
+        if ("name" in a && "name" in b) {
+            return a.id === b.id
+        } else {
+            return a.init === b.init
+        }
+    }
+
+    return false
+}
+
+},{"../vnode/is-widget.js":20}],14:[function(require,module,exports){
+'use strict';
+
+module.exports = SoftSetHook;
+
+function SoftSetHook(value) {
+    if (!(this instanceof SoftSetHook)) {
+        return new SoftSetHook(value);
+    }
+
+    this.value = value;
+}
+
+SoftSetHook.prototype.hook = function (node, propertyName) {
+    if (node[propertyName] !== this.value) {
+        node[propertyName] = this.value;
+    }
+};
+
+},{}],15:[function(require,module,exports){
+var isVNode = require("./is-vnode")
+var isVText = require("./is-vtext")
+var isWidget = require("./is-widget")
+var isThunk = require("./is-thunk")
+
+module.exports = handleThunk
+
+function handleThunk(a, b) {
+    var renderedA = a
+    var renderedB = b
+
+    if (isThunk(b)) {
+        renderedB = renderThunk(b, a)
+    }
+
+    if (isThunk(a)) {
+        renderedA = renderThunk(a, null)
+    }
+
+    return {
+        a: renderedA,
+        b: renderedB
+    }
+}
+
+function renderThunk(thunk, previous) {
+    var renderedThunk = thunk.vnode
+
+    if (!renderedThunk) {
+        renderedThunk = thunk.vnode = thunk.render(previous)
+    }
+
+    if (!(isVNode(renderedThunk) ||
+            isVText(renderedThunk) ||
+            isWidget(renderedThunk))) {
+        throw new Error("thunk did not return a valid node");
+    }
+
+    return renderedThunk
+}
+
+},{"./is-thunk":16,"./is-vnode":18,"./is-vtext":19,"./is-widget":20}],16:[function(require,module,exports){
+module.exports = isThunk
+
+function isThunk(t) {
+    return t && t.type === "Thunk"
+}
+
+},{}],17:[function(require,module,exports){
+module.exports = isHook
+
+function isHook(hook) {
+    return hook &&
+      (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") ||
+       typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
+}
+
+},{}],18:[function(require,module,exports){
+var version = require("./version")
+
+module.exports = isVirtualNode
+
+function isVirtualNode(x) {
+    return x && x.type === "VirtualNode" && x.version === version
+}
+
+},{"./version":21}],19:[function(require,module,exports){
+var version = require("./version")
+
+module.exports = isVirtualText
+
+function isVirtualText(x) {
+    return x && x.type === "VirtualText" && x.version === version
+}
+
+},{"./version":21}],20:[function(require,module,exports){
+module.exports = isWidget
+
+function isWidget(w) {
+    return w && w.type === "Widget"
+}
+
+},{}],21:[function(require,module,exports){
+module.exports = "2"
+
+},{}],22:[function(require,module,exports){
+var version = require("./version")
+var isVNode = require("./is-vnode")
+var isWidget = require("./is-widget")
+var isThunk = require("./is-thunk")
+var isVHook = require("./is-vhook")
+
+module.exports = VirtualNode
+
+var noProperties = {}
+var noChildren = []
+
+function VirtualNode(tagName, properties, children, key, namespace) {
+    this.tagName = tagName
+    this.properties = properties || noProperties
+    this.children = children || noChildren
+    this.key = key != null ? String(key) : undefined
+    this.namespace = (typeof namespace === "string") ? namespace : null
+
+    var count = (children && children.length) || 0
+    var descendants = 0
+    var hasWidgets = false
+    var hasThunks = false
+    var descendantHooks = false
+    var hooks
+
+    for (var propName in properties) {
+        if (properties.hasOwnProperty(propName)) {
+            var property = properties[propName]
+            if (isVHook(property) && property.unhook) {
+                if (!hooks) {
+                    hooks = {}
+                }
+
+                hooks[propName] = property
+            }
+        }
+    }
+
+    for (var i = 0; i < count; i++) {
+        var child = children[i]
+        if (isVNode(child)) {
+            descendants += child.count || 0
+
+            if (!hasWidgets && child.hasWidgets) {
+                hasWidgets = true
+            }
+
+            if (!hasThunks && child.hasThunks) {
+                hasThunks = true
+            }
+
+            if (!descendantHooks && (child.hooks || child.descendantHooks)) {
+                descendantHooks = true
+            }
+        } else if (!hasWidgets && isWidget(child)) {
+            if (typeof child.destroy === "function") {
+                hasWidgets = true
+            }
+        } else if (!hasThunks && isThunk(child)) {
+            hasThunks = true;
+        }
+    }
+
+    this.count = count + descendants
+    this.hasWidgets = hasWidgets
+    this.hasThunks = hasThunks
+    this.hooks = hooks
+    this.descendantHooks = descendantHooks
+}
+
+VirtualNode.prototype.version = version
+VirtualNode.prototype.type = "VirtualNode"
+
+},{"./is-thunk":16,"./is-vhook":17,"./is-vnode":18,"./is-widget":20,"./version":21}],23:[function(require,module,exports){
+var version = require("./version")
+
+VirtualPatch.NONE = 0
+VirtualPatch.VTEXT = 1
+VirtualPatch.VNODE = 2
+VirtualPatch.WIDGET = 3
+VirtualPatch.PROPS = 4
+VirtualPatch.ORDER = 5
+VirtualPatch.INSERT = 6
+VirtualPatch.REMOVE = 7
+VirtualPatch.THUNK = 8
+
+module.exports = VirtualPatch
+
+function VirtualPatch(type, vNode, patch) {
+    this.type = Number(type)
+    this.vNode = vNode
+    this.patch = patch
+}
+
+VirtualPatch.prototype.version = version
+VirtualPatch.prototype.type = "VirtualPatch"
+
+},{"./version":21}],24:[function(require,module,exports){
+var version = require("./version")
+
+module.exports = VirtualText
+
+function VirtualText(text) {
+    this.text = String(text)
+}
+
+VirtualText.prototype.version = version
+VirtualText.prototype.type = "VirtualText"
+
+},{"./version":21}],25:[function(require,module,exports){
+var isObject = require("is-object")
+var isHook = require("../vnode/is-vhook")
+
+module.exports = diffProps
+
+function diffProps(a, b) {
+    var diff
+
+    for (var aKey in a) {
+        if (!(aKey in b)) {
+            diff = diff || {}
+            diff[aKey] = undefined
+        }
+
+        var aValue = a[aKey]
+        var bValue = b[aKey]
+
+        if (aValue === bValue) {
+            continue
+        } else if (isObject(aValue) && isObject(bValue)) {
+            if (getPrototype(bValue) !== getPrototype(aValue)) {
+                diff = diff || {}
+                diff[aKey] = bValue
+            } else if (isHook(bValue)) {
+                 diff = diff || {}
+                 diff[aKey] = bValue
+            } else {
+                var objectDiff = diffProps(aValue, bValue)
+                if (objectDiff) {
+                    diff = diff || {}
+                    diff[aKey] = objectDiff
+                }
+            }
+        } else {
+            diff = diff || {}
+            diff[aKey] = bValue
+        }
+    }
+
+    for (var bKey in b) {
+        if (!(bKey in a)) {
+            diff = diff || {}
+            diff[bKey] = b[bKey]
+        }
+    }
+
+    return diff
+}
+
+function getPrototype(value) {
+  if (Object.getPrototypeOf) {
+    return Object.getPrototypeOf(value)
+  } else if (value.__proto__) {
+    return value.__proto__
+  } else if (value.constructor) {
+    return value.constructor.prototype
+  }
+}
+
+},{"../vnode/is-vhook":17,"is-object":4}],26:[function(require,module,exports){
+var isArray = require("x-is-array")
+
+var VPatch = require("../vnode/vpatch")
+var isVNode = require("../vnode/is-vnode")
+var isVText = require("../vnode/is-vtext")
+var isWidget = require("../vnode/is-widget")
+var isThunk = require("../vnode/is-thunk")
+var handleThunk = require("../vnode/handle-thunk")
+
+var diffProps = require("./diff-props")
+
+module.exports = diff
+
+function diff(a, b) {
+    var patch = { a: a }
+    walk(a, b, patch, 0)
+    return patch
+}
+
+function walk(a, b, patch, index) {
+    if (a === b) {
+        return
+    }
+
+    var apply = patch[index]
+    var applyClear = false
+
+    if (isThunk(a) || isThunk(b)) {
+        thunks(a, b, patch, index)
+    } else if (b == null) {
+
+        // If a is a widget we will add a remove patch for it
+        // Otherwise any child widgets/hooks must be destroyed.
+        // This prevents adding two remove patches for a widget.
+        if (!isWidget(a)) {
+            clearState(a, patch, index)
+            apply = patch[index]
+        }
+
+        apply = appendPatch(apply, new VPatch(VPatch.REMOVE, a, b))
+    } else if (isVNode(b)) {
+        if (isVNode(a)) {
+            if (a.tagName === b.tagName &&
+                a.namespace === b.namespace &&
+                a.key === b.key) {
+                var propsPatch = diffProps(a.properties, b.properties)
+                if (propsPatch) {
+                    apply = appendPatch(apply,
+                        new VPatch(VPatch.PROPS, a, propsPatch))
+                }
+                apply = diffChildren(a, b, patch, apply, index)
+            } else {
+                apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
+                applyClear = true
+            }
+        } else {
+            apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
+            applyClear = true
+        }
+    } else if (isVText(b)) {
+        if (!isVText(a)) {
+            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
+            applyClear = true
+        } else if (a.text !== b.text) {
+            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
+        }
+    } else if (isWidget(b)) {
+        if (!isWidget(a)) {
+            applyClear = true
+        }
+
+        apply = appendPatch(apply, new VPatch(VPatch.WIDGET, a, b))
+    }
+
+    if (apply) {
+        patch[index] = apply
+    }
+
+    if (applyClear) {
+        clearState(a, patch, index)
+    }
+}
+
+function diffChildren(a, b, patch, apply, index) {
+    var aChildren = a.children
+    var orderedSet = reorder(aChildren, b.children)
+    var bChildren = orderedSet.children
+
+    var aLen = aChildren.length
+    var bLen = bChildren.length
+    var len = aLen > bLen ? aLen : bLen
+
+    for (var i = 0; i < len; i++) {
+        var leftNode = aChildren[i]
+        var rightNode = bChildren[i]
+        index += 1
+
+        if (!leftNode) {
+            if (rightNode) {
+                // Excess nodes in b need to be added
+                apply = appendPatch(apply,
+                    new VPatch(VPatch.INSERT, null, rightNode))
+            }
+        } else {
+            walk(leftNode, rightNode, patch, index)
+        }
+
+        if (isVNode(leftNode) && leftNode.count) {
+            index += leftNode.count
+        }
+    }
+
+    if (orderedSet.moves) {
+        // Reorder nodes last
+        apply = appendPatch(apply, new VPatch(
+            VPatch.ORDER,
+            a,
+            orderedSet.moves
+        ))
+    }
+
+    return apply
+}
+
+function clearState(vNode, patch, index) {
+    // TODO: Make this a single walk, not two
+    unhook(vNode, patch, index)
+    destroyWidgets(vNode, patch, index)
+}
+
+// Patch records for all destroyed widgets must be added because we need
+// a DOM node reference for the destroy function
+function destroyWidgets(vNode, patch, index) {
+    if (isWidget(vNode)) {
+        if (typeof vNode.destroy === "function") {
+            patch[index] = appendPatch(
+                patch[index],
+                new VPatch(VPatch.REMOVE, vNode, null)
+            )
+        }
+    } else if (isVNode(vNode) && (vNode.hasWidgets || vNode.hasThunks)) {
+        var children = vNode.children
+        var len = children.length
+        for (var i = 0; i < len; i++) {
+            var child = children[i]
+            index += 1
+
+            destroyWidgets(child, patch, index)
+
+            if (isVNode(child) && child.count) {
+                index += child.count
+            }
+        }
+    } else if (isThunk(vNode)) {
+        thunks(vNode, null, patch, index)
+    }
+}
+
+// Create a sub-patch for thunks
+function thunks(a, b, patch, index) {
+    var nodes = handleThunk(a, b)
+    var thunkPatch = diff(nodes.a, nodes.b)
+    if (hasPatches(thunkPatch)) {
+        patch[index] = new VPatch(VPatch.THUNK, null, thunkPatch)
+    }
+}
+
+function hasPatches(patch) {
+    for (var index in patch) {
+        if (index !== "a") {
+            return true
+        }
+    }
+
+    return false
+}
+
+// Execute hooks when two nodes are identical
+function unhook(vNode, patch, index) {
+    if (isVNode(vNode)) {
+        if (vNode.hooks) {
+            patch[index] = appendPatch(
+                patch[index],
+                new VPatch(
+                    VPatch.PROPS,
+                    vNode,
+                    undefinedKeys(vNode.hooks)
+                )
+            )
+        }
+
+        if (vNode.descendantHooks || vNode.hasThunks) {
+            var children = vNode.children
+            var len = children.length
+            for (var i = 0; i < len; i++) {
+                var child = children[i]
+                index += 1
+
+                unhook(child, patch, index)
+
+                if (isVNode(child) && child.count) {
+                    index += child.count
+                }
+            }
+        }
+    } else if (isThunk(vNode)) {
+        thunks(vNode, null, patch, index)
+    }
+}
+
+function undefinedKeys(obj) {
+    var result = {}
+
+    for (var key in obj) {
+        result[key] = undefined
+    }
+
+    return result
+}
+
+// List diff, naive left to right reordering
+function reorder(aChildren, bChildren) {
+    // O(M) time, O(M) memory
+    var bChildIndex = keyIndex(bChildren)
+    var bKeys = bChildIndex.keys
+    var bFree = bChildIndex.free
+
+    if (bFree.length === bChildren.length) {
+        return {
+            children: bChildren,
+            moves: null
+        }
+    }
+
+    // O(N) time, O(N) memory
+    var aChildIndex = keyIndex(aChildren)
+    var aKeys = aChildIndex.keys
+    var aFree = aChildIndex.free
+
+    if (aFree.length === aChildren.length) {
+        return {
+            children: bChildren,
+            moves: null
+        }
+    }
+
+    // O(MAX(N, M)) memory
+    var newChildren = []
+
+    var freeIndex = 0
+    var freeCount = bFree.length
+    var deletedItems = 0
+
+    // Iterate through a and match a node in b
+    // O(N) time,
+    for (var i = 0 ; i < aChildren.length; i++) {
+        var aItem = aChildren[i]
+        var itemIndex
+
+        if (aItem.key) {
+            if (bKeys.hasOwnProperty(aItem.key)) {
+                // Match up the old keys
+                itemIndex = bKeys[aItem.key]
+                newChildren.push(bChildren[itemIndex])
+
+            } else {
+                // Remove old keyed items
+                itemIndex = i - deletedItems++
+                newChildren.push(null)
+            }
+        } else {
+            // Match the item in a with the next free item in b
+            if (freeIndex < freeCount) {
+                itemIndex = bFree[freeIndex++]
+                newChildren.push(bChildren[itemIndex])
+            } else {
+                // There are no free items in b to match with
+                // the free items in a, so the extra free nodes
+                // are deleted.
+                itemIndex = i - deletedItems++
+                newChildren.push(null)
+            }
+        }
+    }
+
+    var lastFreeIndex = freeIndex >= bFree.length ?
+        bChildren.length :
+        bFree[freeIndex]
+
+    // Iterate through b and append any new keys
+    // O(M) time
+    for (var j = 0; j < bChildren.length; j++) {
+        var newItem = bChildren[j]
+
+        if (newItem.key) {
+            if (!aKeys.hasOwnProperty(newItem.key)) {
+                // Add any new keyed items
+                // We are adding new items to the end and then sorting them
+                // in place. In future we should insert new items in place.
+                newChildren.push(newItem)
+            }
+        } else if (j >= lastFreeIndex) {
+            // Add any leftover non-keyed items
+            newChildren.push(newItem)
+        }
+    }
+
+    var simulate = newChildren.slice()
+    var simulateIndex = 0
+    var removes = []
+    var inserts = []
+    var simulateItem
+
+    for (var k = 0; k < bChildren.length;) {
+        var wantedItem = bChildren[k]
+        simulateItem = simulate[simulateIndex]
+
+        // remove items
+        while (simulateItem === null && simulate.length) {
+            removes.push(remove(simulate, simulateIndex, null))
+            simulateItem = simulate[simulateIndex]
+        }
+
+        if (!simulateItem || simulateItem.key !== wantedItem.key) {
+            // if we need a key in this position...
+            if (wantedItem.key) {
+                if (simulateItem && simulateItem.key) {
+                    // if an insert doesn't put this key in place, it needs to move
+                    if (bKeys[simulateItem.key] !== k + 1) {
+                        removes.push(remove(simulate, simulateIndex, simulateItem.key))
+                        simulateItem = simulate[simulateIndex]
+                        // if the remove didn't put the wanted item in place, we need to insert it
+                        if (!simulateItem || simulateItem.key !== wantedItem.key) {
+                            inserts.push({key: wantedItem.key, to: k})
+                        }
+                        // items are matching, so skip ahead
+                        else {
+                            simulateIndex++
+                        }
+                    }
+                    else {
+                        inserts.push({key: wantedItem.key, to: k})
+                    }
+                }
+                else {
+                    inserts.push({key: wantedItem.key, to: k})
+                }
+                k++
+            }
+            // a key in simulate has no matching wanted key, remove it
+            else if (simulateItem && simulateItem.key) {
+                removes.push(remove(simulate, simulateIndex, simulateItem.key))
+            }
+        }
+        else {
+            simulateIndex++
+            k++
+        }
+    }
+
+    // remove all the remaining nodes from simulate
+    while(simulateIndex < simulate.length) {
+        simulateItem = simulate[simulateIndex]
+        removes.push(remove(simulate, simulateIndex, simulateItem && simulateItem.key))
+    }
+
+    // If the only moves we have are deletes then we can just
+    // let the delete patch remove these items.
+    if (removes.length === deletedItems && !inserts.length) {
+        return {
+            children: newChildren,
+            moves: null
+        }
+    }
+
+    return {
+        children: newChildren,
+        moves: {
+            removes: removes,
+            inserts: inserts
+        }
+    }
+}
+
+function remove(arr, index, key) {
+    arr.splice(index, 1)
+
+    return {
+        from: index,
+        key: key
+    }
+}
+
+function keyIndex(children) {
+    var keys = {}
+    var free = []
+    var length = children.length
+
+    for (var i = 0; i < length; i++) {
+        var child = children[i]
+
+        if (child.key) {
+            keys[child.key] = i
+        } else {
+            free.push(i)
+        }
+    }
+
+    return {
+        keys: keys,     // A hash of key name to index
+        free: free      // An array of unkeyed item indices
+    }
+}
+
+function appendPatch(apply, patch) {
+    if (apply) {
+        if (isArray(apply)) {
+            apply.push(patch)
+        } else {
+            apply = [apply, patch]
+        }
+
+        return apply
+    } else {
+        return patch
+    }
+}
+
+},{"../vnode/handle-thunk":15,"../vnode/is-thunk":16,"../vnode/is-vnode":18,"../vnode/is-vtext":19,"../vnode/is-widget":20,"../vnode/vpatch":23,"./diff-props":25,"x-is-array":27}],27:[function(require,module,exports){
+var nativeIsArray = Array.isArray
+var toString = Object.prototype.toString
+
+module.exports = nativeIsArray || isArray
+
+function isArray(obj) {
+    return toString.call(obj) === "[object Array]"
+}
+
+},{}]},{},[1]);

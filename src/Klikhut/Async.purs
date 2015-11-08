@@ -6,10 +6,14 @@ import Data.Maybe (Maybe(..))
 import OpticUI.Components.Async (Async())
 import Control.Monad.Eff.Exception (Error())
 
+----------------------------------------------------------
+
 data AsyncModel eff a  = Initial
                        | Busy (Async eff a)
                        | Errored Error
                        | Done a
+
+--------LENSES--------------------------------------------
 
 _Initial :: forall eff a. PrismP (AsyncModel eff a) Unit
 _Initial = prism' (const Initial) l

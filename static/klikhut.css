@@ -1,0 +1,7 @@
+.crud-table{
+  table-layout: fixed;
+}
+.crud-table > tbody > tr > td{
+  height: 50px;
+  vertical-align: middle;
+}

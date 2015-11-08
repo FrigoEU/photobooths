@@ -13,6 +13,7 @@
   "dependencies": {
     "purescript-console": "^0.1.0",
     "purescript-any-db": "https://github.com/FrigoEU/purescript-any-db.git",
+    "purescript-datetime": "https://github.com/FrigoEU/purescript-datetime.git#master",
     "purescript-argonaut": "^0.9.0",
     "purescript-express": "master",
     "purescript-optic-ui": "master",
