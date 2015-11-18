@@ -1,6 +1,6 @@
 # photobooths
 
-This is an application that will soon run (on a tiny scale) in production. It's a CRUD application for a domain with around 5 objects.
+This is an application that will soon run (on a tiny scale) in production. It's a CRUD application for (physical) photobooths. The photobooths have a default configuration setup (= defaultprofile).
 
 Aspects:
 - Written in PureScript
@@ -9,9 +9,9 @@ Aspects:
 - Using optic-ui on frontend
 - SQLite Database
 
-Todo:
-- Add more CRUD pages
-- Add synchronization applications
+First: 
+    npm install
+    bower install
 
 Test:
     npm run test
