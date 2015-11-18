@@ -1,9 +1,12 @@
-module Klikhut.Async where
+module App.Model.Async where
 
 import Prelude (Unit(), unit, const)
+
+import OpticUI.Components.Async (Async())
+
 import Data.Lens (prism', PrismP())
 import Data.Maybe (Maybe(..))
-import OpticUI.Components.Async (Async())
+
 import Control.Monad.Eff.Exception (Error())
 
 ----------------------------------------------------------

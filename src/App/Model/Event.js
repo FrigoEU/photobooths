@@ -1,6 +1,6 @@
 "use strict";
 
-//module Klikhut.Model.Event
+//module App.Model.Event
 /*eslint-env node*/
 
 // exports.appDateToISO = function(d){

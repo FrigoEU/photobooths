@@ -587,7 +587,8 @@ var PS = { };
               throw new Error("Failed pattern match at Data.Maybe line 26, column 1 - line 27, column 1: " + [ b.constructor.name, f.constructor.name, _0.constructor.name ]);
           };
       };
-  };                                                
+  };
+  var isNothing = maybe(true)(Prelude["const"](false));
   var functorMaybe = new Prelude.Functor(function (fn) {
       return function (_2) {
           if (_2 instanceof Just) {
@@ -627,6 +628,7 @@ var PS = { };
   }, Just.create);
   exports["Nothing"] = Nothing;
   exports["Just"] = Just;
+  exports["isNothing"] = isNothing;
   exports["maybe"] = maybe;
   exports["functorMaybe"] = functorMaybe;
   exports["applyMaybe"] = applyMaybe;
@@ -645,9 +647,10 @@ var PS = { };
   var Data_Maybe_Last = PS["Data.Maybe.Last"];
   var Data_Monoid = PS["Data.Monoid"];
   var Data_Monoid_Additive = PS["Data.Monoid.Additive"];
-  var Data_Monoid_Dual = PS["Data.Monoid.Dual"];
-  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
   var Data_Monoid_Conj = PS["Data.Monoid.Conj"];
+  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
+  var Data_Monoid_Dual = PS["Data.Monoid.Dual"];
+  var Data_Monoid_Endo = PS["Data.Monoid.Endo"];
   var Data_Monoid_Multiplicative = PS["Data.Monoid.Multiplicative"];     
   var Foldable = function (foldMap, foldl, foldr) {
       this.foldMap = foldMap;
@@ -665,23 +668,28 @@ var PS = { };
           return foldl(__dict_Foldable_8)(Prelude["<>"](__dict_Monoid_9["__superclass_Prelude.Semigroup_0"]()))(Data_Monoid.mempty(__dict_Monoid_9));
       };
   }; 
-  var foldableArray = new Foldable(function (__dict_Monoid_19) {
-      return function (f) {
-          return function (xs) {
-              return foldr(foldableArray)(function (x) {
-                  return function (acc) {
-                      return Prelude["<>"](__dict_Monoid_19["__superclass_Prelude.Semigroup_0"]())(f(x))(acc);
-                  };
-              })(Data_Monoid.mempty(__dict_Monoid_19))(xs);
+  var foldMapDefaultR = function (__dict_Foldable_20) {
+      return function (__dict_Monoid_21) {
+          return function (f) {
+              return function (xs) {
+                  return foldr(__dict_Foldable_20)(function (x) {
+                      return function (acc) {
+                          return Prelude["<>"](__dict_Monoid_21["__superclass_Prelude.Semigroup_0"]())(f(x))(acc);
+                      };
+                  })(Data_Monoid.mempty(__dict_Monoid_21))(xs);
+              };
           };
       };
+  };
+  var foldableArray = new Foldable(function (__dict_Monoid_22) {
+      return foldMapDefaultR(foldableArray)(__dict_Monoid_22);
   }, $foreign.foldlArray, $foreign.foldrArray);
   var foldMap = function (dict) {
       return dict.foldMap;
   };
-  var find = function (__dict_Foldable_25) {
+  var find = function (__dict_Foldable_31) {
       return function (p) {
-          return foldl(__dict_Foldable_25)(function (r) {
+          return foldl(__dict_Foldable_31)(function (r) {
               return function (x) {
                   var _96 = p(x);
                   if (_96) {
@@ -690,7 +698,7 @@ var PS = { };
                   if (!_96) {
                       return r;
                   };
-                  throw new Error("Failed pattern match at Data.Foldable line 181, column 1 - line 182, column 1: " + [ _96.constructor.name ]);
+                  throw new Error("Failed pattern match at Data.Foldable line 229, column 1 - line 230, column 1: " + [ _96.constructor.name ]);
               };
           })(Data_Maybe.Nothing.value);
       };
@@ -698,6 +706,7 @@ var PS = { };
   exports["Foldable"] = Foldable;
   exports["find"] = find;
   exports["mconcat"] = mconcat;
+  exports["foldMapDefaultR"] = foldMapDefaultR;
   exports["foldMap"] = foldMap;
   exports["foldl"] = foldl;
   exports["foldr"] = foldr;
@@ -783,10 +792,10 @@ var PS = { };
   var Data_Maybe_First = PS["Data.Maybe.First"];
   var Data_Maybe_Last = PS["Data.Maybe.Last"];
   var Data_Monoid_Additive = PS["Data.Monoid.Additive"];
+  var Data_Monoid_Conj = PS["Data.Monoid.Conj"];
+  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
   var Data_Monoid_Dual = PS["Data.Monoid.Dual"];
   var Data_Monoid_Multiplicative = PS["Data.Monoid.Multiplicative"];
-  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
-  var Data_Monoid_Conj = PS["Data.Monoid.Conj"];
   var Traversable = function (__superclass_Data$dotFoldable$dotFoldable_1, __superclass_Prelude$dotFunctor_0, sequence, traverse) {
       this["__superclass_Data.Foldable.Foldable_1"] = __superclass_Data$dotFoldable$dotFoldable_1;
       this["__superclass_Prelude.Functor_0"] = __superclass_Prelude$dotFunctor_0;
@@ -795,30 +804,38 @@ var PS = { };
   };
   var traverse = function (dict) {
       return dict.traverse;
-  }; 
+  };
+  var sequenceDefault = function (__dict_Traversable_12) {
+      return function (__dict_Applicative_13) {
+          return function (tma) {
+              return traverse(__dict_Traversable_12)(__dict_Applicative_13)(Prelude.id(Prelude.categoryFn))(tma);
+          };
+      };
+  };
   var traversableArray = new Traversable(function () {
       return Data_Foldable.foldableArray;
   }, function () {
       return Prelude.functorArray;
-  }, function (__dict_Applicative_11) {
-      return traverse(traversableArray)(__dict_Applicative_11)(Prelude.id(Prelude.categoryFn));
-  }, function (__dict_Applicative_10) {
-      return $foreign.traverseArrayImpl(Prelude.apply(__dict_Applicative_10["__superclass_Prelude.Apply_0"]()))(Prelude.map((__dict_Applicative_10["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]()))(Prelude.pure(__dict_Applicative_10));
+  }, function (__dict_Applicative_15) {
+      return sequenceDefault(traversableArray)(__dict_Applicative_15);
+  }, function (__dict_Applicative_14) {
+      return $foreign.traverseArrayImpl(Prelude.apply(__dict_Applicative_14["__superclass_Prelude.Apply_0"]()))(Prelude.map((__dict_Applicative_14["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]()))(Prelude.pure(__dict_Applicative_14));
   });
   var sequence = function (dict) {
       return dict.sequence;
   }; 
-  var $$for = function (__dict_Applicative_22) {
-      return function (__dict_Traversable_23) {
+  var $$for = function (__dict_Applicative_26) {
+      return function (__dict_Traversable_27) {
           return function (x) {
               return function (f) {
-                  return traverse(__dict_Traversable_23)(__dict_Applicative_22)(f)(x);
+                  return traverse(__dict_Traversable_27)(__dict_Applicative_26)(f)(x);
               };
           };
       };
   };
   exports["Traversable"] = Traversable;
   exports["for"] = $$for;
+  exports["sequenceDefault"] = sequenceDefault;
   exports["sequence"] = sequence;
   exports["traverse"] = traverse;
   exports["traversableArray"] = traversableArray;;
@@ -990,6 +1007,36 @@ var PS = { };
  
 })(PS["Data.Int"] = PS["Data.Int"] || {});
 (function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports.take = function (n) {
+    return function (s) {
+      return s.substr(0, n);
+    };
+  };
+
+  exports.drop = function (n) {
+    return function (s) {
+      return s.substr(n);
+    };
+  };
+ 
+})(PS["Data.String"] = PS["Data.String"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.String"];
+  var Prelude = PS["Prelude"];
+  var Data_Char = PS["Data.Char"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_String_Unsafe = PS["Data.String.Unsafe"];
+  exports["drop"] = $foreign.drop;
+  exports["take"] = $foreign.take;;
+ 
+})(PS["Data.String"] = PS["Data.String"] || {});
+(function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
   var $foreign = PS["Data.Foreign"];
@@ -1099,6 +1146,16 @@ var PS = { };
     return xs.length;
   };
 
+  //------------------------------------------------------------------------------
+  // Extending arrays ------------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports.cons = function (e) {
+    return function (l) {
+      return [e].concat(l);
+    };
+  };
+
   exports.snoc = function (l) {
     return function (e) {
       var l1 = l.slice();
@@ -1146,6 +1203,17 @@ var PS = { };
         };
       };
     };
+  };
+
+  exports.concat = function (xss) {
+    var result = [];
+    for (var i = 0, l = xss.length; i < l; i++) {
+      var xs = xss[i];
+      for (var j = 0, m = xs.length; j < m; j++) {
+        result.push(xs[j]);
+      }
+    }
+    return result;
   };
 
   //------------------------------------------------------------------------------
@@ -1270,7 +1338,8 @@ var PS = { };
   exports["updateAt"] = updateAt;
   exports["index"] = index;
   exports["!!"] = $bang$bang;
-  exports["snoc"] = $foreign.snoc;;
+  exports["snoc"] = $foreign.snoc;
+  exports["cons"] = $foreign.cons;;
  
 })(PS["Data.Array"] = PS["Data.Array"] || {});
 (function(exports) {
@@ -2096,7 +2165,6 @@ var PS = { };
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
-  var Prelude = PS["Prelude"];     
   var Contravariant = function (cmap) {
       this.cmap = cmap;
   };
@@ -2107,6 +2175,38 @@ var PS = { };
   exports["cmap"] = cmap;;
  
 })(PS["Data.Functor.Contravariant"] = PS["Data.Functor.Contravariant"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Identity = PS["Data.Identity"];     
+  var Wander = function (__superclass_Data$dotProfunctor$dotChoice$dotChoice_1, __superclass_Data$dotProfunctor$dotStrong$dotStrong_0, wander) {
+      this["__superclass_Data.Profunctor.Choice.Choice_1"] = __superclass_Data$dotProfunctor$dotChoice$dotChoice_1;
+      this["__superclass_Data.Profunctor.Strong.Strong_0"] = __superclass_Data$dotProfunctor$dotStrong$dotStrong_0;
+      this.wander = wander;
+  };
+  var wanderStar = function (__dict_Applicative_0) {
+      return new Wander(function () {
+          return Data_Profunctor_Star.choiceStar(__dict_Applicative_0);
+      }, function () {
+          return Data_Profunctor_Star.strongStar((__dict_Applicative_0["__superclass_Prelude.Apply_0"]())["__superclass_Prelude.Functor_0"]());
+      }, function (t) {
+          return function (_0) {
+              return Data_Profunctor_Star.Star(t(__dict_Applicative_0)(Data_Profunctor_Star.runStar(_0)));
+          };
+      });
+  }; 
+  var wander = function (dict) {
+      return dict.wander;
+  };
+  exports["Wander"] = Wander;
+  exports["wander"] = wander;
+  exports["wanderStar"] = wanderStar;;
+ 
+})(PS["Data.Lens.Internal.Wander"] = PS["Data.Lens.Internal.Wander"] || {});
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
@@ -2299,6 +2399,13 @@ var PS = { };
           return runSink(f(_76));
       };
   };
+  var traversal = function (__dict_Monoid_5) {
+      return function (t) {
+          return function (_77) {
+              return fromSink(Data_Profunctor_Star.runStar(t(Data_Lens_Internal_Wander.wanderStar(sinkApplicative(__dict_Monoid_5)))(Data_Profunctor_Star.Star(toSink(_77)))));
+          };
+      };
+  };
   var foreach = function (__dict_Monoid_6) {
       return function (__dict_Traversable_7) {
           return function (f) {
@@ -2322,6 +2429,7 @@ var PS = { };
   exports["Handler"] = Handler;
   exports["inline"] = inline;
   exports["foreach"] = foreach;
+  exports["traversal"] = traversal;
   exports["withView"] = withView;
   exports["with"] = $$with;
   exports["ui"] = ui;
@@ -2721,10 +2829,10 @@ var PS = { };
   var Data_Identity = PS["Data.Identity"];     
   var onLoad = function (go) {
       return function __do() {
-          var _19 = DOM_HTML.window();
+          var _23 = DOM_HTML.window();
           return (function () {
-              var et = DOM_HTML_Types.windowToEventTarget(_19);
-              return DOM_Event_EventTarget.addEventListener(DOM_Event_EventTypes.load)(DOM_Event_EventTarget.eventListener(function (_24) {
+              var et = DOM_HTML_Types.windowToEventTarget(_23);
+              return DOM_Event_EventTarget.addEventListener(DOM_Event_EventTypes.load)(DOM_Event_EventTarget.eventListener(function (_28) {
                   return go;
               }))(false)(et);
           })()();
@@ -2734,111 +2842,111 @@ var PS = { };
       return function (setter) {
           return function (key) {
               return function (newprop) {
-                  return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Control_Monad_State_Class.gets(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(getter))(function (_18) {
-                      var _31 = Data_StrMap.lookup(key)(_18);
-                      if (_31 instanceof Data_Maybe.Nothing) {
-                          return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Control_Monad_State_Class.modify(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(setter(Data_StrMap.insert(key)(newprop)(_18))))(function () {
+                  return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Control_Monad_State_Class.gets(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(getter))(function (_22) {
+                      var _35 = Data_StrMap.lookup(key)(_22);
+                      if (_35 instanceof Data_Maybe.Nothing) {
+                          return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Control_Monad_State_Class.modify(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(setter(Data_StrMap.insert(key)(newprop)(_22))))(function () {
                               return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(newprop);
                           });
                       };
-                      if (_31 instanceof Data_Maybe.Just) {
-                          return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(_31.value0);
+                      if (_35 instanceof Data_Maybe.Just) {
+                          return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(_35.value0);
                       };
-                      throw new Error("Failed pattern match at OpticUI.Run line 95, column 1 - line 100, column 1: " + [ _31.constructor.name ]);
+                      throw new Error("Failed pattern match at OpticUI.Run line 103, column 1 - line 108, column 1: " + [ _35.constructor.name ]);
                   });
               };
           };
       };
   };
-  var toVProp = function (_27) {
-      if (_27 instanceof OpticUI_Markup.AttrP) {
-          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.attrProp(_27.value0, _27.value1));
+  var toVProp = function (_31) {
+      if (_31 instanceof OpticUI_Markup.AttrP) {
+          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.attrProp(_31.value0, _31.value1));
       };
-      if (_27 instanceof OpticUI_Markup.HandlerP) {
+      if (_31 instanceof OpticUI_Markup.HandlerP) {
           return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Markup.runEventHandler(function (f) {
-              return OpticUI_Internal_VirtualDOM.handlerProp(_27.value0, f);
-          })(_27.value1));
+              return OpticUI_Internal_VirtualDOM.handlerProp(_31.value0, f);
+          })(_31.value1));
       };
-      if (_27 instanceof OpticUI_Markup.PropP) {
-          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(Data_Exists.runExists(function (_23) {
-              return OpticUI_Internal_VirtualDOM.prop(_27.value0, _23.value0);
-          })(_27.value1));
+      if (_31 instanceof OpticUI_Markup.PropP) {
+          return Prelude.pure(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(Data_Exists.runExists(function (_27) {
+              return OpticUI_Internal_VirtualDOM.prop(_31.value0, _27.value0);
+          })(_31.value1));
       };
-      if (_27 instanceof OpticUI_Markup.InitializerP) {
+      if (_31 instanceof OpticUI_Markup.InitializerP) {
           return findProp(function (_0) {
               return _0.initializers;
           })(function (is) {
               return function (_1) {
-                  var _42 = {};
-                  for (var _43 in _1) {
-                      if (_1.hasOwnProperty(_43)) {
-                          _42[_43] = _1[_43];
+                  var _46 = {};
+                  for (var _47 in _1) {
+                      if (_1.hasOwnProperty(_47)) {
+                          _46[_47] = _1[_47];
                       };
                   };
-                  _42.initializers = is;
-                  return _42;
+                  _46.initializers = is;
+                  return _46;
               };
-          })(_27.value0)(OpticUI_Markup.runInitializer(function (i) {
-              return OpticUI_Internal_VirtualDOM.initializer(_27.value0, i);
-          })(_27.value1));
+          })(_31.value0)(OpticUI_Markup.runInitializer(function (i) {
+              return OpticUI_Internal_VirtualDOM.initializer(_31.value0, i);
+          })(_31.value1));
       };
-      if (_27 instanceof OpticUI_Markup.FinalizerP) {
+      if (_31 instanceof OpticUI_Markup.FinalizerP) {
           return findProp(function (_2) {
               return _2.finalizers;
           })(function (fs) {
               return function (_3) {
-                  var _46 = {};
-                  for (var _47 in _3) {
-                      if (_3.hasOwnProperty(_47)) {
-                          _46[_47] = _3[_47];
+                  var _50 = {};
+                  for (var _51 in _3) {
+                      if (_3.hasOwnProperty(_51)) {
+                          _50[_51] = _3[_51];
                       };
                   };
-                  _46.finalizers = fs;
-                  return _46;
+                  _50.finalizers = fs;
+                  return _50;
               };
-          })(_27.value0)(OpticUI_Markup.runFinalizer(function (i) {
-              return OpticUI_Internal_VirtualDOM.finalizer(_27.value0, i);
-          })(_27.value1));
+          })(_31.value0)(OpticUI_Markup.runFinalizer(function (i) {
+              return OpticUI_Internal_VirtualDOM.finalizer(_31.value0, i);
+          })(_31.value1));
       };
-      throw new Error("Failed pattern match at OpticUI.Run line 83, column 1 - line 84, column 1: " + [ _27.constructor.name ]);
+      throw new Error("Failed pattern match at OpticUI.Run line 91, column 1 - line 92, column 1: " + [ _31.constructor.name ]);
   };
-  var toVTree = function (_26) {
-      if (_26 instanceof OpticUI_Markup.Text) {
-          return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.vtext(_26.value0));
+  var toVTree = function (_30) {
+      if (_30 instanceof OpticUI_Markup.Text) {
+          return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.vtext(_30.value0));
       };
-      if (_26 instanceof OpticUI_Markup.Element) {
+      if (_30 instanceof OpticUI_Markup.Element) {
           return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Data_Array.foldM(Control_Monad_State_Trans.monadStateT(Data_Identity.monadIdentity))(function (acc) {
               return function (prop) {
                   return Prelude["<$>"](Control_Monad_State_Trans.functorStateT(Data_Identity.monadIdentity))(Prelude.append(OpticUI_Internal_VirtualDOM.semigroupProps)(acc))(toVProp(prop));
               };
-          })(Data_Monoid.mempty(OpticUI_Internal_VirtualDOM.monoidProps))(_26.value2))(function (_17) {
-              return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(toVTree)(_26.value3.value0))(function (_16) {
-                  return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.vnode(Data_Nullable.toNullable(_26.value0))(_26.value1)(Data_Nullable.toNullable(Data_Maybe.Nothing.value))(_17)(_16));
+          })(Data_Monoid.mempty(OpticUI_Internal_VirtualDOM.monoidProps))(_30.value2))(function (_21) {
+              return Prelude.bind(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(toVTree)(_30.value3.value0))(function (_20) {
+                  return Prelude["return"](Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(OpticUI_Internal_VirtualDOM.vnode(Data_Nullable.toNullable(_30.value0))(_30.value1)(Data_Nullable.toNullable(Data_Maybe.Nothing.value))(_21)(_20));
               });
           });
       };
-      throw new Error("Failed pattern match: " + [ _26.constructor.name ]);
+      throw new Error("Failed pattern match: " + [ _30.constructor.name ]);
   };
-  var buildVTree = function (_25) {
+  var buildVTree = function (_29) {
       return function (memo) {
           var n = Data_Nullable.toNullable(Data_Maybe.Nothing.value);
-          var _61 = Control_Monad_State.runState(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(toVTree)(_25.value0))(memo);
-          return new Data_Tuple.Tuple(OpticUI_Internal_VirtualDOM.vnode(n)("div")(n)(Data_Monoid.mempty(OpticUI_Internal_VirtualDOM.monoidProps))(_61.value0), _61.value1);
+          var _65 = Control_Monad_State.runState(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_State_Trans.applicativeStateT(Data_Identity.monadIdentity))(toVTree)(_29.value0))(memo);
+          return new Data_Tuple.Tuple(OpticUI_Internal_VirtualDOM.vnode(n)("div")(n)(Data_Monoid.mempty(OpticUI_Internal_VirtualDOM.monoidProps))(_65.value0), _65.value1);
       };
   };
   var appendToBody = function (e) {
       return function __do() {
-          var _22 = DOM_HTML.window();
-          var _21 = DOM_HTML_Window.document(_22)();
-          var _20 = Prelude["<$>"](Control_Monad_Eff.functorEff)(Data_Nullable.toMaybe)(DOM_HTML_Document.body(_21))();
+          var _26 = DOM_HTML.window();
+          var _25 = DOM_HTML_Window.document(_26)();
+          var _24 = Prelude["<$>"](Control_Monad_Eff.functorEff)(Data_Nullable.toMaybe)(DOM_HTML_Document.body(_25))();
           return (function () {
-              if (_20 instanceof Data_Maybe.Nothing) {
+              if (_24 instanceof Data_Maybe.Nothing) {
                   return Prelude.pure(Control_Monad_Eff.applicativeEff)(Prelude.unit);
               };
-              if (_20 instanceof Data_Maybe.Just) {
-                  return Prelude["void"](Control_Monad_Eff.functorEff)(DOM_Node_Node.appendChild(DOM_HTML_Types.htmlElementToNode(e))(DOM_HTML_Types.htmlElementToNode(_20.value0)));
+              if (_24 instanceof Data_Maybe.Just) {
+                  return Prelude["void"](Control_Monad_Eff.functorEff)(DOM_Node_Node.appendChild(DOM_HTML_Types.htmlElementToNode(e))(DOM_HTML_Types.htmlElementToNode(_24.value0)));
               };
-              throw new Error("Failed pattern match at OpticUI.Run line 116, column 1 - line 117, column 1: " + [ _20.constructor.name ]);
+              throw new Error("Failed pattern match at OpticUI.Run line 124, column 1 - line 125, column 1: " + [ _24.constructor.name ]);
           })()();
       };
   };
@@ -2847,10 +2955,11 @@ var PS = { };
           var v0 = OpticUI_Internal_VirtualDOM.vtext("");
           var n0 = OpticUI_Internal_VirtualDOM.createElement(v0);
           return function __do() {
-              var _15 = Control_Monad_Eff_Ref.newRef(v0)();
-              var _14 = Control_Monad_Eff_Ref.newRef(n0)();
-              var _13 = Control_Monad_Eff_Ref.newRef(0)();
-              var _12 = Control_Monad_Eff_Ref.newRef({
+              var _19 = Control_Monad_Eff_Ref.newRef(v0)();
+              var _18 = Control_Monad_Eff_Ref.newRef(n0)();
+              var _17 = Control_Monad_Eff_Ref.newRef(s0)();
+              var _16 = Control_Monad_Eff_Ref.newRef(0)();
+              var _15 = Control_Monad_Eff_Ref.newRef({
                   initializers: Data_StrMap.empty, 
                   finalizers: Data_StrMap.empty
               })();
@@ -2858,9 +2967,9 @@ var PS = { };
                   var checkGen = function (g) {
                       return function (go) {
                           return function __do() {
-                              var _4 = Control_Monad_Eff_Ref.readRef(_13)();
+                              var _4 = Control_Monad_Eff_Ref.readRef(_16)();
                               return Control_Monad.when(Control_Monad_Eff.monadEff)(g === _4)(function __do() {
-                                  Control_Monad_Eff_Ref.writeRef(_13)(_4 + 1 | 0)();
+                                  Control_Monad_Eff_Ref.writeRef(_16)(_4 + 1 | 0)();
                                   return go();
                               })();
                           };
@@ -2869,23 +2978,34 @@ var PS = { };
                   var step = function (gen) {
                       return function (s) {
                           return checkGen(gen)(function __do() {
+                              var _12 = Control_Monad_Eff_Ref.readRef(_19)();
                               var _11 = Control_Monad_Eff_Ref.readRef(_15)();
-                              var _10 = Control_Monad_Eff_Ref.readRef(_12)();
-                              var _9 = Prelude["<$>"](Control_Monad_Eff.functorEff)(function (tree) {
-                                  return buildVTree(tree)(_10);
+                              var _10 = Prelude["<$>"](Control_Monad_Eff.functorEff)(function (tree) {
+                                  return buildVTree(tree)(_11);
                               })(OpticUI_Core.runUI(ui)(s)(OpticUI_Core.Handler(step(gen + 1 | 0))))();
-                              var _8 = Control_Monad_Eff_Ref.writeRef(_12)(_9.value1)();
-                              var _7 = Control_Monad_Eff_Ref.writeRef(_15)(_9.value0)();
-                              var _6 = Control_Monad_Eff_Ref.readRef(_14)();
-                              var _5 = OpticUI_Internal_VirtualDOM.patch(OpticUI_Internal_VirtualDOM.diff(_11)(_9.value0))(_6)();
-                              return Control_Monad_Eff_Ref.writeRef(_14)(_5)();
+                              var _9 = Control_Monad_Eff_Ref.writeRef(_15)(_10.value1)();
+                              var _8 = Control_Monad_Eff_Ref.writeRef(_19)(_10.value0)();
+                              var _7 = Control_Monad_Eff_Ref.writeRef(_17)(s)();
+                              var _6 = Control_Monad_Eff_Ref.readRef(_18)();
+                              var _5 = OpticUI_Internal_VirtualDOM.patch(OpticUI_Internal_VirtualDOM.diff(_12)(_10.value0))(_6)();
+                              return Control_Monad_Eff_Ref.writeRef(_18)(_5)();
                           });
                       };
                   };
-                  return onLoad(function __do() {
-                      appendToBody(n0)();
-                      return step(0)(s0)();
-                  });
+                  var driver = function (f) {
+                      return function __do() {
+                          var _14 = Control_Monad_Eff_Ref.readRef(_16)();
+                          var _13 = Control_Monad_Eff_Ref.readRef(_17)();
+                          return step(_14)(f(_13))();
+                      };
+                  };
+                  return function __do() {
+                      onLoad(function __do() {
+                          appendToBody(n0)();
+                          return step(0)(s0)();
+                      })();
+                      return Prelude["return"](Control_Monad_Eff.applicativeEff)(driver)();
+                  };
               })()();
           };
       };
@@ -2948,9 +3068,9 @@ var PS = { };
   "use strict";
   var Prelude = PS["Prelude"];
   var Data_Const = PS["Data.Const"];
+  var Data_Functor_Contravariant = PS["Data.Functor.Contravariant"];
   var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
-  var Data_Lens_Types = PS["Data.Lens.Types"];
-  var Data_Functor_Contravariant = PS["Data.Functor.Contravariant"];     
+  var Data_Lens_Types = PS["Data.Lens.Types"];     
   var view = function (l) {
       return function (s) {
           return Data_Const.getConst(Data_Profunctor_Star.runStar(l(Data_Const.Const))(s));
@@ -2960,115 +3080,159 @@ var PS = { };
  
 })(PS["Data.Lens.Getter"] = PS["Data.Lens.Getter"] || {});
 (function(exports) {
-  /* global exports */
-  /* global XMLHttpRequest */
-  /* global module */
-  "use strict";
-
-  // module Network.HTTP.Affjax
-
-  // jshint maxparams: 5
-  exports._ajax = function (mkHeader, options, canceler, errback, callback) {
-    var platformSpecific = { };
-    if (typeof module !== "undefined" && module.require) {
-      // We are on node.js
-      platformSpecific.newXHR = function () {
-        var XHR = module.require("xhr2");
-        return new XHR();
-      };
-
-      platformSpecific.fixupUrl = function (url) {
-        var urllib = module.require("url");
-        var u = urllib.parse(url);
-        u.protocol = u.protocol || "http:";
-        u.hostname = u.hostname || "localhost";
-        return urllib.format(u);
-      };
-
-      platformSpecific.getResponse = function (xhr) {
-        return xhr.response;
-      };
-    } else {
-      // We are in the browser
-      platformSpecific.newXHR = function () {
-        return new XMLHttpRequest();
-      };
-
-      platformSpecific.fixupUrl = function (url) {
-        return url || "/";
-      };
-
-      platformSpecific.getResponse = function (xhr) {
-        return xhr.response;
-      };
-    }
-
-    return function () {
-      var xhr = platformSpecific.newXHR();
-      var fixedUrl = platformSpecific.fixupUrl(options.url);
-      xhr.open(options.method || "GET", fixedUrl, true, options.username, options.password);
-      if (options.headers) {
-        for (var i = 0, header; (header = options.headers[i]) != null; i++) {
-          xhr.setRequestHeader(header.field, header.value);
-        }
-      }
-      xhr.onerror = function () {
-        errback(new Error("AJAX request failed: " + options.method + " " + options.url))();
-      };
-      xhr.onload = function () {
-        callback({
-          status: xhr.status,
-          headers: xhr.getAllResponseHeaders().split("\n")
-            .filter(function (header) {
-              return header.length > 0;
-            })
-            .map(function (header) {
-              var i = header.indexOf(":");
-              return mkHeader(header.substring(0, i))(header.substring(i + 2));
-            }),
-          response: platformSpecific.getResponse(xhr)
-        })();
-      };
-      xhr.responseType = options.responseType;
-      xhr.send(options.content);
-      return canceler(xhr);
-    };
-  };
-
-  // jshint maxparams: 4
-  exports._cancelAjax = function (xhr, cancelError, errback, callback) {
-    return function () {
-      try { xhr.abort(); } catch (e) { return callback(false)(); }
-      return callback(true)();
-    };
-  };
-
- 
-})(PS["Network.HTTP.Affjax"] = PS["Network.HTTP.Affjax"] || {});
-(function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
   var Prelude = PS["Prelude"];
-  var $eq$less$less = function (__dict_Bind_1) {
-      return function (f) {
-          return function (m) {
-              return Prelude[">>="](__dict_Bind_1)(m)(f);
-          };
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];     
+  var over = function (l) {
+      return l;
+  };
+  var set = function (l) {
+      return function (b) {
+          return over(l)(Prelude["const"](b));
       };
   };
-  var $less$eq$less = function (__dict_Bind_2) {
-      return function (f) {
-          return function (g) {
-              return function (a) {
-                  return $eq$less$less(__dict_Bind_2)(f)(g(a));
+  exports["set"] = set;
+  exports["over"] = over;;
+ 
+})(PS["Data.Lens.Setter"] = PS["Data.Lens.Setter"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Data_Lens_Internal_Tagged = PS["Data.Lens.Internal.Tagged"];
+  var Prelude = PS["Prelude"];
+  var Control_MonadPlus = PS["Control.MonadPlus"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Profunctor = PS["Data.Profunctor"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
+  var Data_Lens_Internal_Market = PS["Data.Lens.Internal.Market"];
+  var prism = function (to) {
+      return function (fro) {
+          return function (__dict_Choice_0) {
+              return function (pab) {
+                  return Data_Profunctor.dimap(__dict_Choice_0["__superclass_Data.Profunctor.Profunctor_0"]())(fro)(Data_Either.either(Prelude.id(Prelude.categoryFn))(Prelude.id(Prelude.categoryFn)))(Data_Profunctor_Choice.right(__dict_Choice_0)(Data_Profunctor.rmap(__dict_Choice_0["__superclass_Data.Profunctor.Profunctor_0"]())(to)(pab)));
               };
           };
       };
   };
-  exports["<=<"] = $less$eq$less;
-  exports["=<<"] = $eq$less$less;;
+  var prism$prime = function (to) {
+      return function (fro) {
+          return function (__dict_Choice_1) {
+              return prism(to)(function (s) {
+                  return Data_Maybe.maybe(new Data_Either.Left(s))(Data_Either.Right.create)(fro(s));
+              })(__dict_Choice_1);
+          };
+      };
+  };
+  exports["prism'"] = prism$prime;
+  exports["prism"] = prism;;
  
-})(PS["Control.Bind"] = PS["Control.Bind"] || {});
+})(PS["Data.Lens.Prism"] = PS["Data.Lens.Prism"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Lens_Prism = PS["Data.Lens.Prism"];
+  var _Just = function (__dict_Choice_1) {
+      return Data_Lens_Prism.prism(Data_Maybe.Just.create)(Data_Maybe.maybe(new Data_Either.Left(Data_Maybe.Nothing.value))(Data_Either.Right.create))(__dict_Choice_1);
+  };
+  exports["_Just"] = _Just;;
+ 
+})(PS["Data.Lens.Prism.Maybe"] = PS["Data.Lens.Prism.Maybe"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var DOM_HTML_Types = PS["DOM.HTML.Types"];
+  var Data_Foreign_Index = PS["Data.Foreign.Index"];                  
+  var valueA = OpticUI_Markup.prop("value");                    
+  var typeA = OpticUI_Markup.attr("type");                              
+  var tr = OpticUI_Markup.element(Data_Maybe.Nothing.value)("tr");      
+  var th = OpticUI_Markup.element(Data_Maybe.Nothing.value)("th");            
+  var td = OpticUI_Markup.element(Data_Maybe.Nothing.value)("td");
+  var tbody = OpticUI_Markup.element(Data_Maybe.Nothing.value)("tbody");
+  var table = OpticUI_Markup.element(Data_Maybe.Nothing.value)("table");
+  var onClick = function (h) {
+      return OpticUI_Markup.handle("click")(h);
+  };                                                                
+  var input_ = function (ps) {
+      return OpticUI_Markup.element(Data_Maybe.Nothing.value)("input")(ps)(Data_Monoid.mempty(OpticUI_Markup.markupMonoid));
+  };                                                                     
+  var h1 = OpticUI_Markup.element(Data_Maybe.Nothing.value)("h1");
+  var getProp = function (__dict_IsForeign_0) {
+      return function (p_1) {
+          return function (_1) {
+              return Data_Either.either(Prelude["const"](Data_Maybe.Nothing.value))(Data_Maybe.Just.create)(Data_Foreign_Class.readProp(__dict_IsForeign_0)(Data_Foreign_Index.indexString)(p_1)(Data_Foreign.toForeign((function (_0) {
+                  return _0.target;
+              })(_1))));
+          };
+      };
+  };
+  var onInput = function (__dict_IsForeign_1) {
+      return function (h) {
+          return OpticUI_Markup.handle("input")(function (e) {
+              return h(e)(getProp(__dict_IsForeign_1)("value")(e));
+          });
+      };
+  };                                                                       
+  var div = OpticUI_Markup.element(Data_Maybe.Nothing.value)("div");  
+  var classA = OpticUI_Markup.attr("class");                              
+  var button = OpticUI_Markup.element(Data_Maybe.Nothing.value)("button");
+  exports["getProp"] = getProp;
+  exports["onInput"] = onInput;
+  exports["onClick"] = onClick;
+  exports["valueA"] = valueA;
+  exports["typeA"] = typeA;
+  exports["classA"] = classA;
+  exports["tr"] = tr;
+  exports["th"] = th;
+  exports["td"] = td;
+  exports["tbody"] = tbody;
+  exports["table"] = table;
+  exports["input_"] = input_;
+  exports["h1"] = h1;
+  exports["div"] = div;
+  exports["button"] = button;;
+ 
+})(PS["OpticUI.Markup.HTML"] = PS["OpticUI.Markup.HTML"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var DOM = PS["DOM"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];     
+  var textField = function (as) {
+      return OpticUI_Core["with"](function (s) {
+          return function (h) {
+              var inpH = function (_0) {
+                  return function (_2) {
+                      return OpticUI_Core.runHandler(h)(Data_Maybe.maybe("")(Prelude.id(Prelude.categoryFn))(_2));
+                  };
+              };
+              var bs = [ OpticUI_Markup_HTML.valueA(s), OpticUI_Markup_HTML.typeA("text"), OpticUI_Markup_HTML.onInput(Data_Foreign_Class.stringIsForeign)(inpH) ];
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.input_(Prelude["++"](Prelude.semigroupArray)(as)(bs)));
+          };
+      });
+  };
+  exports["textField"] = textField;;
+ 
+})(PS["OpticUI.Components"] = PS["OpticUI.Components"] || {});
 (function(exports) {
   /* global exports */
   "use strict";
@@ -3303,6 +3467,205 @@ var PS = { };
   // Generated by psc version 0.7.5.2
   "use strict";
   var Prelude = PS["Prelude"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Monoid = PS["Data.Monoid"];     
+  var Async = (function () {
+      function Async(value0) {
+          this.value0 = value0;
+      };
+      Async.create = function (value0) {
+          return new Async(value0);
+      };
+      return Async;
+  })();
+  var onResult = function (__dict_Monoid_0) {
+      return function (s) {
+          return function (f) {
+              return OpticUI_Core["with"](function (_4) {
+                  return function (_3) {
+                      return OpticUI_Core.inline(function __do() {
+                          Control_Monad_Eff_Ref.writeRef(_4.value0)(Data_Either.either(f)(s))();
+                          return Data_Monoid.mempty(__dict_Monoid_0);
+                      });
+                  };
+              });
+          };
+      };
+  };
+  var async = function (go) {
+      return function __do() {
+          var _2 = Control_Monad_Eff_Ref.newRef(Prelude["const"](Prelude.pure(Control_Monad_Eff.applicativeEff)(Prelude.unit)))();
+          return (function () {
+              var s = function (a) {
+                  return function __do() {
+                      var _0 = Control_Monad_Eff_Ref.readRef(_2)();
+                      return _0(new Data_Either.Right(a))();
+                  };
+              };
+              var f = function (e) {
+                  return function __do() {
+                      var _1 = Control_Monad_Eff_Ref.readRef(_2)();
+                      return _1(new Data_Either.Left(e))();
+                  };
+              };
+              return function __do() {
+                  Control_Monad_Aff.runAff(f)(s)(go)();
+                  return new Async(_2);
+              };
+          })()();
+      };
+  };
+  exports["Async"] = Async;
+  exports["async"] = async;
+  exports["onResult"] = onResult;;
+ 
+})(PS["OpticUI.Components.Async"] = PS["OpticUI.Components.Async"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+
+  // module DOM.Timer
+
+  exports.timeout = function(time){
+    return function(fn){
+      return function(){
+        return setTimeout(function(){
+          fn();
+        }, time);
+      };
+    };
+  };
+ 
+})(PS["DOM.Timer"] = PS["DOM.Timer"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["DOM.Timer"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  exports["timeout"] = $foreign.timeout;;
+ 
+})(PS["DOM.Timer"] = PS["DOM.Timer"] || {});
+(function(exports) {
+  /* global exports */
+  /* global XMLHttpRequest */
+  /* global module */
+  "use strict";
+
+  // module Network.HTTP.Affjax
+
+  // jshint maxparams: 5
+  exports._ajax = function (mkHeader, options, canceler, errback, callback) {
+    var platformSpecific = { };
+    if (typeof module !== "undefined" && module.require) {
+      // We are on node.js
+      platformSpecific.newXHR = function () {
+        var XHR = module.require("xhr2");
+        return new XHR();
+      };
+
+      platformSpecific.fixupUrl = function (url) {
+        var urllib = module.require("url");
+        var u = urllib.parse(url);
+        u.protocol = u.protocol || "http:";
+        u.hostname = u.hostname || "localhost";
+        return urllib.format(u);
+      };
+
+      platformSpecific.getResponse = function (xhr) {
+        return xhr.response;
+      };
+    } else {
+      // We are in the browser
+      platformSpecific.newXHR = function () {
+        return new XMLHttpRequest();
+      };
+
+      platformSpecific.fixupUrl = function (url) {
+        return url || "/";
+      };
+
+      platformSpecific.getResponse = function (xhr) {
+        return xhr.response;
+      };
+    }
+
+    return function () {
+      var xhr = platformSpecific.newXHR();
+      var fixedUrl = platformSpecific.fixupUrl(options.url);
+      xhr.open(options.method || "GET", fixedUrl, true, options.username, options.password);
+      if (options.headers) {
+        for (var i = 0, header; (header = options.headers[i]) != null; i++) {
+          xhr.setRequestHeader(header.field, header.value);
+        }
+      }
+      xhr.onerror = function () {
+        errback(new Error("AJAX request failed: " + options.method + " " + options.url))();
+      };
+      xhr.onload = function () {
+        callback({
+          status: xhr.status,
+          headers: xhr.getAllResponseHeaders().split("\n")
+            .filter(function (header) {
+              return header.length > 0;
+            })
+            .map(function (header) {
+              var i = header.indexOf(":");
+              return mkHeader(header.substring(0, i))(header.substring(i + 2));
+            }),
+          response: platformSpecific.getResponse(xhr)
+        })();
+      };
+      xhr.responseType = options.responseType;
+      xhr.send(options.content);
+      return canceler(xhr);
+    };
+  };
+
+  // jshint maxparams: 4
+  exports._cancelAjax = function (xhr, cancelError, errback, callback) {
+    return function () {
+      try { xhr.abort(); } catch (e) { return callback(false)(); }
+      return callback(true)();
+    };
+  };
+
+ 
+})(PS["Network.HTTP.Affjax"] = PS["Network.HTTP.Affjax"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var $eq$less$less = function (__dict_Bind_1) {
+      return function (f) {
+          return function (m) {
+              return Prelude[">>="](__dict_Bind_1)(m)(f);
+          };
+      };
+  };
+  var $less$eq$less = function (__dict_Bind_2) {
+      return function (f) {
+          return function (g) {
+              return function (a) {
+                  return $eq$less$less(__dict_Bind_2)(f)(g(a));
+              };
+          };
+      };
+  };
+  exports["<=<"] = $less$eq$less;
+  exports["=<<"] = $eq$less$less;;
+ 
+})(PS["Control.Bind"] = PS["Control.Bind"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
   var DOM_File_Types = PS["DOM.File.Types"];
   var DOM_Node_Types = PS["DOM.Node.Types"];
   var DOM_XHR_Types = PS["DOM.XHR.Types"];
@@ -3314,9 +3677,11 @@ var PS = { };
   var toRequest = function (dict) {
       return dict.toRequest;
   };                                                                       
-  var requestableString = new Requestable(Unsafe_Coerce.unsafeCoerce);
+  var requestableString = new Requestable(Unsafe_Coerce.unsafeCoerce);  
+  var requestableBlob = new Requestable(Unsafe_Coerce.unsafeCoerce);
   exports["Requestable"] = Requestable;
   exports["toRequest"] = toRequest;
+  exports["requestableBlob"] = requestableBlob;
   exports["requestableString"] = requestableString;;
  
 })(PS["Network.HTTP.Affjax.Request"] = PS["Network.HTTP.Affjax.Request"] || {});
@@ -3738,217 +4103,11 @@ var PS = { };
   // Generated by psc version 0.7.5.2
   "use strict";
   var Prelude = PS["Prelude"];
-  var Data_Const = PS["Data.Const"];
-  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
-  var Data_Lens_Types = PS["Data.Lens.Types"];
-  var Data_Maybe = PS["Data.Maybe"];     
-  var over = function (l) {
-      return l;
-  };
-  var set = function (l) {
-      return function (b) {
-          return over(l)(Prelude["const"](b));
-      };
-  };
-  exports["set"] = set;
-  exports["over"] = over;;
- 
-})(PS["Data.Lens.Setter"] = PS["Data.Lens.Setter"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var OpticUI_Markup = PS["OpticUI.Markup"];
-  var Data_Maybe = PS["Data.Maybe"];
-  var Data_Either = PS["Data.Either"];
-  var Data_Monoid = PS["Data.Monoid"];
-  var Data_Foreign = PS["Data.Foreign"];
-  var Data_Foreign_Class = PS["Data.Foreign.Class"];
-  var Control_Monad_Eff = PS["Control.Monad.Eff"];
-  var DOM_HTML_Types = PS["DOM.HTML.Types"];
-  var Data_Foreign_Index = PS["Data.Foreign.Index"];                  
-  var valueA = OpticUI_Markup.prop("value");                    
-  var typeA = OpticUI_Markup.attr("type");                              
-  var tr = OpticUI_Markup.element(Data_Maybe.Nothing.value)("tr");      
-  var th = OpticUI_Markup.element(Data_Maybe.Nothing.value)("th");            
-  var td = OpticUI_Markup.element(Data_Maybe.Nothing.value)("td");
-  var tbody = OpticUI_Markup.element(Data_Maybe.Nothing.value)("tbody");
-  var table = OpticUI_Markup.element(Data_Maybe.Nothing.value)("table");
-  var onClick = function (h) {
-      return OpticUI_Markup.handle("click")(h);
-  };                                                                
-  var input_ = function (ps) {
-      return OpticUI_Markup.element(Data_Maybe.Nothing.value)("input")(ps)(Data_Monoid.mempty(OpticUI_Markup.markupMonoid));
-  };                                                              
-  var getProp = function (__dict_IsForeign_0) {
-      return function (p_1) {
-          return function (_1) {
-              return Data_Either.either(Prelude["const"](Data_Maybe.Nothing.value))(Data_Maybe.Just.create)(Data_Foreign_Class.readProp(__dict_IsForeign_0)(Data_Foreign_Index.indexString)(p_1)(Data_Foreign.toForeign((function (_0) {
-                  return _0.target;
-              })(_1))));
-          };
-      };
-  };
-  var onInput = function (__dict_IsForeign_1) {
-      return function (h) {
-          return OpticUI_Markup.handle("input")(function (e) {
-              return h(e)(getProp(__dict_IsForeign_1)("value")(e));
-          });
-      };
-  };                                                                       
-  var div = OpticUI_Markup.element(Data_Maybe.Nothing.value)("div");  
-  var classA = OpticUI_Markup.attr("class");                              
-  var button = OpticUI_Markup.element(Data_Maybe.Nothing.value)("button");
-  exports["getProp"] = getProp;
-  exports["onInput"] = onInput;
-  exports["onClick"] = onClick;
-  exports["valueA"] = valueA;
-  exports["typeA"] = typeA;
-  exports["classA"] = classA;
-  exports["tr"] = tr;
-  exports["th"] = th;
-  exports["td"] = td;
-  exports["tbody"] = tbody;
-  exports["table"] = table;
-  exports["input_"] = input_;
-  exports["div"] = div;
-  exports["button"] = button;;
- 
-})(PS["OpticUI.Markup.HTML"] = PS["OpticUI.Markup.HTML"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var OpticUI_Core = PS["OpticUI.Core"];
-  var OpticUI_Markup = PS["OpticUI.Markup"];
-  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
-  var DOM = PS["DOM"];
-  var Data_Maybe = PS["Data.Maybe"];
-  var Data_Foreign_Class = PS["Data.Foreign.Class"];     
-  var textField = function (as) {
-      return OpticUI_Core["with"](function (s) {
-          return function (h) {
-              var inpH = function (_0) {
-                  return function (_2) {
-                      return OpticUI_Core.runHandler(h)(Data_Maybe.maybe("")(Prelude.id(Prelude.categoryFn))(_2));
-                  };
-              };
-              var bs = [ OpticUI_Markup_HTML.valueA(s), OpticUI_Markup_HTML.typeA("text"), OpticUI_Markup_HTML.onInput(Data_Foreign_Class.stringIsForeign)(inpH) ];
-              return OpticUI_Core.ui(OpticUI_Markup_HTML.input_(Prelude["++"](Prelude.semigroupArray)(as)(bs)));
-          };
-      });
-  };
-  exports["textField"] = textField;;
- 
-})(PS["OpticUI.Components"] = PS["OpticUI.Components"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var OpticUI_Core = PS["OpticUI.Core"];
-  var Control_Monad_Eff = PS["Control.Monad.Eff"];
-  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
-  var Control_Monad_Aff = PS["Control.Monad.Aff"];
-  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
-  var Data_Either = PS["Data.Either"];
-  var Data_Monoid = PS["Data.Monoid"];     
-  var Async = (function () {
-      function Async(value0) {
-          this.value0 = value0;
-      };
-      Async.create = function (value0) {
-          return new Async(value0);
-      };
-      return Async;
-  })();
-  var onResult = function (__dict_Monoid_0) {
-      return function (s) {
-          return function (f) {
-              return OpticUI_Core["with"](function (_4) {
-                  return function (_3) {
-                      return OpticUI_Core.inline(function __do() {
-                          Control_Monad_Eff_Ref.writeRef(_4.value0)(Data_Either.either(f)(s))();
-                          return Data_Monoid.mempty(__dict_Monoid_0);
-                      });
-                  };
-              });
-          };
-      };
-  };
-  var async = function (go) {
-      return function __do() {
-          var _2 = Control_Monad_Eff_Ref.newRef(Prelude["const"](Prelude.pure(Control_Monad_Eff.applicativeEff)(Prelude.unit)))();
-          return (function () {
-              var s = function (a) {
-                  return function __do() {
-                      var _0 = Control_Monad_Eff_Ref.readRef(_2)();
-                      return _0(new Data_Either.Right(a))();
-                  };
-              };
-              var f = function (e) {
-                  return function __do() {
-                      var _1 = Control_Monad_Eff_Ref.readRef(_2)();
-                      return _1(new Data_Either.Left(e))();
-                  };
-              };
-              return function __do() {
-                  Control_Monad_Aff.runAff(f)(s)(go)();
-                  return new Async(_2);
-              };
-          })()();
-      };
-  };
-  exports["Async"] = Async;
-  exports["async"] = async;
-  exports["onResult"] = onResult;;
- 
-})(PS["OpticUI.Components.Async"] = PS["OpticUI.Components.Async"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var Data_Either = PS["Data.Either"];
-  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
-  var Data_Const = PS["Data.Const"];
-  var Data_Maybe = PS["Data.Maybe"];
-  var Data_Maybe_First = PS["Data.Maybe.First"];
-  var Data_Lens_Types = PS["Data.Lens.Types"];
-  var Data_Lens_Internal_Tagged = PS["Data.Lens.Internal.Tagged"];
-  var Data_Lens_Internal_Market = PS["Data.Lens.Internal.Market"];
-  var Control_MonadPlus = PS["Control.MonadPlus"];
-  var Data_Profunctor = PS["Data.Profunctor"];
-  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];
-  var prism = function (to) {
-      return function (fro) {
-          return function (__dict_Choice_0) {
-              return function (pab) {
-                  return Data_Profunctor.dimap(__dict_Choice_0["__superclass_Data.Profunctor.Profunctor_0"]())(fro)(Data_Either.either(Prelude.id(Prelude.categoryFn))(Prelude.id(Prelude.categoryFn)))(Data_Profunctor_Choice.right(__dict_Choice_0)(Data_Profunctor.rmap(__dict_Choice_0["__superclass_Data.Profunctor.Profunctor_0"]())(to)(pab)));
-              };
-          };
-      };
-  };
-  var prism$prime = function (to) {
-      return function (fro) {
-          return function (__dict_Choice_1) {
-              return prism(to)(function (s) {
-                  return Data_Maybe.maybe(new Data_Either.Left(s))(Data_Either.Right.create)(fro(s));
-              })(__dict_Choice_1);
-          };
-      };
-  };
-  exports["prism'"] = prism$prime;
-  exports["prism"] = prism;;
- 
-})(PS["Data.Lens.Prism"] = PS["Data.Lens.Prism"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var Data_Tuple = PS["Data.Tuple"];
-  var Data_Lens_Types = PS["Data.Lens.Types"];
-  var Data_Lens_Internal_Shop = PS["Data.Lens.Internal.Shop"];
   var Data_Profunctor = PS["Data.Profunctor"];
   var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Lens_Internal_Shop = PS["Data.Lens.Internal.Shop"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];
   var lens$prime = function (to) {
       return function (__dict_Strong_0) {
           return function (pab) {
@@ -3972,23 +4131,6 @@ var PS = { };
   exports["lens"] = lens;;
  
 })(PS["Data.Lens.Lens"] = PS["Data.Lens.Lens"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var Data_Maybe = PS["Data.Maybe"];
-  var Data_Either = PS["Data.Either"];
-  var Data_Tuple = PS["Data.Tuple"];
-  var Data_Lens_Types = PS["Data.Lens.Types"];
-  var Data_Lens_Prism = PS["Data.Lens.Prism"];
-  var Data_Lens_Lens = PS["Data.Lens.Lens"];
-  var Data_Lens_Internal_Void = PS["Data.Lens.Internal.Void"];
-  var _Just = function (__dict_Choice_5) {
-      return Data_Lens_Prism.prism(Data_Maybe.Just.create)(Data_Maybe.maybe(new Data_Either.Left(Data_Maybe.Nothing.value))(Data_Either.Right.create))(__dict_Choice_5);
-  };
-  exports["_Just"] = _Just;;
- 
-})(PS["Data.Lens.Common"] = PS["Data.Lens.Common"] || {});
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
@@ -4150,10 +4292,89 @@ var PS = { };
   }, function (x) {
       return new SString(x);
   });
+  var genericNumber = new Generic(function (_6) {
+      if (_6 instanceof SNumber) {
+          return new Data_Maybe.Just(_6.value0);
+      };
+      return Data_Maybe.Nothing.value;
+  }, function (_5) {
+      return SigNumber.value;
+  }, function (x) {
+      return new SNumber(x);
+  });
+  var genericInt = new Generic(function (_8) {
+      if (_8 instanceof SInt) {
+          return new Data_Maybe.Just(_8.value0);
+      };
+      return Data_Maybe.Nothing.value;
+  }, function (_7) {
+      return SigInt.value;
+  }, function (x) {
+      return new SInt(x);
+  });
   var fromSpine = function (dict) {
       return dict.fromSpine;
   };
   var anyProxy = Proxy.value;
+  var genericArray = function (__dict_Generic_3) {
+      return new Generic(function (_15) {
+          if (_15 instanceof SArray) {
+              return Data_Traversable.traverse(Data_Traversable.traversableArray)(Data_Maybe.applicativeMaybe)(function (_172) {
+                  return fromSpine(__dict_Generic_3)((function (_1) {
+                      return _1(Prelude.unit);
+                  })(_172));
+              })(_15.value0);
+          };
+          return Data_Maybe.Nothing.value;
+      }, function (x) {
+          var lowerProxy = function (_16) {
+              return anyProxy;
+          };
+          return new SigArray(function (unit) {
+              return toSignature(__dict_Generic_3)(lowerProxy(x));
+          });
+      }, function (xs) {
+          return new SArray(Prelude["<$>"](Prelude.functorArray)(function (x) {
+              return function (y) {
+                  return toSpine(__dict_Generic_3)(x);
+              };
+          })(xs));
+      });
+  };
+  var genericMaybe = function (__dict_Generic_6) {
+      return new Generic(function (_22) {
+          if (_22 instanceof SProd && (_22.value0 === "Data.Maybe.Just" && _22.value1.length === 1)) {
+              return Prelude["<$>"](Data_Maybe.functorMaybe)(Data_Maybe.Just.create)(fromSpine(__dict_Generic_6)(_22.value1[0](Prelude.unit)));
+          };
+          if (_22 instanceof SProd && (_22.value0 === "Data.Maybe.Nothing" && _22.value1.length === 0)) {
+              return Prelude["return"](Data_Maybe.applicativeMaybe)(Data_Maybe.Nothing.value);
+          };
+          return Data_Maybe.Nothing.value;
+      }, function (x) {
+          var mbProxy = function (_23) {
+              return anyProxy;
+          };
+          return new SigProd([ {
+              sigConstructor: "Data.Maybe.Just", 
+              sigValues: [ function (u) {
+                  return toSignature(__dict_Generic_6)(mbProxy(x));
+              } ]
+          }, {
+              sigConstructor: "Data.Maybe.Nothing", 
+              sigValues: [  ]
+          } ]);
+      }, function (_21) {
+          if (_21 instanceof Data_Maybe.Just) {
+              return new SProd("Data.Maybe.Just", [ function (u) {
+                  return toSpine(__dict_Generic_6)(_21.value0);
+              } ]);
+          };
+          if (_21 instanceof Data_Maybe.Nothing) {
+              return new SProd("Data.Maybe.Nothing", [  ]);
+          };
+          throw new Error("Failed pattern match at Data.Generic line 126, column 1 - line 137, column 1: " + [ _21.constructor.name ]);
+      });
+  };
   exports["Proxy"] = Proxy;
   exports["SigProd"] = SigProd;
   exports["SigRecord"] = SigRecord;
@@ -4174,7 +4395,11 @@ var PS = { };
   exports["fromSpine"] = fromSpine;
   exports["toSignature"] = toSignature;
   exports["toSpine"] = toSpine;
-  exports["genericString"] = genericString;;
+  exports["genericNumber"] = genericNumber;
+  exports["genericInt"] = genericInt;
+  exports["genericString"] = genericString;
+  exports["genericArray"] = genericArray;
+  exports["genericMaybe"] = genericMaybe;;
  
 })(PS["Data.Generic"] = PS["Data.Generic"] || {});
 (function(exports) {
@@ -4581,8 +4806,10 @@ var PS = { };
   var Data_Generic = PS["Data.Generic"];
   var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
   var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
-  var Data_Lens = PS["Data.Lens"];
   var Data_Maybe = PS["Data.Maybe"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Klikhut_Model_StrMap = PS["Klikhut.Model.StrMap"];
   var Data_Either = PS["Data.Either"];
   var Data_Foreign_Index = PS["Data.Foreign.Index"];     
   var Photobooth = (function () {
@@ -4597,18 +4824,21 @@ var PS = { };
   var genericPhotobooth = new Data_Generic.Generic(function ($dollarx) {
       if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "Photobooth" && $dollarx.value1.length === 1)) {
           return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(Photobooth.create))((function (r) {
-              if (r instanceof Data_Generic.SRecord && r.value0.length === 3) {
-                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (alias_1) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 4) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (alias_1) {
                       return function (computername_1) {
                           return function (defaultprofile_1) {
-                              return {
-                                  alias: alias_1, 
-                                  computername: computername_1, 
-                                  defaultprofile: defaultprofile_1
+                              return function (id_1) {
+                                  return {
+                                      alias: alias_1, 
+                                      computername: computername_1, 
+                                      defaultprofile: defaultprofile_1, 
+                                      id: id_1
+                                  };
                               };
                           };
                       };
-                  }))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[2]).recValue(Prelude.unit)));
+                  }))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[2]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericMaybe(Data_Generic.genericInt))((r.value0[3]).recValue(Prelude.unit)));
               };
               return Data_Maybe.Nothing.value;
           })($dollarx.value1[0](Prelude.unit)));
@@ -4633,6 +4863,11 @@ var PS = { };
                   recValue: function ($dollarq_2) {
                       return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
                   }
+              }, {
+                  recLabel: "id", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericMaybe(Data_Generic.genericInt))(Data_Generic.anyProxy);
+                  }
               } ]);
           } ]
       } ]);
@@ -4653,216 +4888,161 @@ var PS = { };
               recValue: function ($dollarq_1) {
                   return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.defaultprofile);
               }
+          }, {
+              recLabel: "id", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericMaybe(Data_Generic.genericInt))($dollarx.value0.id);
+              }
           } ]);
       } ]);
   });                                                                    
   var encodeJsonPhotobooth = new Data_Argonaut_Encode.EncodeJson(Data_Argonaut_Encode.gEncodeJson(genericPhotobooth));
-  var decodeJsonPhotobooth = new Data_Argonaut_Decode.DecodeJson(Data_Argonaut_Decode.gDecodeJson(genericPhotobooth));                                                                                                          
-  var _defaultprofile = function (__dict_Strong_0) {
-      return Data_Lens_Lens.lens(function (_6) {
-          return _6.defaultprofile;
-      })(function (_7) {
-          return function (_8) {
-              var _30 = {};
-              for (var _31 in _7) {
-                  if (_7.hasOwnProperty(_31)) {
-                      _30[_31] = _7[_31];
-                  };
-              };
-              _30.defaultprofile = _8;
-              return _30;
-          };
-      })(__dict_Strong_0);
-  };
-  var _computername = function (__dict_Strong_1) {
-      return Data_Lens_Lens.lens(function (_0) {
-          return _0.computername;
-      })(function (_1) {
-          return function (_2) {
-              var _32 = {};
-              for (var _33 in _1) {
-                  if (_1.hasOwnProperty(_33)) {
-                      _32[_33] = _1[_33];
-                  };
-              };
-              _32.computername = _2;
-              return _32;
-          };
-      })(__dict_Strong_1);
-  };
-  var _alias = function (__dict_Strong_2) {
-      return Data_Lens_Lens.lens(function (_3) {
-          return _3.alias;
-      })(function (_4) {
-          return function (_5) {
-              var _34 = {};
-              for (var _35 in _4) {
-                  if (_4.hasOwnProperty(_35)) {
-                      _34[_35] = _4[_35];
-                  };
-              };
-              _34.alias = _5;
-              return _34;
-          };
-      })(__dict_Strong_2);
-  };
-  var _Photobooth = Data_Lens_Lens.lens(function (_12) {
-      return _12.value0;
-  })(function (_13) {
+  var decodeJsonPhotobooth = new Data_Argonaut_Decode.DecodeJson(Data_Argonaut_Decode.gDecodeJson(genericPhotobooth));
+  var _Photobooth = Data_Lens_Lens.lens(function (_4) {
+      return _4.value0;
+  })(function (_5) {
       return function (a) {
           return new Photobooth(a);
       };
   });
   exports["Photobooth"] = Photobooth;
   exports["_Photobooth"] = _Photobooth;
-  exports["_defaultprofile"] = _defaultprofile;
-  exports["_alias"] = _alias;
-  exports["_computername"] = _computername;
   exports["genericPhotobooth"] = genericPhotobooth;
   exports["encodeJsonPhotobooth"] = encodeJsonPhotobooth;
   exports["decodeJsonPhotobooth"] = decodeJsonPhotobooth;;
  
 })(PS["Klikhut.Model.Photobooth"] = PS["Klikhut.Model.Photobooth"] || {});
 (function(exports) {
-  // Generated by psc version 0.7.5.2
   "use strict";
-  var Network_HTTP_MimeType = PS["Network.HTTP.MimeType"];
-  var applicationJSON = "application/json";
-  exports["applicationJSON"] = applicationJSON;;
- 
-})(PS["Network.HTTP.MimeType.Common"] = PS["Network.HTTP.MimeType.Common"] || {});
-(function(exports) {
-  // module Data.Argonaut.Parser
 
-  exports._jsonParser = function(fail, succ, s) {
-      try {
-          return succ(JSON.parse(s));
-      }
-      catch(e) {
-          return fail(e.message);
-      }
+  //module Klikhut.Client.Router
+
+  exports.setHash = function setHash(s){
+    return function(){
+      window.location.hash = s;
+    };
+  };
+
+  exports.getHash = getHash;
+  function getHash(){
+    return window.location.hash;
+  }
+
+  exports.hashChanged = function hashChanged(handler) {
+    return function() {
+      window.addEventListener('hashchange', function() {
+        var newHash = getHash();
+        handler(newHash)();
+      });
+    };
   };
  
-})(PS["Data.Argonaut.Parser"] = PS["Data.Argonaut.Parser"] || {});
+})(PS["Klikhut.Client.Router"] = PS["Klikhut.Client.Router"] || {});
+(function(exports) {
+  /* global exports */
+  "use strict";
+
+  exports.nowImpl = function (ctor) {
+    return function () {
+      return ctor(new Date());
+    };
+  };
+
+  exports.jsDateConstructor = function (x) {
+    return new Date(x);
+  };
+
+  // jshint maxparams: 2
+  exports.jsDateMethod = function (method, date) {
+    return date[method]();
+  };
+ 
+})(PS["Data.Date"] = PS["Data.Date"] || {});
+(function(exports) {
+  /* globals exports */
+  "use strict";     
+
+  exports.isNaN = isNaN;         
+ 
+})(PS["Global"] = PS["Global"] || {});
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
-  var $foreign = PS["Data.Argonaut.Parser"];
-  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];
+  var $foreign = PS["Global"];
+  exports["isNaN"] = $foreign.isNaN;;
+ 
+})(PS["Global"] = PS["Global"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Milliseconds = function (x) {
+      return x;
+  };
+  exports["Milliseconds"] = Milliseconds;;
+ 
+})(PS["Data.Time"] = PS["Data.Time"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Date"];
+  var Global = PS["Global"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Enum = PS["Data.Enum"];
   var Data_Function = PS["Data.Function"];
-  var Data_Either = PS["Data.Either"];     
-  var jsonParser = function (j) {
-      return $foreign._jsonParser(Data_Either.Left.create, Data_Either.Right.create, j);
-  };
-  exports["jsonParser"] = jsonParser;;
- 
-})(PS["Data.Argonaut.Parser"] = PS["Data.Argonaut.Parser"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];     
-  var Printer = function (printJson) {
-      this.printJson = printJson;
-  };
-  var printerString = new Printer(Prelude.show(Data_Argonaut_Core.showJson));
-  var printJson = function (dict) {
-      return dict.printJson;
-  };
-  exports["Printer"] = Printer;
-  exports["printJson"] = printJson;
-  exports["printerString"] = printerString;;
- 
-})(PS["Data.Argonaut.Printer"] = PS["Data.Argonaut.Printer"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.5.2
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
-  var Network_HTTP_RequestHeader = PS["Network.HTTP.RequestHeader"];
-  var Network_HTTP_MimeType_Common = PS["Network.HTTP.MimeType.Common"];
-  var Network_HTTP_Method = PS["Network.HTTP.Method"];
-  var Control_Monad_Aff = PS["Control.Monad.Aff"];
-  var Data_Argonaut_Parser = PS["Data.Argonaut.Parser"];
-  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
-  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
-  var Data_Argonaut_Printer = PS["Data.Argonaut.Printer"];
-  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
-  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
-  var Data_Either = PS["Data.Either"];
-  var Node_Express_Types = PS["Node.Express.Types"];
-  var Data_String_Regex = PS["Data.String.Regex"];
   var Data_Maybe = PS["Data.Maybe"];
-  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
-  var Network_HTTP_Affjax_Request = PS["Network.HTTP.Affjax.Request"];
-  var Network_HTTP_Affjax_Response = PS["Network.HTTP.Affjax.Response"];     
-  var Endpoint = (function () {
-      function Endpoint(value0) {
-          this.value0 = value0;
-      };
-      Endpoint.create = function (value0) {
-          return new Endpoint(value0);
-      };
-      return Endpoint;
-  })();
-  var putPhotobooths = new Endpoint({
-      method: Network_HTTP_Method.PUT.value, 
-      serverUrl: "/api/photobooths", 
-      mkClientUrl: Prelude["const"]("/api/photobooths")
-  });
-  var postPhotobooths = new Endpoint({
-      method: Network_HTTP_Method.POST.value, 
-      serverUrl: "/api/photobooths", 
-      mkClientUrl: Prelude["const"]("/api/photobooths")
-  });
-  var parseOrThrow = function (__dict_DecodeJson_0) {
-      return function (a) {
-          var throwStr = function (str) {
-              return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error(str));
-          };
-          return Data_Either.either(throwStr)(function (json) {
-              return Data_Either.either(throwStr)(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Argonaut_Decode.decodeJson(__dict_DecodeJson_0)(json));
-          })(Data_Argonaut_Parser.jsonParser(a));
-      };
+  var Data_Time = PS["Data.Time"];
+  var Data_Generic = PS["Data.Generic"];
+  var DateTime = function (x) {
+      return x;
   };
-  var getPhotobooths = new Endpoint({
-      method: Network_HTTP_Method.GET.value, 
-      serverUrl: "/api/photobooths", 
-      mkClientUrl: Prelude["const"]("/api/photobooths")
-  });
-  var execEndpoint = function (__dict_EncodeJson_1) {
-      return function (__dict_DecodeJson_2) {
-          return function (__dict_EncodeJson_3) {
-              return function (__dict_DecodeJson_4) {
-                  return function (_1) {
-                      return function (a) {
-                          return function (b) {
-                              var opts = {
-                                  method: _1.value0.method, 
-                                  url: _1.value0.mkClientUrl(a), 
-                                  headers: [ new Network_HTTP_RequestHeader.ContentType(Network_HTTP_MimeType_Common.applicationJSON) ], 
-                                  content: Data_Maybe.Just.create(Data_Argonaut_Printer.printJson(Data_Argonaut_Printer.printerString)(Data_Argonaut_Encode.encodeJson(__dict_EncodeJson_1)(b))), 
-                                  username: Data_Maybe.Nothing.value, 
-                                  password: Data_Maybe.Nothing.value
-                              };
-                              return Prelude[">>="](Control_Monad_Aff.bindAff)(Network_HTTP_Affjax.affjax(Network_HTTP_Affjax_Request.requestableString)(Network_HTTP_Affjax_Response.responsableString)(opts))(Prelude[">>>"](Prelude.semigroupoidFn)(function (_0) {
-                                  return _0.response;
-                              })(parseOrThrow(__dict_DecodeJson_4)));
-                          };
-                      };
-                  };
-              };
-          };
+  var toEpochMilliseconds = function (_1) {
+      return $foreign.jsDateMethod("getTime", _1);
+  }; 
+  var now = $foreign.nowImpl(DateTime);
+  var fromJSDate = function (d) {
+      var _44 = Global.isNaN($foreign.jsDateMethod("getTime", d));
+      if (_44) {
+          return Data_Maybe.Nothing.value;
       };
+      if (!_44) {
+          return new Data_Maybe.Just(d);
+      };
+      throw new Error("Failed pattern match at Data.Date line 58, column 1 - line 59, column 1: " + [ _44.constructor.name ]);
   };
-  exports["Endpoint"] = Endpoint;
-  exports["parseOrThrow"] = parseOrThrow;
-  exports["putPhotobooths"] = putPhotobooths;
-  exports["postPhotobooths"] = postPhotobooths;
-  exports["getPhotobooths"] = getPhotobooths;
-  exports["execEndpoint"] = execEndpoint;;
+  var fromString = function (_64) {
+      return fromJSDate($foreign.jsDateConstructor(_64));
+  };
+  var fromEpochMilliseconds = function (_65) {
+      return fromJSDate($foreign.jsDateConstructor(_65));
+  };
+  var genericDate = new Data_Generic.Generic(function (_8) {
+      if (_8 instanceof Data_Generic.SProd && (_8.value0 === "Data.Date.Date" && _8.value1.length === 1)) {
+          return Data_Maybe.maybe(Data_Maybe.Nothing.value)(function (_66) {
+              return fromEpochMilliseconds(Data_Time.Milliseconds(_66));
+          })(Data_Generic.fromSpine(Data_Generic.genericNumber)(_8.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function (_7) {
+      return new Data_Generic.SigProd([ {
+          sigConstructor: "Data.Date.Date", 
+          sigValues: [ Prelude["const"](Data_Generic.SigNumber.value) ]
+      } ]);
+  }, function (d) {
+      var _49 = toEpochMilliseconds(d);
+      return new Data_Generic.SProd("Data.Date.Date", [ function (u) {
+          return new Data_Generic.SNumber(_49);
+      } ]);
+  });
+  exports["now"] = now;
+  exports["fromString"] = fromString;
+  exports["toEpochMilliseconds"] = toEpochMilliseconds;
+  exports["fromEpochMilliseconds"] = fromEpochMilliseconds;
+  exports["fromJSDate"] = fromJSDate;
+  exports["genericDate"] = genericDate;;
  
-})(PS["Klikhut.Endpoint"] = PS["Klikhut.Endpoint"] || {});
+})(PS["Data.Date"] = PS["Data.Date"] || {});
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
@@ -4955,16 +5135,274 @@ var PS = { };
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
+  var Prelude = PS["Prelude"];
+  var Klikhut_SQL = PS["Klikhut.SQL"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Data_Generic = PS["Data.Generic"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Klikhut_Model_StrMap = PS["Klikhut.Model.StrMap"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Foreign_Index = PS["Data.Foreign.Index"];     
+  var SavedImage = (function () {
+      function SavedImage(value0) {
+          this.value0 = value0;
+      };
+      SavedImage.create = function (value0) {
+          return new SavedImage(value0);
+      };
+      return SavedImage;
+  })();
+  var genericSavedImage = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "SavedImage" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(SavedImage.create))((function (r) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 3) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (eventId_1) {
+                      return function (id_1) {
+                          return function (name_1) {
+                              return {
+                                  eventId: eventId_1, 
+                                  id: id_1, 
+                                  name: name_1
+                              };
+                          };
+                      };
+                  }))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[2]).recValue(Prelude.unit)));
+              };
+              return Data_Maybe.Nothing.value;
+          })($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd([ {
+          sigConstructor: "SavedImage", 
+          sigValues: [ function ($dollarq_1) {
+              return new Data_Generic.SigRecord([ {
+                  recLabel: "eventId", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "id", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "name", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              } ]);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      return new Data_Generic.SProd("SavedImage", [ function ($dollarq) {
+          return new Data_Generic.SRecord([ {
+              recLabel: "eventId", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.eventId);
+              }
+          }, {
+              recLabel: "id", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.id);
+              }
+          }, {
+              recLabel: "name", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.name);
+              }
+          } ]);
+      } ]);
+  });                                                                    
+  var encodeJsonSavedImage = new Data_Argonaut_Encode.EncodeJson(Data_Argonaut_Encode.gEncodeJson(genericSavedImage));
+  var decodeJsonSavedImage = new Data_Argonaut_Decode.DecodeJson(Data_Argonaut_Decode.gDecodeJson(genericSavedImage));
+  exports["SavedImage"] = SavedImage;
+  exports["genericSavedImage"] = genericSavedImage;
+  exports["encodeJsonSavedImage"] = encodeJsonSavedImage;
+  exports["decodeJsonSavedImage"] = decodeJsonSavedImage;;
+ 
+})(PS["Klikhut.Model.SavedImage"] = PS["Klikhut.Model.SavedImage"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
   var Data_Lens_Lens = PS["Data.Lens.Lens"];
   var Prelude = PS["Prelude"];
+  var Klikhut_SQL = PS["Klikhut.SQL"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Data_Generic = PS["Data.Generic"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
   var Data_Lens = PS["Data.Lens"];
-  var Klikhut_Async = PS["Klikhut.Async"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Date = PS["Data.Date"];
+  var Data_Time = PS["Data.Time"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Either = PS["Data.Either"];
+  var Klikhut_Model_StrMap = PS["Klikhut.Model.StrMap"];
+  var Klikhut_Model_SavedImage = PS["Klikhut.Model.SavedImage"];
+  var Data_Foreign_Index = PS["Data.Foreign.Index"];
+  var Event = (function () {
+      function Event(value0) {
+          this.value0 = value0;
+      };
+      Event.create = function (value0) {
+          return new Event(value0);
+      };
+      return Event;
+  })();
+  var genericEvent = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "Event" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(Event.create))((function (r) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 7) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (computername_1) {
+                      return function (datefrom_1) {
+                          return function (dateuntil_1) {
+                              return function (id_1) {
+                                  return function (images_1) {
+                                      return function (name_1) {
+                                          return function (profile_1) {
+                                              return {
+                                                  computername: computername_1, 
+                                                  datefrom: datefrom_1, 
+                                                  dateuntil: dateuntil_1, 
+                                                  id: id_1, 
+                                                  images: images_1, 
+                                                  name: name_1, 
+                                                  profile: profile_1
+                                              };
+                                          };
+                                      };
+                                  };
+                              };
+                          };
+                      };
+                  }))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Date.genericDate)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Date.genericDate)((r.value0[2]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericMaybe(Data_Generic.genericInt))((r.value0[3]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericArray(Klikhut_Model_SavedImage.genericSavedImage))((r.value0[4]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[5]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[6]).recValue(Prelude.unit)));
+              };
+              return Data_Maybe.Nothing.value;
+          })($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd([ {
+          sigConstructor: "Event", 
+          sigValues: [ function ($dollarq_1) {
+              return new Data_Generic.SigRecord([ {
+                  recLabel: "computername", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "datefrom", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Date.genericDate)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "dateuntil", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Date.genericDate)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "id", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericMaybe(Data_Generic.genericInt))(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "images", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericArray(Klikhut_Model_SavedImage.genericSavedImage))(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "name", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "profile", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              } ]);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      return new Data_Generic.SProd("Event", [ function ($dollarq) {
+          return new Data_Generic.SRecord([ {
+              recLabel: "computername", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.computername);
+              }
+          }, {
+              recLabel: "datefrom", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Date.genericDate)($dollarx.value0.datefrom);
+              }
+          }, {
+              recLabel: "dateuntil", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Date.genericDate)($dollarx.value0.dateuntil);
+              }
+          }, {
+              recLabel: "id", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericMaybe(Data_Generic.genericInt))($dollarx.value0.id);
+              }
+          }, {
+              recLabel: "images", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericArray(Klikhut_Model_SavedImage.genericSavedImage))($dollarx.value0.images);
+              }
+          }, {
+              recLabel: "name", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.name);
+              }
+          }, {
+              recLabel: "profile", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.profile);
+              }
+          } ]);
+      } ]);
+  });                                                          
+  var encodeJsonEvent = new Data_Argonaut_Encode.EncodeJson(Data_Argonaut_Encode.gEncodeJson(genericEvent));
+  var decodeJsonEvent = new Data_Argonaut_Decode.DecodeJson(Data_Argonaut_Decode.gDecodeJson(genericEvent));
+  var _Event = Data_Lens_Lens.lens(function (_8) {
+      return _8.value0;
+  })(function (_9) {
+      return function (a) {
+          return new Event(a);
+      };
+  });
+  exports["Event"] = Event;
+  exports["_Event"] = _Event;
+  exports["genericEvent"] = genericEvent;
+  exports["encodeJsonEvent"] = encodeJsonEvent;
+  exports["decodeJsonEvent"] = decodeJsonEvent;;
+ 
+})(PS["Klikhut.Model.Event"] = PS["Klikhut.Model.Event"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Data_Lens_Lens = PS["Data.Lens.Lens"];
+  var Prelude = PS["Prelude"];
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
   var DOM = PS["DOM"];
+  var DOM_File_Types = PS["DOM.File.Types"];
   var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Date = PS["Data.Date"];
+  var Klikhut_Async = PS["Klikhut.Async"];
   var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
-  var Data_Maybe = PS["Data.Maybe"];     
+  var Klikhut_Model_Event = PS["Klikhut.Model.Event"];
+  var Klikhut_Model_SavedImage = PS["Klikhut.Model.SavedImage"];     
   var PhotoboothsPage = (function () {
       function PhotoboothsPage() {
 
@@ -4981,228 +5419,723 @@ var PS = { };
       };
       return EventsPage;
   })();
-  var initialState = {
-      route: PhotoboothsPage.value, 
-      photobooths: Klikhut_Async.Initial.value, 
-      photoboothsPage: {
-          newPb: {
-              model: {
-                  computername: "", 
-                  alias: "", 
-                  defaultprofile: ""
+  var initialState = function (initRoute) {
+      return function __do() {
+          var _63 = Data_Date.now();
+          return Prelude["return"](Control_Monad_Eff.applicativeEff)({
+              route: initRoute, 
+              photobooths: Klikhut_Async.Initial.value, 
+              events: Klikhut_Async.Initial.value, 
+              eventsPage: {
+                  "new": {
+                      model: {
+                          id: Data_Maybe.Nothing.value, 
+                          computername: "", 
+                          name: "", 
+                          datefrom: _63, 
+                          dateuntil: _63, 
+                          profile: "", 
+                          images: [  ]
+                      }, 
+                      state: Klikhut_Async.Initial.value
+                  }, 
+                  editing: Data_Maybe.Nothing.value
               }, 
-              state: Klikhut_Async.Initial.value
-          }, 
-          editing: Data_Maybe.Nothing.value
-      }
+              photoboothsPage: {
+                  "new": {
+                      model: {
+                          id: Data_Maybe.Nothing.value, 
+                          computername: "", 
+                          alias: "", 
+                          defaultprofile: ""
+                      }, 
+                      state: Klikhut_Async.Initial.value
+                  }, 
+                  editing: Data_Maybe.Nothing.value
+              }
+          })();
+      };
   };
   var _state = function (__dict_Strong_0) {
       return Data_Lens_Lens.lens(function (_9) {
           return _9.state;
       })(function (_10) {
           return function (_11) {
-              var _29 = {};
-              for (var _30 in _10) {
-                  if (_10.hasOwnProperty(_30)) {
-                      _29[_30] = _10[_30];
+              var _67 = {};
+              for (var _68 in _10) {
+                  if (_10.hasOwnProperty(_68)) {
+                      _67[_68] = _10[_68];
                   };
               };
-              _29.state = _11;
-              return _29;
+              _67.state = _11;
+              return _67;
           };
       })(__dict_Strong_0);
   };
-  var _saving = function (__dict_Strong_1) {
+  var _savingImage = function (__dict_Strong_1) {
+      return Data_Lens_Lens.lens(function (_60) {
+          return _60.savingImage;
+      })(function (_61) {
+          return function (_62) {
+              var _69 = {};
+              for (var _70 in _61) {
+                  if (_61.hasOwnProperty(_70)) {
+                      _69[_70] = _61[_70];
+                  };
+              };
+              _69.savingImage = _62;
+              return _69;
+          };
+      })(__dict_Strong_1);
+  };
+  var _saving = function (__dict_Strong_2) {
       return Data_Lens_Lens.lens(function (_21) {
           return _21.saving;
       })(function (_22) {
           return function (_23) {
-              var _31 = {};
-              for (var _32 in _22) {
-                  if (_22.hasOwnProperty(_32)) {
-                      _31[_32] = _22[_32];
+              var _71 = {};
+              for (var _72 in _22) {
+                  if (_22.hasOwnProperty(_72)) {
+                      _71[_72] = _22[_72];
                   };
               };
-              _31.saving = _23;
-              return _31;
+              _71.saving = _23;
+              return _71;
           };
-      })(__dict_Strong_1);
+      })(__dict_Strong_2);
   };
-  var _route = function (__dict_Strong_2) {
+  var _route = function (__dict_Strong_3) {
       return Data_Lens_Lens.lens(function (_24) {
           return _24.route;
       })(function (_25) {
           return function (_26) {
-              var _33 = {};
-              for (var _34 in _25) {
-                  if (_25.hasOwnProperty(_34)) {
-                      _33[_34] = _25[_34];
+              var _73 = {};
+              for (var _74 in _25) {
+                  if (_25.hasOwnProperty(_74)) {
+                      _73[_74] = _25[_74];
                   };
               };
-              _33.route = _26;
-              return _33;
+              _73.route = _26;
+              return _73;
           };
-      })(__dict_Strong_2);
+      })(__dict_Strong_3);
   };
-  var _photoboothsEditing = Data_Lens_Lens.lens(function (_27) {
-      return {
-          photobooths: _27.photobooths, 
-          editing: _27.editing
-      };
-  })(function (old) {
-      return function (_28) {
-          var _41 = {};
-          for (var _42 in old) {
-              if (old.hasOwnProperty(_42)) {
-                  _41[_42] = old[_42];
-              };
-          };
-          _41.photobooths = _28.photobooths;
-          _41.editing = _28.editing;
-          return _41;
-      };
-  });
-  var _photobooths = function (__dict_Strong_4) {
-      return Data_Lens_Lens.lens(function (_0) {
-          return _0.photobooths;
-      })(function (_1) {
-          return function (_2) {
-              var _45 = {};
-              for (var _46 in _1) {
-                  if (_1.hasOwnProperty(_46)) {
-                      _45[_46] = _1[_46];
+  var _profile = function (__dict_Strong_4) {
+      return Data_Lens_Lens.lens(function (_39) {
+          return _39.profile;
+      })(function (_40) {
+          return function (_41) {
+              var _75 = {};
+              for (var _76 in _40) {
+                  if (_40.hasOwnProperty(_76)) {
+                      _75[_76] = _40[_76];
                   };
               };
-              _45.photobooths = _2;
-              return _45;
+              _75.profile = _41;
+              return _75;
           };
       })(__dict_Strong_4);
   };
-  var _pbPage = function (__dict_Strong_5) {
+  var _pbPage = function (__dict_Strong_6) {
       return Data_Lens_Lens.lens(function (obj) {
           return {
-              photobooths: obj.photobooths, 
-              newPb: obj.photoboothsPage.newPb, 
+              collection: obj.photobooths, 
+              "new": obj.photoboothsPage["new"], 
               editing: obj.photoboothsPage.editing, 
               route: obj.route
           };
       })(function (old) {
           return function (obj) {
-              var _47 = {};
-              for (var _48 in old) {
-                  if (old.hasOwnProperty(_48)) {
-                      _47[_48] = old[_48];
+              var _79 = {};
+              for (var _80 in old) {
+                  if (old.hasOwnProperty(_80)) {
+                      _79[_80] = old[_80];
                   };
               };
-              _47.photobooths = obj.photobooths;
-              _47.photoboothsPage = {
-                  newPb: obj.newPb, 
+              _79.photobooths = obj.collection;
+              _79.photoboothsPage = {
+                  "new": obj["new"], 
                   editing: obj.editing
               };
-              _47.route = obj.route;
-              return _47;
-          };
-      })(__dict_Strong_5);
-  };
-  var _newPb = function (__dict_Strong_6) {
-      return Data_Lens_Lens.lens(function (_3) {
-          return _3.newPb;
-      })(function (_4) {
-          return function (_5) {
-              var _49 = {};
-              for (var _50 in _4) {
-                  if (_4.hasOwnProperty(_50)) {
-                      _49[_50] = _4[_50];
-                  };
-              };
-              _49.newPb = _5;
-              return _49;
+              _79.route = obj.route;
+              return _79;
           };
       })(__dict_Strong_6);
   };
-  var _model = function (__dict_Strong_7) {
+  var _new = function (__dict_Strong_7) {
+      return Data_Lens_Lens.lens(function (_3) {
+          return _3["new"];
+      })(function (_4) {
+          return function (_5) {
+              var _81 = {};
+              for (var _82 in _4) {
+                  if (_4.hasOwnProperty(_82)) {
+                      _81[_82] = _4[_82];
+                  };
+              };
+              _81.new = _5;
+              return _81;
+          };
+      })(__dict_Strong_7);
+  };
+  var _name = function (__dict_Strong_8) {
+      return Data_Lens_Lens.lens(function (_30) {
+          return _30.name;
+      })(function (_31) {
+          return function (_32) {
+              var _83 = {};
+              for (var _84 in _31) {
+                  if (_31.hasOwnProperty(_84)) {
+                      _83[_84] = _31[_84];
+                  };
+              };
+              _83.name = _32;
+              return _83;
+          };
+      })(__dict_Strong_8);
+  };
+  var _model = function (__dict_Strong_9) {
       return Data_Lens_Lens.lens(function (_6) {
           return _6.model;
       })(function (_7) {
           return function (_8) {
-              var _51 = {};
-              for (var _52 in _7) {
-                  if (_7.hasOwnProperty(_52)) {
-                      _51[_52] = _7[_52];
+              var _85 = {};
+              for (var _86 in _7) {
+                  if (_7.hasOwnProperty(_86)) {
+                      _85[_86] = _7[_86];
                   };
               };
-              _51.model = _8;
-              return _51;
+              _85.model = _8;
+              return _85;
           };
-      })(__dict_Strong_7);
+      })(__dict_Strong_9);
   };
-  var _editing = function (__dict_Strong_9) {
+  var _images = function (__dict_Strong_11) {
+      return Data_Lens_Lens.lens(function (_51) {
+          return _51.images;
+      })(function (_52) {
+          return function (_53) {
+              var _89 = {};
+              for (var _90 in _52) {
+                  if (_52.hasOwnProperty(_90)) {
+                      _89[_90] = _52[_90];
+                  };
+              };
+              _89.images = _53;
+              return _89;
+          };
+      })(__dict_Strong_11);
+  };
+  var _image = function (__dict_Strong_12) {
+      return Data_Lens_Lens.lens(function (_57) {
+          return _57.image;
+      })(function (_58) {
+          return function (_59) {
+              var _91 = {};
+              for (var _92 in _58) {
+                  if (_58.hasOwnProperty(_92)) {
+                      _91[_92] = _58[_92];
+                  };
+              };
+              _91.image = _59;
+              return _91;
+          };
+      })(__dict_Strong_12);
+  };
+  var _eventsPage = function (__dict_Strong_14) {
+      return Data_Lens_Lens.lens(function (obj) {
+          return {
+              collection: obj.events, 
+              "new": obj.eventsPage["new"], 
+              editing: obj.eventsPage.editing, 
+              route: obj.route
+          };
+      })(function (old) {
+          return function (obj) {
+              var _95 = {};
+              for (var _96 in old) {
+                  if (old.hasOwnProperty(_96)) {
+                      _95[_96] = old[_96];
+                  };
+              };
+              _95.events = obj.collection;
+              _95.eventsPage = {
+                  "new": obj["new"], 
+                  editing: obj.editing
+              };
+              _95.route = obj.route;
+              return _95;
+          };
+      })(__dict_Strong_14);
+  };
+  var _editing = function (__dict_Strong_16) {
       return Data_Lens_Lens.lens(function (_12) {
           return _12.editing;
       })(function (_13) {
           return function (_14) {
-              var _55 = {};
-              for (var _56 in _13) {
-                  if (_13.hasOwnProperty(_56)) {
-                      _55[_56] = _13[_56];
+              var _99 = {};
+              for (var _100 in _13) {
+                  if (_13.hasOwnProperty(_100)) {
+                      _99[_100] = _13[_100];
                   };
               };
-              _55.editing = _14;
-              return _55;
+              _99.editing = _14;
+              return _99;
           };
-      })(__dict_Strong_9);
+      })(__dict_Strong_16);
+  };
+  var _defaultprofile = function (__dict_Strong_17) {
+      return Data_Lens_Lens.lens(function (_48) {
+          return _48.defaultprofile;
+      })(function (_49) {
+          return function (_50) {
+              var _101 = {};
+              for (var _102 in _49) {
+                  if (_49.hasOwnProperty(_102)) {
+                      _101[_102] = _49[_102];
+                  };
+              };
+              _101.defaultprofile = _50;
+              return _101;
+          };
+      })(__dict_Strong_17);
+  };
+  var _dateuntil = function (__dict_Strong_18) {
+      return Data_Lens_Lens.lens(function (_36) {
+          return _36.dateuntil;
+      })(function (_37) {
+          return function (_38) {
+              var _103 = {};
+              for (var _104 in _37) {
+                  if (_37.hasOwnProperty(_104)) {
+                      _103[_104] = _37[_104];
+                  };
+              };
+              _103.dateuntil = _38;
+              return _103;
+          };
+      })(__dict_Strong_18);
+  };
+  var _datefrom = function (__dict_Strong_19) {
+      return Data_Lens_Lens.lens(function (_33) {
+          return _33.datefrom;
+      })(function (_34) {
+          return function (_35) {
+              var _105 = {};
+              for (var _106 in _34) {
+                  if (_34.hasOwnProperty(_106)) {
+                      _105[_106] = _34[_106];
+                  };
+              };
+              _105.datefrom = _35;
+              return _105;
+          };
+      })(__dict_Strong_19);
+  };
+  var _computername = function (__dict_Strong_20) {
+      return Data_Lens_Lens.lens(function (_42) {
+          return _42.computername;
+      })(function (_43) {
+          return function (_44) {
+              var _107 = {};
+              for (var _108 in _43) {
+                  if (_43.hasOwnProperty(_108)) {
+                      _107[_108] = _43[_108];
+                  };
+              };
+              _107.computername = _44;
+              return _107;
+          };
+      })(__dict_Strong_20);
+  };
+  var _collectionEditing = Data_Lens_Lens.lens(function (_64) {
+      return {
+          collection: _64.collection, 
+          editing: _64.editing
+      };
+  })(function (old) {
+      return function (_65) {
+          var _113 = {};
+          for (var _114 in old) {
+              if (old.hasOwnProperty(_114)) {
+                  _113[_114] = old[_114];
+              };
+          };
+          _113.collection = _65.collection;
+          _113.editing = _65.editing;
+          return _113;
+      };
+  });
+  var _collection = function (__dict_Strong_21) {
+      return Data_Lens_Lens.lens(function (_0) {
+          return _0.collection;
+      })(function (_1) {
+          return function (_2) {
+              var _117 = {};
+              for (var _118 in _1) {
+                  if (_1.hasOwnProperty(_118)) {
+                      _117[_118] = _1[_118];
+                  };
+              };
+              _117.collection = _2;
+              return _117;
+          };
+      })(__dict_Strong_21);
+  };
+  var _alias = function (__dict_Strong_22) {
+      return Data_Lens_Lens.lens(function (_45) {
+          return _45.alias;
+      })(function (_46) {
+          return function (_47) {
+              var _119 = {};
+              for (var _120 in _46) {
+                  if (_46.hasOwnProperty(_120)) {
+                      _119[_120] = _46[_120];
+                  };
+              };
+              _119.alias = _47;
+              return _119;
+          };
+      })(__dict_Strong_22);
   };
   exports["PhotoboothsPage"] = PhotoboothsPage;
   exports["EventsPage"] = EventsPage;
+  exports["_savingImage"] = _savingImage;
+  exports["_image"] = _image;
+  exports["_images"] = _images;
+  exports["_defaultprofile"] = _defaultprofile;
+  exports["_alias"] = _alias;
+  exports["_computername"] = _computername;
+  exports["_profile"] = _profile;
+  exports["_dateuntil"] = _dateuntil;
+  exports["_datefrom"] = _datefrom;
+  exports["_name"] = _name;
+  exports["_eventsPage"] = _eventsPage;
   exports["_pbPage"] = _pbPage;
   exports["_route"] = _route;
   exports["_saving"] = _saving;
   exports["_editing"] = _editing;
   exports["_state"] = _state;
   exports["_model"] = _model;
-  exports["_newPb"] = _newPb;
-  exports["_photoboothsEditing"] = _photoboothsEditing;
-  exports["_photobooths"] = _photobooths;
+  exports["_new"] = _new;
+  exports["_collectionEditing"] = _collectionEditing;
+  exports["_collection"] = _collection;
   exports["initialState"] = initialState;;
  
 })(PS["ClientState"] = PS["ClientState"] || {});
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
+  var $foreign = PS["Klikhut.Client.Router"];
   var OpticUI_Core = PS["OpticUI.Core"];
   var Data_Lens_Setter = PS["Data.Lens.Setter"];
-  var Data_Lens_Getter = PS["Data.Lens.Getter"];
-  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
-  var OpticUI_Markup = PS["OpticUI.Markup"];
-  var OpticUI_Components = PS["OpticUI.Components"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var OpticUI = PS["OpticUI"];
-  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
+  var Data_Lens = PS["Data.Lens"];
+  var DOM = PS["DOM"];
+  var Data_String = PS["Data.String"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var ClientState = PS["ClientState"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];     
+  var nav = function (s) {
+      return function (h) {
+          return function (_0) {
+              if (_0 instanceof ClientState.PhotoboothsPage) {
+                  return function __do() {
+                      $foreign.setHash("/photobooths")();
+                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._route(Data_Profunctor_Strong.strongFn))(_0)(s))();
+                  };
+              };
+              if (_0 instanceof ClientState.EventsPage) {
+                  return function __do() {
+                      $foreign.setHash("/events/" + _0.value0)();
+                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._route(Data_Profunctor_Strong.strongFn))(_0)(s))();
+                  };
+              };
+              throw new Error("Failed pattern match at Klikhut.Client.Router line 20, column 1 - line 21, column 1: " + [ s.constructor.name, h.constructor.name, _0.constructor.name ]);
+          };
+      };
+  };
+  var match$prime = function (str) {
+      var t = Data_String.drop(2)(str);
+      var _5 = Prelude["=="](Prelude.eqString)(t)("photobooths");
+      if (_5) {
+          return new Data_Maybe.Just(ClientState.PhotoboothsPage.value);
+      };
+      if (!_5) {
+          var _6 = Prelude["=="](Prelude.eqString)(Data_String.take(6)(t))("events");
+          if (_6) {
+              return new Data_Maybe.Just(new ClientState.EventsPage(Data_String.drop(7)(t)));
+          };
+          if (!_6) {
+              return Data_Maybe.Nothing.value;
+          };
+          throw new Error("Failed pattern match: " + [ _6.constructor.name ]);
+      };
+      throw new Error("Failed pattern match at Klikhut.Client.Router line 31, column 1 - line 32, column 1: " + [ _5.constructor.name ]);
+  };
+  var match = function (str) {
+      return Data_Maybe.maybe(ClientState.PhotoboothsPage.value)(Prelude.id(Prelude.categoryFn))(match$prime(str));
+  };
+  exports["match"] = match;
+  exports["nav"] = nav;
+  exports["hashChanged"] = $foreign.hashChanged;
+  exports["getHash"] = $foreign.getHash;;
+ 
+})(PS["Klikhut.Client.Router"] = PS["Klikhut.Client.Router"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Prelude = PS["Prelude"];
+  var OpticUI = PS["OpticUI"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Control_Apply = PS["Control.Apply"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var DOM_Timer = PS["DOM.Timer"];     
+  var exec = function (__dict_Monoid_0) {
+      return function (eff) {
+          return OpticUI_Core.inline(Control_Apply["*>"](Control_Monad_Eff.applyEff)(DOM_Timer.timeout(0)(eff))(Prelude["return"](Control_Monad_Eff.applicativeEff)(Data_Monoid.mempty(__dict_Monoid_0))));
+      };
+  };
+  exports["exec"] = exec;;
+ 
+})(PS["Klikhut.Client.Exec"] = PS["Klikhut.Client.Exec"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Network_HTTP_MimeType = PS["Network.HTTP.MimeType"];
+  var imageJPEG = "image/jpeg";                        
+  var applicationJSON = "application/json";
+  exports["imageJPEG"] = imageJPEG;
+  exports["applicationJSON"] = applicationJSON;;
+ 
+})(PS["Network.HTTP.MimeType.Common"] = PS["Network.HTTP.MimeType.Common"] || {});
+(function(exports) {
+  // module Data.Argonaut.Parser
+
+  exports._jsonParser = function(fail, succ, s) {
+      try {
+          return succ(JSON.parse(s));
+      }
+      catch(e) {
+          return fail(e.message);
+      }
+  };
+ 
+})(PS["Data.Argonaut.Parser"] = PS["Data.Argonaut.Parser"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Data.Argonaut.Parser"];
+  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];
+  var Data_Function = PS["Data.Function"];
+  var Data_Either = PS["Data.Either"];     
+  var jsonParser = function (j) {
+      return $foreign._jsonParser(Data_Either.Left.create, Data_Either.Right.create, j);
+  };
+  exports["jsonParser"] = jsonParser;;
+ 
+})(PS["Data.Argonaut.Parser"] = PS["Data.Argonaut.Parser"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Data_Argonaut_Core = PS["Data.Argonaut.Core"];     
+  var Printer = function (printJson) {
+      this.printJson = printJson;
+  };
+  var printerString = new Printer(Prelude.show(Data_Argonaut_Core.showJson));
+  var printJson = function (dict) {
+      return dict.printJson;
+  };
+  exports["Printer"] = Printer;
+  exports["printJson"] = printJson;
+  exports["printerString"] = printerString;;
+ 
+})(PS["Data.Argonaut.Printer"] = PS["Data.Argonaut.Printer"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Prelude = PS["Prelude"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Network_HTTP_RequestHeader = PS["Network.HTTP.RequestHeader"];
+  var Network_HTTP_MimeType_Common = PS["Network.HTTP.MimeType.Common"];
+  var Network_HTTP_Method = PS["Network.HTTP.Method"];
+  var DOM_File_Types = PS["DOM.File.Types"];
+  var Unsafe_Coerce = PS["Unsafe.Coerce"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Data_Either = PS["Data.Either"];
+  var Data_Argonaut_Parser = PS["Data.Argonaut.Parser"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Printer = PS["Data.Argonaut.Printer"];
+  var Data_String_Regex = PS["Data.String.Regex"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Node_Express_Types = PS["Node.Express.Types"];
+  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
+  var Klikhut_Model_Event = PS["Klikhut.Model.Event"];
+  var Klikhut_Model_SavedImage = PS["Klikhut.Model.SavedImage"];
+  var Network_HTTP_Affjax_Request = PS["Network.HTTP.Affjax.Request"];
+  var Network_HTTP_Affjax_Response = PS["Network.HTTP.Affjax.Response"];     
+  var FileEndpoint = (function () {
+      function FileEndpoint(value0) {
+          this.value0 = value0;
+      };
+      FileEndpoint.create = function (value0) {
+          return new FileEndpoint(value0);
+      };
+      return FileEndpoint;
+  })();
+  var Endpoint = (function () {
+      function Endpoint(value0) {
+          this.value0 = value0;
+      };
+      Endpoint.create = function (value0) {
+          return new Endpoint(value0);
+      };
+      return Endpoint;
+  })();
+  var putPhotobooths = new Endpoint({
+      method: Network_HTTP_Method.PUT.value, 
+      serverUrl: "/api/photobooths", 
+      mkClientUrl: Prelude["const"]("/api/photobooths")
+  });
+  var putEvents = new Endpoint({
+      method: Network_HTTP_Method.PUT.value, 
+      serverUrl: "/api/events", 
+      mkClientUrl: Prelude["const"]("/api/events")
+  });
+  var postPhotobooths = new Endpoint({
+      method: Network_HTTP_Method.POST.value, 
+      serverUrl: "/api/photobooths", 
+      mkClientUrl: Prelude["const"]("/api/photobooths")
+  });
+  var postEvents = new Endpoint({
+      method: Network_HTTP_Method.POST.value, 
+      serverUrl: "/api/events", 
+      mkClientUrl: Prelude["const"]("/api/events")
+  });
+  var parseOrThrow = function (__dict_DecodeJson_0) {
+      return function (a) {
+          var throwStr = function (str) {
+              return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error(str + (" in: " + Prelude.show(Prelude.showString)(a))));
+          };
+          return Data_Either.either(throwStr)(function (json) {
+              return Data_Either.either(throwStr)(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Argonaut_Decode.decodeJson(__dict_DecodeJson_0)(json));
+          })(Data_Argonaut_Parser.jsonParser(a));
+      };
+  };
+  var getPhotobooths = new Endpoint({
+      method: Network_HTTP_Method.GET.value, 
+      serverUrl: "/api/photobooths", 
+      mkClientUrl: Prelude["const"]("/api/photobooths")
+  });
+  var getEvents = new Endpoint({
+      method: Network_HTTP_Method.GET.value, 
+      serverUrl: "/api/events/:cname", 
+      mkClientUrl: function (s) {
+          return "/api/events/" + s;
+      }
+  });
+  var fileToBlob = Unsafe_Coerce.unsafeCoerce;
+  var sendJpeg = function (__dict_EncodeJson_1) {
+      return function (__dict_DecodeJson_2) {
+          return function (_4) {
+              return function (file) {
+                  return function (a) {
+                      var opts = {
+                          method: Network_HTTP_Method.POST.value, 
+                          url: _4.value0.mkClientUrl(a), 
+                          headers: [ new Network_HTTP_RequestHeader.ContentType(Network_HTTP_MimeType_Common.imageJPEG) ], 
+                          content: Data_Maybe.Just.create(fileToBlob(file)), 
+                          username: Data_Maybe.Nothing.value, 
+                          password: Data_Maybe.Nothing.value
+                      };
+                      return Prelude[">>="](Control_Monad_Aff.bindAff)(Network_HTTP_Affjax.affjax(Network_HTTP_Affjax_Request.requestableBlob)(Network_HTTP_Affjax_Response.responsableString)(opts))(Prelude[">>>"](Prelude.semigroupoidFn)(function (_1) {
+                          return _1.response;
+                      })(parseOrThrow(__dict_DecodeJson_2)));
+                  };
+              };
+          };
+      };
+  };
+  var execEndpoint = function (__dict_EncodeJson_3) {
+      return function (__dict_DecodeJson_4) {
+          return function (__dict_EncodeJson_5) {
+              return function (__dict_DecodeJson_6) {
+                  return function (_3) {
+                      return function (a) {
+                          return function (b) {
+                              var opts = {
+                                  method: _3.value0.method, 
+                                  url: _3.value0.mkClientUrl(a), 
+                                  headers: [ new Network_HTTP_RequestHeader.ContentType(Network_HTTP_MimeType_Common.applicationJSON) ], 
+                                  content: Data_Maybe.Just.create(Data_Argonaut_Printer.printJson(Data_Argonaut_Printer.printerString)(Data_Argonaut_Encode.encodeJson(__dict_EncodeJson_3)(b))), 
+                                  username: Data_Maybe.Nothing.value, 
+                                  password: Data_Maybe.Nothing.value
+                              };
+                              return Prelude[">>="](Control_Monad_Aff.bindAff)(Network_HTTP_Affjax.affjax(Network_HTTP_Affjax_Request.requestableString)(Network_HTTP_Affjax_Response.responsableString)(opts))(Prelude[">>>"](Prelude.semigroupoidFn)(function (_0) {
+                                  return _0.response;
+                              })(parseOrThrow(__dict_DecodeJson_6)));
+                          };
+                      };
+                  };
+              };
+          };
+      };
+  };
+  var attachImage = new FileEndpoint({
+      serverUrl: "/api/attachfiletoevent/:eventid/:name", 
+      mkClientUrl: function (_2) {
+          return "/api/attachfiletoevent/" + (Prelude.show(Prelude.showInt)(_2.value0) + ("/" + _2.value1));
+      }
+  });
+  exports["FileEndpoint"] = FileEndpoint;
+  exports["Endpoint"] = Endpoint;
+  exports["attachImage"] = attachImage;
+  exports["putEvents"] = putEvents;
+  exports["postEvents"] = postEvents;
+  exports["getEvents"] = getEvents;
+  exports["putPhotobooths"] = putPhotobooths;
+  exports["postPhotobooths"] = postPhotobooths;
+  exports["getPhotobooths"] = getPhotobooths;
+  exports["parseOrThrow"] = parseOrThrow;
+  exports["fileToBlob"] = fileToBlob;
+  exports["sendJpeg"] = sendJpeg;
+  exports["execEndpoint"] = execEndpoint;;
+ 
+})(PS["Klikhut.Endpoint"] = PS["Klikhut.Endpoint"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var Data_Lens_Setter = PS["Data.Lens.Setter"];
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Data_Lens_Getter = PS["Data.Lens.Getter"];
+  var Data_Lens_Prism_Maybe = PS["Data.Lens.Prism.Maybe"];
+  var Prelude = PS["Prelude"];
   var Control_Monad_Aff = PS["Control.Monad.Aff"];
   var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
-  var Control_Apply = PS["Control.Apply"];
+  var OpticUI = PS["OpticUI"];
+  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
   var Data_Lens = PS["Data.Lens"];
   var Data_Lens_Common = PS["Data.Lens.Common"];
-  var Data_Foldable = PS["Data.Foldable"];
   var Data_Array = PS["Data.Array"];
   var Data_Maybe = PS["Data.Maybe"];
-  var Data_Monoid = PS["Data.Monoid"];
-  var Prelude = PS["Prelude"];
-  var DOM = PS["DOM"];
-  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
-  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
-  var Klikhut_Endpoint = PS["Klikhut.Endpoint"];
   var Klikhut_Types = PS["Klikhut.Types"];
   var Klikhut_Async = PS["Klikhut.Async"];
   var ClientState = PS["ClientState"];
-  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
-  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
-  var Data_Traversable = PS["Data.Traversable"];
   var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];
   var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
   var Data_Const = PS["Data.Const"];
-  var Data_Profunctor_Choice = PS["Data.Profunctor.Choice"];     
+  var Data_Monoid = PS["Data.Monoid"];     
   var LoadAll = (function () {
       function LoadAll() {
 
@@ -5236,10 +6169,12 @@ var PS = { };
       return SaveNew;
   })();
   var NewSaved = (function () {
-      function NewSaved() {
-
+      function NewSaved(value0) {
+          this.value0 = value0;
       };
-      NewSaved.value = new NewSaved();
+      NewSaved.create = function (value0) {
+          return new NewSaved(value0);
+      };
       return NewSaved;
   })();
   var NewSaveFailed = (function () {
@@ -5275,10 +6210,12 @@ var PS = { };
       return SaveEdit;
   })();
   var EditSaved = (function () {
-      function EditSaved() {
-
+      function EditSaved(value0) {
+          this.value0 = value0;
       };
-      EditSaved.value = new EditSaved();
+      EditSaved.create = function (value0) {
+          return new EditSaved(value0);
+      };
       return EditSaved;
   })();
   var EditSaveFailed = (function () {
@@ -5290,6 +6227,176 @@ var PS = { };
       };
       return EditSaveFailed;
   })();
+  var crudHandler = function (s) {
+      return function (h) {
+          return function (impls) {
+              return function (comm) {
+                  var updateEditingAndStop = function (replacement) {
+                      return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (_1) {
+                          var updates = function (_21) {
+                              return Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(Data_Lens_Setter.over(function (_22) {
+                                  return ClientState._collection(Data_Profunctor_Strong.strongFn)(Klikhut_Async._Done(Data_Profunctor_Choice.choiceFn)(_22));
+                              })(function (as) {
+                                  return Data_Maybe.maybe(as)(Prelude.id(Prelude.categoryFn))(Data_Array.updateAt(_1.index)(replacement)(as));
+                              })(_21));
+                          };
+                          return OpticUI_Core.runHandler(h)(updates(s));
+                      })(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s));
+                  };
+                  var handle = function (_4) {
+                      if (_4 instanceof LoadAll) {
+                          return function __do() {
+                              var a = OpticUI_Components_Async.async(impls.loadAll)();
+                              return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._collection(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Busy(a))(s))();
+                          };
+                      };
+                      if (_4 instanceof SaveNew) {
+                          return function __do() {
+                              var a = OpticUI_Components_Async.async(impls.saveNew(impls.constr(Data_Lens_Getter.view(function (_23) {
+                                  return ClientState._new(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(_23));
+                              })(s))))();
+                              return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_24) {
+                                  return ClientState._new(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_24));
+                              })(new Klikhut_Async.Busy(a))(s))();
+                          };
+                      };
+                      if (_4 instanceof Loaded) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._collection(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Done(_4.value0))(s));
+                      };
+                      if (_4 instanceof LoadingFailed) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._collection(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Errored(_4.value0))(s));
+                      };
+                      if (_4 instanceof NewSaveFailed) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_25) {
+                              return ClientState._new(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_25));
+                          })(new Klikhut_Async.Errored(_4.value0))(s));
+                      };
+                      if (_4 instanceof NewSaved) {
+                          var updates = function (init) {
+                              return function (_26) {
+                                  return Data_Lens_Setter.over(function (_27) {
+                                      return ClientState._collection(Data_Profunctor_Strong.strongFn)(Klikhut_Async._Done(Data_Profunctor_Choice.choiceFn)(_27));
+                                  })(function (arr) {
+                                      return Data_Array.snoc(arr)(_4.value0);
+                                  })(Data_Lens_Setter.set(function (_28) {
+                                      return ClientState._new(Data_Profunctor_Strong.strongFn)(ClientState._model(Data_Profunctor_Strong.strongFn)(_28));
+                                  })(init)(Data_Lens_Setter.set(function (_29) {
+                                      return ClientState._new(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_29));
+                                  })(Klikhut_Async.Initial.value)(_26)));
+                              };
+                          };
+                          return function __do() {
+                              var _0 = impls.initial();
+                              return OpticUI_Core.runHandler(h)(updates(_0)(s))();
+                          };
+                      };
+                      if (_4 instanceof StartEdit) {
+                          return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (a) {
+                              return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(new Data_Maybe.Just({
+                                  index: _4.value0, 
+                                  previous: a, 
+                                  saving: Klikhut_Async.Initial.value
+                              }))(s));
+                          })(Data_Array["!!"](Data_Lens_Getter.view(function (_30) {
+                              return ClientState._collection(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(Klikhut_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_Monoid.monoidArray)))(_30));
+                          })(s))(_4.value0));
+                      };
+                      if (_4 instanceof CancelEdit) {
+                          return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (_2) {
+                              return updateEditingAndStop(_2.previous);
+                          })(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s));
+                      };
+                      if (_4 instanceof SaveEdit) {
+                          return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (a) {
+                              return function __do() {
+                                  var b = OpticUI_Components_Async.async(impls.saveEdit(a))();
+                                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_31) {
+                                      return ClientState._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(ClientState._saving(Data_Profunctor_Strong.strongFn)(_31)));
+                                  })(new Klikhut_Async.Busy(b))(s))();
+                              };
+                          })(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (_3) {
+                              return Data_Array["!!"](Data_Lens_Getter.view(function (_32) {
+                                  return ClientState._collection(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(Klikhut_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_Monoid.monoidArray)))(_32));
+                              })(s))(_3.index);
+                          }));
+                      };
+                      if (_4 instanceof EditSaved) {
+                          return updateEditingAndStop(_4.value0);
+                      };
+                      if (_4 instanceof EditSaveFailed) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_33) {
+                              return ClientState._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(ClientState._saving(Data_Profunctor_Strong.strongFn)(_33)));
+                          })(new Klikhut_Async.Errored(_4.value0))(s));
+                      };
+                      throw new Error("Failed pattern match at Klikhut.Crud line 41, column 1 - line 49, column 1: " + [ _4.constructor.name ]);
+                  };
+                  return handle(comm);
+              };
+          };
+      };
+  };
+  exports["LoadAll"] = LoadAll;
+  exports["Loaded"] = Loaded;
+  exports["LoadingFailed"] = LoadingFailed;
+  exports["SaveNew"] = SaveNew;
+  exports["NewSaved"] = NewSaved;
+  exports["NewSaveFailed"] = NewSaveFailed;
+  exports["StartEdit"] = StartEdit;
+  exports["CancelEdit"] = CancelEdit;
+  exports["SaveEdit"] = SaveEdit;
+  exports["EditSaved"] = EditSaved;
+  exports["EditSaveFailed"] = EditSaveFailed;
+  exports["crudHandler"] = crudHandler;;
+ 
+})(PS["Klikhut.Crud"] = PS["Klikhut.Crud"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Data_Lens_Getter = PS["Data.Lens.Getter"];
+  var Data_Lens_Prism_Maybe = PS["Data.Lens.Prism.Maybe"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Components = PS["OpticUI.Components"];
+  var OpticUI = PS["OpticUI"];
+  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Apply = PS["Control.Apply"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Lens_Common = PS["Data.Lens.Common"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Array = PS["Data.Array"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Prelude = PS["Prelude"];
+  var DOM = PS["DOM"];
+  var DOM_Timer = PS["DOM.Timer"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Klikhut_Model_Photobooth = PS["Klikhut.Model.Photobooth"];
+  var Klikhut_Client_Router = PS["Klikhut.Client.Router"];
+  var Klikhut_Client_Exec = PS["Klikhut.Client.Exec"];
+  var Klikhut_Endpoint = PS["Klikhut.Endpoint"];
+  var Klikhut_Types = PS["Klikhut.Types"];
+  var Klikhut_Crud = PS["Klikhut.Crud"];
+  var Klikhut_Async = PS["Klikhut.Async"];
+  var ClientState = PS["ClientState"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Const = PS["Data.Const"];     
+  var Crud = (function () {
+      function Crud(value0) {
+          this.value0 = value0;
+      };
+      Crud.create = function (value0) {
+          return new Crud(value0);
+      };
+      return Crud;
+  })();
   var ToEvents = (function () {
       function ToEvents(value0) {
           this.value0 = value0;
@@ -5300,28 +6407,28 @@ var PS = { };
       return ToEvents;
   })();
   var updatePB = function (pb) {
-      return Klikhut_Endpoint.execEndpoint(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Klikhut_Endpoint.putPhotobooths)(Prelude.unit)(pb);
+      return Klikhut_Endpoint.execEndpoint(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Klikhut_Endpoint.putPhotobooths)(Prelude.unit)(pb);
   };
   var showPB = function (handle) {
-      return function (_13) {
+      return function (_9) {
           return function (i) {
-              if (_13 instanceof Data_Maybe.Just && i === _13.value0) {
-                  return OpticUI_Core["with"](function (_9) {
+              if (_9 instanceof Data_Maybe.Just && i === _9.value0) {
+                  return OpticUI_Core["with"](function (_5) {
                       return function (h) {
-                          return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_9.value0.computername))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Klikhut_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Klikhut_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._defaultprofile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning"), OpticUI_Markup_HTML.onClick(function (_7) {
-                              return handle(CancelEdit.value);
-                          }) ])(OpticUI_Markup.text("Cancel")), OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-success"), OpticUI_Markup_HTML.onClick(function (_8) {
-                              return handle(SaveEdit.value);
+                          return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_5.value0.computername))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Klikhut_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(ClientState._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Klikhut_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(ClientState._defaultprofile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning"), OpticUI_Markup_HTML.onClick(function (_3) {
+                              return handle(new Crud(Klikhut_Crud.CancelEdit.value));
+                          }) ])(OpticUI_Markup.text("Cancel")), OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-success"), OpticUI_Markup_HTML.onClick(function (_4) {
+                              return handle(new Crud(Klikhut_Crud.SaveEdit.value));
                           }) ])(OpticUI_Markup.text("Save")) ]))) ]));
                       };
                   });
               };
-              return OpticUI_Core["with"](function (_12) {
+              return OpticUI_Core["with"](function (_8) {
                   return function (h) {
-                      return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_12.value0.computername)), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_12.value0.alias)), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_12.value0.defaultprofile)), Data_Maybe.maybe(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_10) {
-                          return handle(new StartEdit(i));
-                      }) ])(OpticUI_Markup.text("Edit"))))(Prelude["const"](Data_Monoid.mempty(OpticUI_Markup.markupMonoid)))(_13), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_11) {
-                          return handle(new ToEvents(_12.value0.computername));
+                      return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_8.value0.computername)), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_8.value0.alias)), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_8.value0.defaultprofile)), Data_Maybe.maybe(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_6) {
+                          return handle(Crud.create(new Klikhut_Crud.StartEdit(i)));
+                      }) ])(OpticUI_Markup.text("Edit"))))(Prelude["const"](Data_Monoid.mempty(OpticUI_Markup.markupMonoid)))(_9), OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_7) {
+                          return handle(new ToEvents(_8.value0.computername));
                       }) ])(OpticUI_Markup.text("Zie events"))) ])));
                   };
               });
@@ -5329,20 +6436,20 @@ var PS = { };
       };
   };
   var saveNewPb = function (pb) {
-      return Klikhut_Endpoint.execEndpoint(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Klikhut_Endpoint.postPhotobooths)(Prelude.unit)(pb);
+      return Klikhut_Endpoint.execEndpoint(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Klikhut_Model_Photobooth.encodeJsonPhotobooth)(Klikhut_Model_Photobooth.decodeJsonPhotobooth)(Klikhut_Endpoint.postPhotobooths)(Prelude.unit)(pb);
   };
   var makeNewPbButton = function (handle) {
-      return OpticUI_Core["with"](function (newPb) {
+      return OpticUI_Core["with"](function ($$new) {
           return function (h) {
-              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_2) {
-                  return handle(SaveNew.value);
-              }) ])(OpticUI_Markup.text("Save shit")))), Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning") ])(OpticUI_Markup.text("Saving PB"))), OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_3) {
-                  return handle(NewSaved.value);
-              })(function (_44) {
-                  return handle(NewSaveFailed.create(_44));
+              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_0) {
+                  return handle(new Crud(Klikhut_Crud.SaveNew.value));
+              }) ])(OpticUI_Markup.text("Save shit")))), Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning") ])(OpticUI_Markup.text("Saving PB"))), OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (newS) {
+                  return handle(new Crud(new Klikhut_Crud.NewSaved(newS)));
+              })(function (_29) {
+                  return handle(Crud.create(Klikhut_Crud.NewSaveFailed.create(_29)));
               }) ])), Klikhut_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
-                  return function (_4) {
-                      return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger") ])(OpticUI_Markup.text("Failed!"))), OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Photobooths failed to get saved: " + Control_Monad_Eff_Exception.message(err)))) ]);
+                  return function (_1) {
+                      return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger") ])(OpticUI_Markup.text("Failed!"))), OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Photobooth not saved: " + Control_Monad_Eff_Exception.message(err)))) ]);
                   };
               })) ]);
           };
@@ -5351,159 +6458,559 @@ var PS = { };
   var makeNewPb = function (handle) {
       return OpticUI_Core["with"](function (model) {
           return function (h) {
-              return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Photobooth._defaultprofile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._state(OpticUI_Core.uiStrong)(makeNewPbButton(handle))) ]));
+              return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._defaultprofile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._state(OpticUI_Core.uiStrong)(makeNewPbButton(handle))) ]));
           };
       });
   };
   var loadPbs = Klikhut_Endpoint.execEndpoint(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Data_Argonaut_Encode.encodeJsonArray(Klikhut_Model_Photobooth.encodeJsonPhotobooth))(Data_Argonaut_Decode.decodeArray(Klikhut_Model_Photobooth.decodeJsonPhotobooth))(Klikhut_Endpoint.getPhotobooths)(Prelude.unit)(Prelude.unit);
   var listPhotobooths = function (handle) {
       return function (selInd) {
-          return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ ClientState._photobooths(OpticUI_Core.uiStrong)(OpticUI_Core["with"](function (pbs) {
+          return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ ClientState._collection(OpticUI_Core.uiStrong)(OpticUI_Core["with"](function (pbs) {
               return function (h) {
-                  return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.inline(Control_Apply["*>"](Control_Monad_Eff.applyEff)(handle(LoadAll.value))(Prelude["return"](Control_Monad_Eff.applicativeEff)(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Nothing loaded yet"))))))), Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))), OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_45) {
-                      return handle(Loaded.create(_45));
-                  })(function (_46) {
-                      return handle(LoadingFailed.create(_46));
+                  return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(Klikhut_Client_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(Klikhut_Crud.LoadAll.value))))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Nothing loaded yet")))))), Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))), OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_30) {
+                      return handle(Crud.create(Klikhut_Crud.Loaded.create(_30)));
+                  })(function (_31) {
+                      return handle(Crud.create(Klikhut_Crud.LoadingFailed.create(_31)));
                   }) ])), Klikhut_Async._Done(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.foreach(OpticUI_Markup.markupMonoid)(Data_Traversable.traversableArray)(showPB(handle)(selInd))), Klikhut_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
-                      return function (_5) {
+                      return function (_2) {
                           return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(err)))));
                       };
                   })) ]);
               };
-          })), ClientState._editing(OpticUI_Core.uiStrong)(Data_Lens_Common._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(ClientState._saving(OpticUI_Core.uiStrong)(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_6) {
-              return handle(EditSaved.value);
-          })(function (_47) {
-              return handle(EditSaveFailed.create(_47));
+          })), ClientState._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(ClientState._saving(OpticUI_Core.uiStrong)(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (edited) {
+              return handle(new Crud(new Klikhut_Crud.EditSaved(edited)));
+          })(function (_32) {
+              return handle(Crud.create(Klikhut_Crud.EditSaveFailed.create(_32)));
+          }))))), ClientState._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(ClientState._saving(OpticUI_Core.uiStrong)(Klikhut_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
+              return function (h) {
+                  return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(Data_Monoid.mempty(OpticUI_Markup.markupMonoid))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(Data_Monoid.mempty(OpticUI_Markup.markupMonoid))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(Data_Monoid.mempty(OpticUI_Markup.markupMonoid))), OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Photobooth edit failed to get saved: " + Control_Monad_Eff_Exception.message(err)))) ]);
+              };
           }))))) ]);
       };
   };
-  var photoboothsPage = OpticUI_Core["with"](function (s) {
-      return function (h) {
-          var handle = function (_14) {
-              if (_14 instanceof LoadAll) {
-                  return function __do() {
-                      var a = OpticUI_Components_Async.async(loadPbs)();
-                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._photobooths(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Busy(a))(s))();
+  var photoboothsPage = function ($$goto) {
+      return OpticUI_Core["with"](function (s) {
+          return function (h) {
+              var impls = {
+                  loadAll: loadPbs, 
+                  saveNew: saveNewPb, 
+                  saveEdit: updatePB, 
+                  initial: Prelude["return"](Control_Monad_Eff.applicativeEff)({
+                      id: Data_Maybe.Nothing.value, 
+                      computername: "", 
+                      alias: "", 
+                      defaultprofile: ""
+                  }), 
+                  constr: Klikhut_Model_Photobooth.Photobooth.create
+              };
+              var handle = function (_10) {
+                  if (_10 instanceof Crud) {
+                      return Klikhut_Crud.crudHandler(s)(h)(impls)(_10.value0);
                   };
-              };
-              if (_14 instanceof SaveNew) {
-                  return function __do() {
-                      var a = OpticUI_Components_Async.async(saveNewPb(new Klikhut_Model_Photobooth.Photobooth(Data_Lens_Getter.view(function (_48) {
-                          return ClientState._newPb(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(_48));
-                      })(s))))();
-                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_49) {
-                          return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_49));
-                      })(new Klikhut_Async.Busy(a))(s))();
+                  if (_10 instanceof ToEvents) {
+                      return $$goto(new ClientState.EventsPage(_10.value0));
                   };
+                  throw new Error("Failed pattern match at Klikhut.Client.PhotoboothsPage line 42, column 1 - line 48, column 1: " + [ _10.constructor.name ]);
               };
-              if (_14 instanceof Loaded) {
-                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._photobooths(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Done(_14.value0))(s));
-              };
-              if (_14 instanceof LoadingFailed) {
-                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._photobooths(Data_Profunctor_Strong.strongFn))(new Klikhut_Async.Errored(_14.value0))(s));
-              };
-              if (_14 instanceof NewSaveFailed) {
-                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_50) {
-                      return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_50));
-                  })(new Klikhut_Async.Errored(_14.value0))(s));
-              };
-              if (_14 instanceof NewSaved) {
-                  var $$new = Klikhut_Model_Photobooth.Photobooth.create(Data_Lens_Getter.view(function (_51) {
-                      return ClientState._newPb(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(_51));
-                  })(s));
-                  var updates = function (_52) {
-                      return Data_Lens_Setter.over(function (_53) {
-                          return ClientState._photobooths(Data_Profunctor_Strong.strongFn)(Klikhut_Async._Done(Data_Profunctor_Choice.choiceFn)(_53));
-                      })(function (arr) {
-                          return Data_Array.snoc(arr)($$new);
-                      })(Data_Lens_Setter.set(function (_54) {
-                          return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._model(Data_Profunctor_Strong.strongFn)(_54));
-                      })({
-                          computername: "", 
-                          alias: "", 
-                          defaultprofile: ""
-                      })(Data_Lens_Setter.set(function (_55) {
-                          return ClientState._newPb(Data_Profunctor_Strong.strongFn)(ClientState._state(Data_Profunctor_Strong.strongFn)(_55));
-                      })(Klikhut_Async.Initial.value)(_52)));
-                  };
-                  return OpticUI_Core.runHandler(h)(updates(s));
-              };
-              if (_14 instanceof StartEdit) {
-                  return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (pb) {
-                      return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(new Data_Maybe.Just({
-                          index: _14.value0, 
-                          previous: pb, 
-                          saving: Klikhut_Async.Initial.value
-                      }))(s));
-                  })(Data_Array["!!"](Data_Lens_Getter.view(function (_56) {
-                      return ClientState._photobooths(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(Klikhut_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_Monoid.monoidArray)))(_56));
-                  })(s))(_14.value0));
-              };
-              if (_14 instanceof CancelEdit) {
-                  return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (_0) {
-                      var updates = function (_57) {
-                          return Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(Data_Lens_Setter.over(function (_58) {
-                              return ClientState._photobooths(Data_Profunctor_Strong.strongFn)(Klikhut_Async._Done(Data_Profunctor_Choice.choiceFn)(_58));
-                          })(function (pbs) {
-                              return Data_Maybe.maybe(pbs)(Prelude.id(Prelude.categoryFn))(Data_Array.updateAt(_0.index)(_0.previous)(pbs));
-                          })(_57));
-                      };
-                      return OpticUI_Core.runHandler(h)(updates(s));
-                  })(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s));
-              };
-              if (_14 instanceof SaveEdit) {
-                  return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (pb) {
-                      return function __do() {
-                          var a = OpticUI_Components_Async.async(updatePB(pb))();
-                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_59) {
-                              return ClientState._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Common._Just(Data_Profunctor_Choice.choiceFn)(ClientState._saving(Data_Profunctor_Strong.strongFn)(_59)));
-                          })(new Klikhut_Async.Busy(a))(s))();
-                      };
-                  })(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (_1) {
-                      return Data_Array["!!"](Data_Lens_Getter.view(function (_60) {
-                          return ClientState._photobooths(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(Klikhut_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_Monoid.monoidArray)))(_60));
-                      })(s))(_1.index);
-                  }));
-              };
-              if (_14 instanceof EditSaved) {
-                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(s));
-              };
-              if (_14 instanceof EditSaveFailed) {
-                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function (_61) {
-                      return ClientState._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Common._Just(Data_Profunctor_Choice.choiceFn)(ClientState._saving(Data_Profunctor_Strong.strongFn)(_61)));
-                  })(new Klikhut_Async.Errored(_14.value0))(s));
-              };
-              if (_14 instanceof ToEvents) {
-                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(ClientState._route(Data_Profunctor_Strong.strongFn))(new ClientState.EventsPage(_14.value0))(s));
-              };
-              throw new Error("Failed pattern match at Klikhut.Client.PhotoboothsPage line 53, column 7 - line 54, column 7: " + [ _14.constructor.name ]);
+              return OpticUI_Core.withView(function (_33) {
+                  return OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("") ])(OpticUI_Markup_HTML.table([ OpticUI_Markup_HTML.classA("table crud-table") ])(OpticUI_Markup_HTML.tbody([  ])(_33)));
+              })(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Name")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Alias")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Default Profile")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Actions")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Link")) ]))), ClientState._collectionEditing(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (ed) {
+                  return Prelude["return"](Data_Maybe.applicativeMaybe)(ed.index);
+              }))), ClientState._new(OpticUI_Core.uiStrong)(makeNewPb(handle)) ]));
           };
-          return OpticUI_Core.withView(function (_62) {
-              return OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("container") ])(OpticUI_Markup_HTML.table([ OpticUI_Markup_HTML.classA("table crud-table") ])(OpticUI_Markup_HTML.tbody([  ])(_62)));
-          })(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Markup.markupMonoid)([ OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Name")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Alias")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Default Profile")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Actions")), OpticUI_Markup_HTML.th([  ])(OpticUI_Markup.text("Link")) ]))), ClientState._photoboothsEditing(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (ed) {
-              return Prelude["return"](Data_Maybe.applicativeMaybe)(ed.index);
-          }))), ClientState._newPb(OpticUI_Core.uiStrong)(makeNewPb(handle)) ]));
-      };
-  });
+      });
+  };
   exports["photoboothsPage"] = photoboothsPage;;
  
 })(PS["Klikhut.Client.PhotoboothsPage"] = PS["Klikhut.Client.PhotoboothsPage"] || {});
 (function(exports) {
   // Generated by psc version 0.7.5.2
   "use strict";
+  var Data_Lens_Internal_Wander = PS["Data.Lens.Internal.Wander"];
+  var Prelude = PS["Prelude"];
+  var Control_Alternative = PS["Control.Alternative"];
+  var Control_Plus = PS["Control.Plus"];
+  var Data_Monoid_Disj = PS["Data.Monoid.Disj"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Lens_Types = PS["Data.Lens.Types"];     
+  var traversed = function (__dict_Traversable_0) {
+      return function (__dict_Wander_1) {
+          return Data_Lens_Internal_Wander.wander(__dict_Wander_1)(function (__dict_Applicative_2) {
+              return Data_Traversable.traverse(__dict_Traversable_0)(__dict_Applicative_2);
+          });
+      };
+  };
+  exports["traversed"] = traversed;;
+ 
+})(PS["Data.Lens.Traversal"] = PS["Data.Lens.Traversal"] || {});
+(function(exports) {
+  "use strict";
+
+  //module Klikhut.Model.Date
+  /*eslint-env node*/
+
+  exports.iso8601 = function iso8601(d){
+    return d.toISOString();
+  };
+ 
+})(PS["Klikhut.Model.Date"] = PS["Klikhut.Model.Date"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Klikhut.Model.Date"];
+  var Data_Date = PS["Data.Date"];
+  exports["iso8601"] = $foreign.iso8601;;
+ 
+})(PS["Klikhut.Model.Date"] = PS["Klikhut.Model.Date"] || {});
+(function(exports) {
+  "use strict";
+
+  //module Klikhut.Client.FileInput
+
+  exports.name = function name(f){
+    return f.name;
+  };
+
+  exports.firstFileImpl = function firstFileImpl(nothing){
+    return function(just){
+      return function firstFile(ev){
+        var f, files = ev.target.files;
+        if(files){
+          f = files[0];
+          return f ? just(f) : nothing;
+        } else {
+          return nothing;
+        }
+      };
+    };
+  };
+ 
+})(PS["Klikhut.Client.FileInput"] = PS["Klikhut.Client.FileInput"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var $foreign = PS["Klikhut.Client.FileInput"];
   var OpticUI_Core = PS["OpticUI.Core"];
+  var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var OpticUI = PS["OpticUI"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var DOM = PS["DOM"];
+  var DOM_File_Types = PS["DOM.File.Types"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Array = PS["Data.Array"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Unsafe_Coerce = PS["Unsafe.Coerce"];
+  var Klikhut_Types = PS["Klikhut.Types"];     
+  var firstFile = $foreign.firstFileImpl(Data_Maybe.Nothing.value)(Data_Maybe.Just.create);
+  var onFileInput = function (h) {
+      return OpticUI_Markup.handle("change")(function (e) {
+          return h(e)(firstFile(e));
+      });
+  };
+  var fileInput = function (ps) {
+      return OpticUI_Core["with"](function (s) {
+          return function (h) {
+              var props = Prelude["<>"](Prelude.semigroupArray)([ OpticUI_Markup_HTML.typeA("file"), onFileInput(function (_0) {
+                  return function (f) {
+                      return OpticUI_Core.runHandler(h)(f);
+                  };
+              }) ])((function () {
+                  var _2 = Data_Maybe.isNothing(s);
+                  if (_2) {
+                      return [ OpticUI_Markup_HTML.valueA("") ];
+                  };
+                  if (!_2) {
+                      return Data_Monoid.mempty(Data_Monoid.monoidArray);
+                  };
+                  throw new Error("Failed pattern match at Klikhut.Client.FileInput line 31, column 7 - line 33, column 4: " + [ _2.constructor.name ]);
+              })());
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.input_(Prelude["<>"](Prelude.semigroupArray)(ps)(props)));
+          };
+      });
+  };
+  var accept = OpticUI_Markup.attr("accept");
+  exports["accept"] = accept;
+  exports["onFileInput"] = onFileInput;
+  exports["fileInput"] = fileInput;
+  exports["name"] = $foreign.name;;
+ 
+})(PS["Klikhut.Client.FileInput"] = PS["Klikhut.Client.FileInput"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Prelude = PS["Prelude"];
+  var OpticUI = PS["OpticUI"];
+  var OpticUI_Markup = PS["OpticUI.Markup"];
+  var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var DOM = PS["DOM"];
+  var Data_String = PS["Data.String"];
+  var Klikhut_Types = PS["Klikhut.Types"];
+  var Klikhut_Model_Date = PS["Klikhut.Model.Date"];
+  var Data_Date = PS["Data.Date"];     
+  var dateTimeField = function (ps) {
+      return OpticUI_Core["with"](function (s) {
+          return function (h) {
+              var handler = function (_0) {
+                  return function (v) {
+                      return Data_Maybe.maybe(function __do() {
+                          var d = Data_Date.now();
+                          return OpticUI_Core.runHandler(h)(d)();
+                      })(function (d) {
+                          return OpticUI_Core.runHandler(h)(d);
+                      })(Data_Date.fromString(Data_Maybe.maybe("")(Prelude.id(Prelude.categoryFn))(v)));
+                  };
+              };
+              var props = [ OpticUI_Markup_HTML.typeA("datetime-local"), OpticUI_Markup_HTML.onInput(Data_Foreign_Class.stringIsForeign)(handler), OpticUI_Markup_HTML.valueA(Data_String.take(16)(Klikhut_Model_Date.iso8601(s))) ];
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.input_(Prelude["++"](Prelude.semigroupArray)(ps)(props)));
+          };
+      });
+  };
+  exports["dateTimeField"] = dateTimeField;;
+ 
+})(PS["Klikhut.Client.DateTimeField"] = PS["Klikhut.Client.DateTimeField"] || {});
+(function(exports) {
+  // Generated by psc version 0.7.5.2
+  "use strict";
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Data_Lens_Getter = PS["Data.Lens.Getter"];
+  var Data_Lens_Setter = PS["Data.Lens.Setter"];
+  var Data_Lens_Prism_Maybe = PS["Data.Lens.Prism.Maybe"];
   var Prelude = PS["Prelude"];
   var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
   var OpticUI_Markup = PS["OpticUI.Markup"];
   var OpticUI_Components = PS["OpticUI.Components"];
   var OpticUI = PS["OpticUI"];
-  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];     
-  var eventsPage = function (cn) {
+  var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
+  var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Apply = PS["Control.Apply"];
+  var Data_Maybe = PS["Data.Maybe"];
+  var Data_Date = PS["Data.Date"];
+  var Data_Foldable = PS["Data.Foldable"];
+  var Data_Lens_Common = PS["Data.Lens.Common"];
+  var Data_Lens = PS["Data.Lens"];
+  var Data_Lens_Traversal = PS["Data.Lens.Traversal"];
+  var Data_Monoid = PS["Data.Monoid"];
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_Array = PS["Data.Array"];
+  var DOM = PS["DOM"];
+  var DOM_Timer = PS["DOM.Timer"];
+  var DOM_File_Types = PS["DOM.File.Types"];
+  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
+  var Klikhut_Model_Event = PS["Klikhut.Model.Event"];
+  var Klikhut_Model_Date = PS["Klikhut.Model.Date"];
+  var Klikhut_Model_SavedImage = PS["Klikhut.Model.SavedImage"];
+  var Klikhut_Client_Router = PS["Klikhut.Client.Router"];
+  var Klikhut_Client_Exec = PS["Klikhut.Client.Exec"];
+  var Klikhut_Client_FileInput = PS["Klikhut.Client.FileInput"];
+  var Klikhut_Crud = PS["Klikhut.Crud"];
+  var Klikhut_Async = PS["Klikhut.Async"];
+  var Klikhut_Endpoint = PS["Klikhut.Endpoint"];
+  var Klikhut_Types = PS["Klikhut.Types"];
+  var ClientState = PS["ClientState"];
+  var Klikhut_Client_DateTimeField = PS["Klikhut.Client.DateTimeField"];
+  var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
+  var Data_Const = PS["Data.Const"];
+  var Data_Argonaut_Encode = PS["Data.Argonaut.Encode"];
+  var Data_Argonaut_Decode = PS["Data.Argonaut.Decode"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
+  var Data_Traversable = PS["Data.Traversable"];     
+  var Crud = (function () {
+      function Crud(value0) {
+          this.value0 = value0;
+      };
+      Crud.create = function (value0) {
+          return new Crud(value0);
+      };
+      return Crud;
+  })();
+  var saveUpdatedEvent = function (i) {
+      return Prelude[">>="](Control_Monad_Aff.bindAff)(Klikhut_Endpoint.execEndpoint(Klikhut_Model_Event.encodeJsonEvent)(Klikhut_Model_Event.decodeJsonEvent)(Klikhut_Model_Event.encodeJsonEvent)(Klikhut_Model_Event.decodeJsonEvent)(Klikhut_Endpoint.putEvents)(Prelude.unit)(Data_Lens_Getter.view(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(i)))(function (n) {
+          return Prelude["return"](Control_Monad_Aff.applicativeAff)((function () {
+              var _18 = {};
+              for (var _19 in i) {
+                  if (i.hasOwnProperty(_19)) {
+                      _18[_19] = i[_19];
+                  };
+              };
+              _18.model = n;
+              return _18;
+          })());
+      });
+  };
+  var saveNewEvent = function (i) {
+      return Prelude[">>="](Control_Monad_Aff.bindAff)(Klikhut_Endpoint.execEndpoint(Klikhut_Model_Event.encodeJsonEvent)(Klikhut_Model_Event.decodeJsonEvent)(Klikhut_Model_Event.encodeJsonEvent)(Klikhut_Model_Event.decodeJsonEvent)(Klikhut_Endpoint.postEvents)(Prelude.unit)(Data_Lens_Getter.view(ClientState._model(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(i)))(function (n) {
+          return Prelude["return"](Control_Monad_Aff.applicativeAff)((function () {
+              var _20 = {};
+              for (var _21 in i) {
+                  if (i.hasOwnProperty(_21)) {
+                      _20[_21] = i[_21];
+                  };
+              };
+              _20.model = n;
+              return _20;
+          })());
+      });
+  };
+  var saveFile = function (file) {
+      return function (i) {
+          return Klikhut_Endpoint.sendJpeg(Klikhut_Model_SavedImage.encodeJsonSavedImage)(Klikhut_Model_SavedImage.decodeJsonSavedImage)(Klikhut_Endpoint.attachImage)(file)(new Data_Tuple.Tuple(i, Klikhut_Client_FileInput.name(file)));
+      };
+  };
+  var newEventButton = function (handle) {
+      var c = function (_17) {
+          return function (h) {
+              if (_17 instanceof Klikhut_Async.Busy) {
+                  return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning") ])(OpticUI_Markup.text("Saving Event"))))(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_85) {
+                      return handle(Crud.create(Klikhut_Crud.NewSaved.create(_85)));
+                  })(function (_86) {
+                      return handle(Crud.create(Klikhut_Crud.NewSaveFailed.create(_86)));
+                  })));
+              };
+              if (_17 instanceof Klikhut_Async.Errored) {
+                  return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger"), OpticUI_Markup_HTML.onClick(function (_7) {
+                      return handle(new Crud(Klikhut_Crud.SaveNew.value));
+                  }) ])(OpticUI_Markup.text("Saving Failed, Try Again?"))))(OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Event not saved: " + Control_Monad_Eff_Exception.message(_17.value0)))));
+              };
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_8) {
+                  return handle(new Crud(Klikhut_Crud.SaveNew.value));
+              }) ])(OpticUI_Markup.text("Save!")));
+          };
+      };
+      return OpticUI_Core["with"](c);
+  };
+  var makeNewEvent = function (handle) {
       return OpticUI_Core["with"](function (s) {
           return function (h) {
-              return OpticUI_Core.ui(OpticUI_Markup_HTML.div([  ])(OpticUI_Markup.text(cn)));
+              return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(""))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._name(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._datefrom(OpticUI_Core.uiStrong)(Klikhut_Client_DateTimeField.dateTimeField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._dateuntil(OpticUI_Core.uiStrong)(Klikhut_Client_DateTimeField.dateTimeField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(ClientState._profile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ])))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._state(OpticUI_Core.uiStrong)(newEventButton(handle))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(""))) ]));
           };
       });
+  };
+  var loadEvents = function (s) {
+      return Prelude[">>="](Control_Monad_Aff.bindAff)(Klikhut_Endpoint.execEndpoint(Data_Argonaut_Encode.encodeJsonUnit)(Data_Argonaut_Decode.decodeJsonNull)(Data_Argonaut_Encode.encodeJsonArray(Klikhut_Model_Event.encodeJsonEvent))(Data_Argonaut_Decode.decodeArray(Klikhut_Model_Event.decodeJsonEvent))(Klikhut_Endpoint.getEvents)(s)(Prelude.unit))(function (es) {
+          return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.map(Prelude.functorArray)(function (_0) {
+              return {
+                  model: _0, 
+                  state: {
+                      savingImage: Klikhut_Async.Initial.value, 
+                      image: Data_Maybe.Nothing.value
+                  }
+              };
+          })(es));
+      });
+  };
+  var editEventButton = function (handle) {
+      return function (i) {
+          return function (editing) {
+              var c = function (_16) {
+                  if (_16 instanceof Data_Maybe.Nothing) {
+                      return OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(Prelude["const"](handle(Crud.create(new Klikhut_Crud.StartEdit(i))))) ])(OpticUI_Markup.text("Edit!")));
+                  };
+                  if (_16 instanceof Data_Maybe.Just && _16.value0.index !== i) {
+                      return OpticUI_Core.ui(OpticUI_Markup_HTML.div([  ])(OpticUI_Markup.text("")));
+                  };
+                  if (_16 instanceof Data_Maybe.Just && _16.value0.saving instanceof Klikhut_Async.Busy) {
+                      return OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning") ])(OpticUI_Markup.text("Saving")));
+                  };
+                  if (_16 instanceof Data_Maybe.Just && _16.value0.saving instanceof Klikhut_Async.Errored) {
+                      return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger"), OpticUI_Markup_HTML.onClick(function (_4) {
+                          return handle(new Crud(Klikhut_Crud.SaveEdit.value));
+                      }) ])(OpticUI_Markup.text("Save failed, try again"))))(OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text(Control_Monad_Eff_Exception.message(_16.value0.saving.value0)))));
+                  };
+                  if (_16 instanceof Data_Maybe.Just) {
+                      return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-success"), OpticUI_Markup_HTML.onClick(function (_5) {
+                          return handle(new Crud(Klikhut_Crud.SaveEdit.value));
+                      }) ])(OpticUI_Markup.text("Save edit"))))(OpticUI_Core.ui(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_6) {
+                          return handle(new Crud(Klikhut_Crud.CancelEdit.value));
+                      }) ])(OpticUI_Markup.text("Cancel edit"))));
+                  };
+                  throw new Error("Failed pattern match at Klikhut.Client.EventsPage line 118, column 5 - line 119, column 5: " + [ _16.constructor.name ]);
+              };
+              return c(editing);
+          };
+      };
+  };
+  var showEvents = function (handle) {
+      var line = function (_12) {
+          return function (editing) {
+              return function (i) {
+                  return function (_13) {
+                      return function (h) {
+                          if (_12 instanceof Data_Maybe.Just && _12.value0 === i) {
+                              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Data_Maybe.maybe("")(Prelude.show(Prelude.showInt))(_13.model.value0.id)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_13.model.value0.computername))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Event._Event(OpticUI_Core.uiStrong)(ClientState._name(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Event._Event(OpticUI_Core.uiStrong)(ClientState._datefrom(OpticUI_Core.uiStrong)(Klikhut_Client_DateTimeField.dateTimeField([ OpticUI_Markup_HTML.classA("form-control") ]))))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Event._Event(OpticUI_Core.uiStrong)(ClientState._dateuntil(OpticUI_Core.uiStrong)(Klikhut_Client_DateTimeField.dateTimeField([ OpticUI_Markup_HTML.classA("form-control") ]))))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Event._Event(OpticUI_Core.uiStrong)(ClientState._profile(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))))), editEventButton(handle)(i)(editing), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(""))) ]);
+                          };
+                          var fileSelected = function (_14) {
+                              return function (_15) {
+                                  if (_15 instanceof Data_Maybe.Nothing) {
+                                      return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit);
+                                  };
+                                  if (_15 instanceof Data_Maybe.Just) {
+                                      return function __do() {
+                                          var a = OpticUI_Components_Async.async(saveFile(_15.value0)(Data_Maybe.maybe(-1)(Prelude.id(Prelude.categoryFn))(_13.model.value0.id)))();
+                                          return OpticUI_Core.runHandler(h)((function () {
+                                              var _54 = {};
+                                              for (var _55 in _13) {
+                                                  if (_13.hasOwnProperty(_55)) {
+                                                      _54[_55] = _13[_55];
+                                                  };
+                                              };
+                                              _54.state = (function () {
+                                                  var _52 = {};
+                                                  for (var _53 in _13.state) {
+                                                      if (_13.state.hasOwnProperty(_53)) {
+                                                          _52[_53] = _13.state[_53];
+                                                      };
+                                                  };
+                                                  _52.savingImage = new Klikhut_Async.Busy(a);
+                                                  return _52;
+                                              })();
+                                              return _54;
+                                          })())();
+                                      };
+                                  };
+                                  throw new Error("Failed pattern match at Klikhut.Client.EventsPage line 99, column 11 - line 100, column 8: " + [ _14.constructor.name, _15.constructor.name ]);
+                              };
+                          };
+                          var fileSaved = function (si) {
+                              return OpticUI_Core.runHandler(h)({
+                                  model: Data_Lens_Setter.over(function (_87) {
+                                      return Klikhut_Model_Event._Event(Data_Profunctor_Strong.strongFn)(ClientState._images(Data_Profunctor_Strong.strongFn)(_87));
+                                  })(Data_Array.cons(si))(_13.model), 
+                                  state: (function () {
+                                      var _57 = {};
+                                      for (var _58 in _13.state) {
+                                          if (_13.state.hasOwnProperty(_58)) {
+                                              _57[_58] = _13.state[_58];
+                                          };
+                                      };
+                                      _57.savingImage = Klikhut_Async.Initial.value;
+                                      _57.image = Data_Maybe.Nothing.value;
+                                      return _57;
+                                  })()
+                              });
+                          };
+                          var fileSaveErrored = function (err) {
+                              return OpticUI_Core.runHandler(h)((function () {
+                                  var _61 = {};
+                                  for (var _62 in _13) {
+                                      if (_13.hasOwnProperty(_62)) {
+                                          _61[_62] = _13[_62];
+                                      };
+                                  };
+                                  _61.state = (function () {
+                                      var _59 = {};
+                                      for (var _60 in _13.state) {
+                                          if (_13.state.hasOwnProperty(_60)) {
+                                              _59[_60] = _13.state[_60];
+                                          };
+                                      };
+                                      _59.savingImage = new Klikhut_Async.Errored(err);
+                                      return _59;
+                                  })();
+                                  return _61;
+                              })());
+                          };
+                          return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Data_Maybe.maybe("")(Prelude.show(Prelude.showInt))(_13.model.value0.id)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_13.model.value0.computername))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_13.model.value0.name))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Klikhut_Model_Date.iso8601(_13.model.value0.datefrom)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Klikhut_Model_Date.iso8601(_13.model.value0.dateuntil)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_13.model.value0.profile))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(editEventButton(handle)(i)(editing)), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ ClientState._state(OpticUI_Core.uiStrong)(ClientState._image(OpticUI_Core.uiStrong)(Klikhut_Client_FileInput.fileInput([ Klikhut_Client_FileInput.onFileInput(fileSelected), Klikhut_Client_FileInput.accept(".jpg,.jpeg") ]))), ClientState._model(OpticUI_Core.uiStrong)(Klikhut_Model_Event._Event(OpticUI_Core.uiStrong)(ClientState._images(OpticUI_Core.uiStrong)(OpticUI_Core.traversal(OpticUI_Markup.markupMonoid)(function (__dict_Wander_0) {
+                              return Data_Lens_Traversal.traversed(Data_Traversable.traversableArray)(__dict_Wander_0);
+                          })(OpticUI_Core["with"](function (_2) {
+                              return function (_1) {
+                                  return OpticUI_Core.ui(OpticUI_Markup_HTML.div([  ])(OpticUI_Markup.text(_2.value0.name)));
+                              };
+                          }))))), ClientState._state(OpticUI_Core.uiStrong)(ClientState._savingImage(OpticUI_Core.uiStrong)(Klikhut_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
+                              return function (_3) {
+                                  return OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text(Control_Monad_Eff_Exception.message(err))));
+                              };
+                          })))) ])), ClientState._state(OpticUI_Core.uiStrong)(ClientState._savingImage(OpticUI_Core.uiStrong)(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(fileSaved)(fileSaveErrored)))) ]);
+                      };
+                  };
+              };
+          };
+      };
+      var c = function (_11) {
+          return function (h) {
+              if (_11.collection instanceof Klikhut_Async.Initial) {
+                  return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("No events loaded yet, loading..."))));
+              };
+              if (_11.collection instanceof Klikhut_Async.Busy) {
+                  return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading events"))));
+              };
+              if (_11.collection instanceof Klikhut_Async.Errored) {
+                  return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Events failed to load: " + Control_Monad_Eff_Exception.message(_11.collection.value0))))));
+              };
+              if (_11.collection instanceof Klikhut_Async.Done) {
+                  var selI = Data_Maybe.maybe(Data_Maybe.Nothing.value)(function (ed) {
+                      return new Data_Maybe.Just(ed.index);
+                  })(_11.editing);
+                  var editing = Data_Lens_Getter.view(ClientState._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(_11);
+                  return ClientState._collection(OpticUI_Core.uiStrong)(Klikhut_Async._Done(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.foreach(OpticUI_Markup.markupMonoid)(Data_Traversable.traversableArray)(function (i) {
+                      return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(OpticUI_Core["with"](line(selI)(editing)(i)));
+                  })));
+              };
+              throw new Error("Failed pattern match at Klikhut.Client.EventsPage line 70, column 1 - line 74, column 1: " + [ _11.constructor.name, h.constructor.name ]);
+          };
+      };
+      return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core["with"](c))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(ClientState._collection(OpticUI_Core.uiStrong)(Klikhut_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(Klikhut_Client_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(Klikhut_Crud.LoadAll.value))))))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(ClientState._collection(OpticUI_Core.uiStrong)(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_88) {
+          return handle(Crud.create(Klikhut_Crud.Loaded.create(_88)));
+      })(function (_89) {
+          return handle(Crud.create(Klikhut_Crud.LoadingFailed.create(_89)));
+      }))))(ClientState._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(ClientState._saving(OpticUI_Core.uiStrong)(Klikhut_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_90) {
+          return handle(Crud.create(Klikhut_Crud.EditSaved.create(_90)));
+      })(function (_91) {
+          return handle(Crud.create(Klikhut_Crud.EditSaveFailed.create(_91)));
+      }))))))));
+  };
+  var eventsPage = function (cn) {
+      var c = function (_9) {
+          return function (h) {
+              if (_9.route instanceof ClientState.EventsPage) {
+                  var impls = {
+                      loadAll: loadEvents(_9.route.value0), 
+                      saveNew: saveNewEvent, 
+                      saveEdit: saveUpdatedEvent, 
+                      initial: function __do() {
+                          var d = Data_Date.now();
+                          return Prelude["return"](Control_Monad_Eff.applicativeEff)({
+                              id: Data_Maybe.Nothing.value, 
+                              computername: _9.route.value0, 
+                              name: "", 
+                              datefrom: d, 
+                              dateuntil: d, 
+                              profile: "", 
+                              images: [  ]
+                          })();
+                      }, 
+                      constr: function (a) {
+                          return {
+                              model: new Klikhut_Model_Event.Event(a), 
+                              state: {
+                                  savingImage: Klikhut_Async.Initial.value, 
+                                  image: Data_Maybe.Nothing.value
+                              }
+                          };
+                      }
+                  };
+                  var handle = function (_10) {
+                      return Klikhut_Crud.crudHandler(_9)(h)(impls)(_10.value0);
+                  };
+                  return OpticUI_Core.withView(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("") ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.h1([  ])(OpticUI_Markup.text("Events for: " + _9.route.value0))), OpticUI_Core.withView(function (_92) {
+                      return OpticUI_Markup_HTML.table([ OpticUI_Markup_HTML.classA("table crud-table") ])(OpticUI_Markup_HTML.tbody([  ])(_92));
+                  })(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(ClientState._collectionEditing(OpticUI_Core.uiStrong)(showEvents(handle)))(ClientState._new(OpticUI_Core.uiStrong)(makeNewEvent(handle)))) ]));
+              };
+              return OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text("Something went wrong with the router!")));
+          };
+      };
+      return OpticUI_Core["with"](c);
   };
   exports["eventsPage"] = eventsPage;;
  
@@ -5514,30 +7021,41 @@ var PS = { };
   var OpticUI_Run = PS["OpticUI.Run"];
   var OpticUI_Core = PS["OpticUI.Core"];
   var Data_Lens_Getter = PS["Data.Lens.Getter"];
+  var Data_Lens_Setter = PS["Data.Lens.Setter"];
   var Prelude = PS["Prelude"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var OpticUI = PS["OpticUI"];
   var Data_Lens = PS["Data.Lens"];
-  var Control_Monad_Eff = PS["Control.Monad.Eff"];
-  var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
-  var DOM = PS["DOM"];
-  var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
   var Klikhut_Client_PhotoboothsPage = PS["Klikhut.Client.PhotoboothsPage"];
   var Klikhut_Client_EventsPage = PS["Klikhut.Client.EventsPage"];
+  var Klikhut_Client_Router = PS["Klikhut.Client.Router"];
+  var Klikhut_Types = PS["Klikhut.Types"];
   var ClientState = PS["ClientState"];
   var Data_Profunctor_Star = PS["Data.Profunctor.Star"];
-  var Data_Const = PS["Data.Const"];     
-  var main = OpticUI_Run.animate(ClientState.initialState)(OpticUI_Core["with"](function (s) {
-      return function (h) {
-          var _0 = Data_Lens_Getter.view(ClientState._route(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s);
-          if (_0 instanceof ClientState.PhotoboothsPage) {
-              return ClientState._pbPage(OpticUI_Core.uiStrong)(Klikhut_Client_PhotoboothsPage.photoboothsPage);
+  var Data_Const = PS["Data.Const"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];     
+  var main = function __do() {
+      var _2 = Prelude["<$>"](Control_Monad_Eff.functorEff)(Klikhut_Client_Router.match)(Klikhut_Client_Router.getHash)();
+      var _1 = ClientState.initialState(_2)();
+      var _0 = OpticUI_Run.animate(_1)(OpticUI_Core["with"](function (s) {
+          return function (h) {
+              var nav$prime = Klikhut_Client_Router.nav(s)(h);
+              var _5 = Data_Lens_Getter.view(ClientState._route(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s);
+              if (_5 instanceof ClientState.PhotoboothsPage) {
+                  return ClientState._pbPage(OpticUI_Core.uiStrong)(Klikhut_Client_PhotoboothsPage.photoboothsPage(nav$prime));
+              };
+              if (_5 instanceof ClientState.EventsPage) {
+                  return ClientState._eventsPage(OpticUI_Core.uiStrong)(Klikhut_Client_EventsPage.eventsPage(_5.value0));
+              };
+              throw new Error("Failed pattern match at Client line 18, column 1 - line 19, column 1: " + [ _5.constructor.name ]);
           };
-          if (_0 instanceof ClientState.EventsPage) {
-              return Klikhut_Client_EventsPage.eventsPage(_0.value0);
-          };
-          throw new Error("Failed pattern match at Client line 19, column 1 - line 20, column 1: " + [ _0.constructor.name ]);
-      };
-  }));
+      }))();
+      return Klikhut_Client_Router.hashChanged(function (str) {
+          return _0(function (s) {
+              return Data_Lens_Setter.set(ClientState._route(Data_Profunctor_Strong.strongFn))(Klikhut_Client_Router.match(str))(s);
+          });
+      })();
+  };
   exports["main"] = main;;
  
 })(PS["Client"] = PS["Client"] || {});
