@@ -1,6 +1,6 @@
 # photobooths
 
-This is an application that will soon run (on a tiny scale) in production. It's a CRUD application for (physical) photobooths. The photobooths have a default configuration setup (= defaultprofile).
+This is an application that will soon run (on a tiny scale) in production. It's a CRUD application for (physical) photobooths. The photobooths have a default configuration setup (= defaultprofile). You can schedule events for each photobooth, for which you can select another profile and/or upload seperate files that overwrite configuration files in the profile.
 
 Aspects:
 - Written in PureScript
