@@ -25,6 +25,8 @@ data FieldType = Char
                | Date
                | Blob
 
+type Id = Int
+
 instance showColumnDef :: Show ColumnDef where
   show (ColumnDef ft ccs) = show ft ++ (if length ccs > 0 then " " else "") ++ 
                               joinWith ", " (map show ccs)
@@ -67,7 +69,8 @@ insertGet t@({name: name}) fs = insert t fs $
                                 " SELECT * FROM " ++ name ++ 
                                 " WHERE id = last_insert_rowid();"
 
-update :: forall a. Table -> Int -> StrMap String -> String -> Query a
+--needs id
+update :: forall a. Table -> Id -> StrMap String -> String -> Query a
 update {name: name, columns: fds} i fs str =
   let sortedKeys = sort $ keys fs
       sortedValues = (map snd <<<
@@ -79,14 +82,14 @@ update {name: name, columns: fds} i fs str =
               (joinWith ", " (map (\(Tuple fd f) -> fd ++ " = '" ++ f ++"'") fields)) ++
               " WHERE id = " ++ show i  ++ str
 
-updateGet :: forall a. Table -> Int -> StrMap String -> Query a
+updateGet :: forall a. Table -> Id -> StrMap String -> Query a
 updateGet t@{name: name} i fs = update t i fs $ "; SELECT * FROM " ++ name ++ " WHERE id = " ++ show i ++ ";"
 
 
 selectStar :: forall a. Table -> String -> Query a
 selectStar {name: name} s = Query $ "SELECT * FROM " ++ name ++ " " ++ s
 
-selectStarId :: forall a. Table -> Int -> Query a
+selectStarId :: forall a. Table -> Id -> Query a
 selectStarId t i = selectStar t $ "WHERE id = " ++ show i
 
 selectLastInserted :: forall a. Table -> Query a

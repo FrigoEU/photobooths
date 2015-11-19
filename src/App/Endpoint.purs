@@ -43,3 +43,6 @@ putEvents = Endpoint { method: PUT, serverUrl: "/api/events"
 attachImage :: FileEndpoint (Tuple Int String) SI.SavedImage
 attachImage = FileEndpoint { serverUrl: "/api/attachfiletoevent/:eventid/:name"
                            , mkClientUrl: \(Tuple i name) -> "/api/attachfiletoevent/" <> show i <> "/" <> name}
+
+------- Statistics ----------------------
+

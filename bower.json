@@ -20,7 +20,8 @@
     "purescript-affjax": "master",
     "purescript-maps": "master",
     "purescript-timers": "master",
-    "purescript-node-buffer": "master"
+    "purescript-node-buffer": "master",
+    "purescript-generics": "^0.7.0"
   },
   "devDependencies": {
     "purescript-spec": "~0.7.2"
@@ -28,6 +29,9 @@
   "resolutions": {
     "purescript-aff": "~0.13.0",
     "purescript-transformers": "~0.8.1",
-    "purescript-argonaut-codecs": "^0.3.0"
+    "purescript-argonaut-codecs": "^0.3.0",
+    "purescript-generics": "^0.7.0",
+    "purescript-node-buffer": "~0.1.0",
+    "purescript-maps": "~0.5.2"
   }
 }

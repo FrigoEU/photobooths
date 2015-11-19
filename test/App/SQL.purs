@@ -24,16 +24,16 @@ connectionInfo = Sqlite3
   { filename: "test"
   , memory: true }
 
-data Id = Id {id :: Int}
-derive instance genericId :: Generic Id
-instance isForeignId :: IsForeign Id where
+data MyId = MyId {id :: Int}
+derive instance genericId :: Generic MyId
+instance isForeignId :: IsForeign MyId where
   read obj = do
     id <- readProp "id" obj
-    return $ Id {id: id}
+    return $ MyId {id: id}
 
-instance eqId :: Eq Id 
+instance eqId :: Eq MyId 
   where eq = gEq
-instance showId :: Show Id 
+instance showId :: Show MyId 
   where show = gShow
 
 mybooth = Photobooth { id: Just 1
@@ -62,8 +62,8 @@ main = do
           let t = {name: "mytable", columns: fromArray [Tuple "id" $ ColumnDef Integer []]}
           execute_ (createTable t) conn
           execute_ (insert t (fromArray [Tuple "id" $ show 5]) "") conn
-          result <- query_ (selectStar t "" :: Query Id) conn
-          result `shouldEqual` [Id {id: 5}]
+          result <- query_ (selectStar t "" :: Query MyId) conn
+          result `shouldEqual` [MyId {id: 5}]
 
   describe "createTable" do
     it "should make the correct SQL string" do

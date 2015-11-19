@@ -28,6 +28,7 @@ import App.Debug
 import App.Model.Photobooth
 import App.Model.Event
 import App.Model.SavedImage
+import App.Model.Statistic
 import App.Model.Date
 import App.Model.StrMap
 
@@ -56,6 +57,19 @@ myevent d = Event { id: Nothing
                   , profile: "myprofile" 
                   , images: []}
 
+myeventstatistic :: EventStatistic
+myeventstatistic = EventStatistic { eventId: 1
+                                  , photoboothId: 1
+                                  , pictures: 200
+                                  , prints: 190 }
+
+mymonthlystatistic :: MonthlyStatistic
+mymonthlystatistic = MonthlyStatistic { month: 1
+                                      , photoboothId: 1
+                                      , pictures: 500
+                                      , prints: 390 }
+
+
 port :: Int
 port = 8080
 
@@ -72,6 +86,12 @@ main = do
       execute_ (insertEvent (myevent dateNow)) conn
       execute_ (dropTable savedImageTable) conn
       execute_ (createTable savedImageTable) conn
+      execute_ (dropTable eventStatisticsTable) conn
+      execute_ (Query createEventStatisticsTable) conn
+      execute_ (insertEventStatistic myeventstatistic) conn
+      execute_ (dropTable monthlyStatisticsTable) conn
+      execute_ (Query createMonthlyStatisticsTable) conn
+      execute_ (insertMonthlyStatistic mymonthlystatistic) conn
   app <- makeApp
   hostEndpoint app getPhotobooths allPhotobooths
   hostEndpoint app postPhotobooths newPB
@@ -189,6 +209,22 @@ selectImagesForEvents is conn =
   query (selectStar savedImageTable $ "WHERE eventid = (" <> qs <>")") (map toSql is) conn
     where 
       qs = joinWith ", " (replicate (length is) "?")
+
+insertEventStatistic :: EventStatistic -> Query Unit
+insertEventStatistic (EventStatistic e) = insert eventStatisticsTable 
+                                 (fromArray [ Tuple "eventId" $ show e.eventId
+                                            , Tuple "photoboothId" $ show e.photoboothId
+                                            , Tuple "pictures" $ show e.pictures
+                                            , Tuple "prints" $ show e.prints
+                                            ]) ""
+
+insertMonthlyStatistic :: MonthlyStatistic -> Query Unit
+insertMonthlyStatistic (MonthlyStatistic e) = insert monthlyStatisticsTable 
+                                   (fromArray [ Tuple "month" $ show e.month
+                                              , Tuple "photoboothId" $ show e.photoboothId
+                                              , Tuple "pictures" $ show e.pictures
+                                              , Tuple "prints" $ show e.prints
+                                              ]) ""
 
 foreign import pInt :: forall a. Maybe a -> (a -> Maybe a) -> String -> Maybe Int
 
