@@ -7,8 +7,6 @@ import Control.Monad.Eff.Console (log, CONSOLE())
 import Control.Monad.Aff (runAff, Aff())
 import Control.Monad.Error.Class (throwError)
 
-import Data.Argonaut.Printer (printJson)
-import Data.Argonaut.Encode (encodeJson, EncodeJson)
 import Data.Date (now, Now(), Date())
 import Data.Array (tail, replicate, filter, length)
 import Data.StrMap (lookup)

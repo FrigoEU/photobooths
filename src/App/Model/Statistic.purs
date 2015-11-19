@@ -7,8 +7,6 @@ import SQL as S
 import Data.Foreign
 import Data.Foreign.Class
 import Data.Generic
-import Data.Argonaut.Encode
-import Data.Argonaut.Decode
 import Data.Lens (Lens(), lens)
 import Data.Tuple (Tuple(..))
 import Data.Maybe
@@ -22,8 +20,6 @@ data EventStatistic = EventStatistic { photoboothId :: Int
 
 derive instance genericEventStatistic :: Generic EventStatistic
 
-instance encodeJsonEventStatistic :: EncodeJson EventStatistic where encodeJson = gEncodeJson
-instance decodeJsonEventStatistic :: DecodeJson EventStatistic where decodeJson = gDecodeJson
 instance eqEventStatistic         :: Eq EventStatistic where eq = gEq 
 instance showEventStatistic       :: Show EventStatistic where show = gShow
 
@@ -54,8 +50,6 @@ data MonthlyStatistic = MonthlyStatistic { photoboothId :: Int
 
 derive instance genericMonthlyStatistic :: Generic MonthlyStatistic
 
-instance encodeJsonMonthlyStatistic :: EncodeJson MonthlyStatistic where encodeJson = gEncodeJson
-instance decodeJsonMonthlyStatistic :: DecodeJson MonthlyStatistic where decodeJson = gDecodeJson
 instance eqMonthlyStatistic         :: Eq MonthlyStatistic where eq = gEq 
 instance showMonthlyStatistic       :: Show MonthlyStatistic where show = gShow
 

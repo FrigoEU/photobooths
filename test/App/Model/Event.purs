@@ -8,9 +8,9 @@ import Test.Spec.Assertions       (shouldEqual)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Aff
 
+import Data.Foreign.Generic
+import Data.Foreign
 import Data.Date (now, Now(), Date())
-import Data.Argonaut.Encode
-import Data.Argonaut.Decode
 import Data.Either
 import Data.Maybe
 
@@ -30,5 +30,6 @@ main = do
     it "encodeJson and decodeJson are inverses" do
       n <- (liftEff now :: forall eff. Aff (now :: Now | eff) Date)
       let myEvent = myEventMaker n
-          coded = ((decodeJson <<< encodeJson) myEvent :: Either String Event)
+          coded = ((readJSONGeneric defaultOptions <<< toJSONGeneric defaultOptions) 
+                   myEvent :: Either ForeignError Event)
       shouldEqual coded (Right myEvent)

@@ -7,8 +7,6 @@ import SQL as S
 import Data.Foreign
 import Data.Foreign.Class
 import Data.Generic
-import Data.Argonaut.Encode
-import Data.Argonaut.Decode
 import Data.Lens (Lens(), lens)
 import Data.Tuple (Tuple(..))
 import Data.Date
@@ -47,8 +45,6 @@ mkEvent (PartialEvent pe) im = Event { id: pe.id
 
 derive instance genericEvent :: Generic Event
 
-instance encodeJsonEvent :: EncodeJson Event where encodeJson = gEncodeJson
-instance decodeJsonEvent :: DecodeJson Event where decodeJson = gDecodeJson
 instance eqEvent         :: Eq Event where eq = gEq 
 instance showEvent       :: Show Event where show = gShow
 

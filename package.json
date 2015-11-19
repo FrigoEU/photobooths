@@ -16,7 +16,7 @@
     "compile:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main | java -jar compiler.jar --js_output_file server.js",
     "compile:client": "psc-bundle output/**/{index,foreign}.js --main Client --module Client | browserify -e - | java -jar compiler.jar --js_output_file static/client.js",
     "dev:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main -o server.js",
-    "dev:client": "psc-bundle output/**/{index,foreign}.js --main Client --module Client | browserify -e - -o static/client.js",
+    "dev:client": "psc-bundle output/**/{index,foreign}.js --main App.Client --module App.Client | browserify -e - -o static/client.js",
     "prestart": "npm run test",
     "start": "npm run compile:server & npm run compile:client && node server.js",
     "predev": "npm run test",

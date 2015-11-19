@@ -7,13 +7,11 @@ import Control.Monad.Error.Class (throwError)
 import Control.Monad.Eff.Exception (error, message)
 
 import Data.Either (Either(..), either)
-import Data.Argonaut.Parser (jsonParser)
-import Data.Argonaut.Decode (decodeJson, DecodeJson)
-import Data.Argonaut.Encode (EncodeJson, encodeJson)
-import Data.Argonaut.Printer (printJson)
 import Data.String.Regex (Regex())
 import Data.Maybe(Maybe(..))
 import Data.Tuple (Tuple(..))
+import Data.Foreign.Generic (defaultOptions, readJSONGeneric, toJSONGeneric)
+import Data.Generic (Generic)
 
 import Network.HTTP.Affjax (get, post, put, AJAX(), URL(), affjax)
 import Network.HTTP.RequestHeader (RequestHeader(..))
@@ -39,18 +37,18 @@ data FileEndpoint a b = FileEndpoint {
   mkClientUrl :: a -> URL
   }
 
-execEndpoint :: forall eff a b c. (EncodeJson b, DecodeJson b, EncodeJson c, DecodeJson c) =>
+execEndpoint :: forall eff a b c. (Generic b, Generic c) =>
                   Endpoint a b c -> a -> b -> Aff (ajax :: AJAX | eff) c
 execEndpoint (Endpoint {method: method, mkClientUrl: f}) a b = 
   affjax opts >>= _.response >>> parseOrThrow
     where opts = { method: method
                  , url: f a
                  , headers: [ContentType applicationJSON]
-                 , content: (Just $ printJson $ encodeJson b) :: Maybe String
+                 , content: (Just $ toJSONGeneric defaultOptions b) :: Maybe String
                  , username: Nothing
                  , password: Nothing}
 
-sendJpeg :: forall eff a b . (EncodeJson b, DecodeJson b) =>
+sendJpeg :: forall eff a b . (Generic b) =>
                              FileEndpoint a b -> File -> a -> Aff (ajax :: AJAX | eff) b
 sendJpeg (FileEndpoint {mkClientUrl: f}) file a = affjax opts >>= _.response >>> parseOrThrow
   where opts = { method: POST
@@ -64,7 +62,6 @@ sendJpeg (FileEndpoint {mkClientUrl: f}) file a = affjax opts >>= _.response >>>
 fileToBlob :: File -> Blob
 fileToBlob = unsafeCoerce
 
-parseOrThrow :: forall eff a. (DecodeJson a) => String -> Aff eff a
+parseOrThrow :: forall eff a. (Generic a) => String -> Aff eff a
 parseOrThrow a = 
-  either throwStr (\json -> either throwStr return $ decodeJson json) (jsonParser a)
-    where throwStr str = throwError $ error (str <> " in: " <> show a) 
+  either (\e -> throwError $ error $ show e) return (readJSONGeneric defaultOptions a)

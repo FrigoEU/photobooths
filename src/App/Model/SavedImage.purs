@@ -7,8 +7,6 @@ import SQL as S
 import Data.Foreign
 import Data.Foreign.Class
 import Data.Generic
-import Data.Argonaut.Encode
-import Data.Argonaut.Decode
 import Data.Lens (Lens(), lens)
 import Data.Tuple (Tuple(..))
 
@@ -20,8 +18,6 @@ data SavedImage = SavedImage { id :: Int
 
 derive instance genericSavedImage :: Generic SavedImage
 
-instance encodeJsonSavedImage :: EncodeJson SavedImage where encodeJson = gEncodeJson
-instance decodeJsonSavedImage :: DecodeJson SavedImage where decodeJson = gDecodeJson
 instance eqSavedImage         :: Eq SavedImage where eq = gEq 
 instance showSavedImage       :: Show SavedImage where show = gShow
 

@@ -6,8 +6,6 @@ import SQL
 
 import Data.Foreign.Class
 import Data.Generic
-import Data.Argonaut.Encode
-import Data.Argonaut.Decode
 import Data.Maybe (Maybe(..))
 import Data.Lens (Lens(), lens)
 import Data.Tuple (Tuple(..))
@@ -21,8 +19,6 @@ data Photobooth = Photobooth { id             :: Maybe Int
 
 derive instance genericPhotobooth :: Generic Photobooth
 
-instance encodeJsonPhotobooth :: EncodeJson Photobooth where encodeJson = gEncodeJson
-instance decodeJsonPhotobooth :: DecodeJson Photobooth where decodeJson = gDecodeJson
 instance eqPhotobooth         :: Eq Photobooth where eq = gEq 
 instance showPhotobooth       :: Show Photobooth where show = gShow
 

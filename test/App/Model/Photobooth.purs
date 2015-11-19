@@ -2,8 +2,8 @@ module Test.App.Model.Photobooth where
 
 import Prelude
 import App.Model.Photobooth
-import Data.Argonaut.Encode
-import Data.Argonaut.Decode
+import Data.Foreign.Generic
+import Data.Foreign
 import Data.Either
 import Data.Maybe
 
@@ -23,10 +23,10 @@ mybooth2 = Photobooth { id: Just 1
 main = do
   describe "json" do
     it "encodeJson and decodeJson are inverses 1" do
-      ((decodeJson <<< encodeJson) mybooth :: Either String Photobooth) 
+      ((readJSONGeneric defaultOptions <<< toJSONGeneric defaultOptions) mybooth :: Either ForeignError Photobooth) 
         `shouldEqual` 
         Right mybooth
     it "encodeJson and decodeJson are inverses 2" do
-      ((decodeJson <<< encodeJson) mybooth2 :: Either String Photobooth) 
+      ((readJSONGeneric defaultOptions <<< toJSONGeneric defaultOptions) mybooth2 :: Either ForeignError Photobooth) 
         `shouldEqual` 
         Right mybooth2
