@@ -1,4 +1,4 @@
-module App.Client.Components.Exec where
+module App.GUI.Components.Exec where
 
 import Prelude
 

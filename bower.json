@@ -21,7 +21,8 @@
     "purescript-maps": "master",
     "purescript-timers": "master",
     "purescript-node-buffer": "master",
-    "purescript-generics": "https://github.com/FrigoEU/purescript-generics.git#master"
+    "purescript-generics": "https://github.com/FrigoEU/purescript-generics.git#master",
+    "purescript-node-fs-aff": "^0.1.0"
   },
   "devDependencies": {
     "purescript-spec": "~0.7.2"

@@ -1,4 +1,4 @@
-module App.Client.Views.Crud where
+module App.GUI.Views.Crud where
 
 import Prelude
 
@@ -15,8 +15,8 @@ import Data.Lens.Common (_Just, _Nothing)
 import Data.Array (snoc, (!!), updateAt)
 import Data.Maybe (Maybe(..), maybe)
 
-import App.Client.Types
-import App.Client.State
+import App.GUI.Types
+import App.GUI.State
 import App.Model.Async
 
 --------------------------------------------------------

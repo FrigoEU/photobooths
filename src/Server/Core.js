@@ -5,6 +5,8 @@
 
 exports.makeApp = function makeApp(){
   var app = require("express")();
+  var compression = require("compression");
+  app.use(compression());
   return app;
 };
 

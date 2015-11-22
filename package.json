@@ -4,7 +4,8 @@
     "any-db": "^2.1.0",
     "express": "*",
     "virtual-dom": "latest",
-    "body-parser": "*"
+    "body-parser": "*",
+    "compression": "^1.6.0"
   },
   "devDependencies": {
     "browserify": "latest",
@@ -14,9 +15,9 @@
     "build": "pulp build",
     "test": "pulp test",
     "compile:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main | java -jar compiler.jar --js_output_file server.js",
-    "compile:client": "psc-bundle output/**/{index,foreign}.js --main Client --module Client | browserify -e - | java -jar compiler.jar --js_output_file static/client.js",
+    "compile:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - | java -jar compiler.jar --js_output_file static/client.js",
     "dev:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main -o server.js",
-    "dev:client": "psc-bundle output/**/{index,foreign}.js --main App.Client --module App.Client | browserify -e - -o static/client.js",
+    "dev:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - -o static/client.js",
     "prestart": "npm run test",
     "start": "npm run compile:server & npm run compile:client && node server.js",
     "predev": "npm run test",

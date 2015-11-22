@@ -1,6 +1,6 @@
 "use strict";
 
-//module App.Client.Router
+//module App.GUI.Router
 
 exports.setHash = function setHash(s){
   return function(){

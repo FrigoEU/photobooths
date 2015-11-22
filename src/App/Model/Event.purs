@@ -50,8 +50,8 @@ instance showEvent       :: Show Event where show = gShow
 
 instance partialEventIsForeign :: IsForeign PartialEvent where
   read obj = do
-    id <- readProp "id" obj
-    cn <- readProp "computername" obj
+    id <- Just <$> readProp "id" obj
+    computername <- readProp "computername" obj
     name <- readProp "name" obj
     datefromF <- readProp "datefrom" obj
     datefrom <- maybe (Left $ TypeMismatch "ISO 8601 Date" datefromF) Right 
@@ -59,9 +59,8 @@ instance partialEventIsForeign :: IsForeign PartialEvent where
     dateuntilF <- readProp "dateuntil" obj
     dateuntil <- maybe (Left $ TypeMismatch "ISO 8601 Date" dateuntilF) Right 
                    $ fromStringStrict dateuntilF
-    p <- readProp "profile" obj
-    return $ PartialEvent { id: Just id, computername: cn, name: name, datefrom: datefrom
-                          , dateuntil: dateuntil, profile: p}
+    profile <- readProp "profile" obj
+    return $ PartialEvent {id, computername, name, datefrom, dateuntil, profile}
 
 eventsTable = { name: "EVENTS" 
               , columns: fromArray [ Tuple "id" $ S.ColumnDef S.Integer [S.PrimaryKey]

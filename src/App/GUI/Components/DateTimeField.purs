@@ -1,4 +1,4 @@
-module App.Client.Components.DateTimeField where
+module App.GUI.Components.DateTimeField where
 
 import Prelude
 import DOM(DOM())
@@ -13,7 +13,7 @@ import Data.String (take)
 import Data.Date (Date(), fromString, now, Now())
 import Data.Foreign.Class (IsForeign)
 
-import App.Client.Types
+import App.GUI.Types
 import App.Model.Date
 
 dateTimeField :: forall eff. Array Prop -> UI (now :: Now, dom :: DOM | eff) Markup Date Date

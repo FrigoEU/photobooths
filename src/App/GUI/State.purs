@@ -1,4 +1,4 @@
-module App.Client.State where
+module App.GUI.State where
 
 import Prelude
 
@@ -16,7 +16,9 @@ import Data.Date (Date(), now, Now())
 import App.Model.Async
 import App.Model.Photobooth as PB
 import App.Model.Event as E
+import App.Model.Profile
 import App.Model.SavedImage
+import App.Model.Statistic
 
 -------------------------------------------
 
@@ -26,6 +28,8 @@ initialState initRoute = do
   return { route: initRoute
   , photobooths: Initial
   , events: Initial
+  , profiles: Initial
+  , statistics: Initial
   , eventsPage: 
     { new: 
       { model: 
@@ -42,6 +46,8 @@ initialState initRoute = do
 type State eff = { route :: Route
                  , photobooths :: AsyncModel eff (Array PB.Photobooth)
                  , events :: AsyncModel eff (Array (EventWithState eff))
+                 , profiles :: AsyncModel eff Profiles
+                 , statistics :: AsyncModel eff AllStatistics
                  , eventsPage :: 
                    { new :: 
                      { model :: { id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, images :: Array SavedImage}
@@ -61,6 +67,7 @@ type EventWithState eff = {model :: E.Event, state :: {savingImage :: AsyncModel
 
 data Route = PhotoboothsPage
            | EventsPage String
+           | StatisticsPage String
 
 ------ LENSES --------------------------
 
@@ -94,27 +101,40 @@ _saving = lens _.saving (_ {saving = _})
 _route :: forall a b o. Lens {route :: a | o} {route :: b | o} a b
 _route = lens _.route (_ {route = _})
 
-_pbPage :: forall a b c d o. LensP {photobooths :: a, photoboothsPage :: {new :: b, editing :: c}, route :: d | o}
-                                {collection :: a, new :: b, editing :: c, route :: d}
+_pbPage :: forall a b c d e o. LensP {photobooths :: a, profiles :: e, photoboothsPage :: {new :: b, editing :: c}, route :: d | o}
+                                {collection :: a, profiles :: e, new :: b, editing :: c, route :: d}
 _pbPage = lens (\obj -> {collection: obj.photobooths
+                       , profiles: obj.profiles
                        , new: obj.photoboothsPage.new
                        , editing: obj.photoboothsPage.editing
                        , route: obj.route})
                (\old obj ->
                    old {photobooths = obj.collection
+                       , profiles = obj.profiles
                        , photoboothsPage = {new: obj.new, editing: obj.editing}
                        , route = obj.route})
 
-_eventsPage :: forall a b c d o. LensP {events :: a, eventsPage :: {new :: b, editing :: c}, route :: d | o}
-                                {collection :: a, new :: b, editing :: c, route :: d}
+_eventsPage :: forall a b c d e o. LensP {events :: a, profiles :: e, eventsPage :: {new :: b, editing :: c}, route :: d | o}
+                                {collection :: a, profiles :: e, new :: b, editing :: c, route :: d}
 _eventsPage = lens (\obj -> {collection: obj.events
-                       , new: obj.eventsPage.new
-                       , editing: obj.eventsPage.editing
-                       , route: obj.route})
+                            , profiles: obj.profiles
+                            , new: obj.eventsPage.new
+                            , editing: obj.eventsPage.editing
+                            , route: obj.route})
                (\old obj ->
                    old {events = obj.collection
+                       , profiles = obj.profiles
                        , eventsPage = {new: obj.new, editing: obj.editing}
                        , route = obj.route})
+
+_statisticsPage :: forall a b o. LensP {events :: a, statistics :: b | o}
+                                       {events :: a, statistics :: b}
+_statisticsPage = lens (\obj -> { events: obj.events
+                                , statistics: obj.statistics })
+                       (\old obj ->
+                           old {events = obj.events
+                               , statistics = obj.statistics })
+
 
 _id :: forall a b o. Lens {id :: a | o} {id :: b | o} a b
 _id = lens _.id (_ {id = _})
@@ -149,6 +169,32 @@ _eventId = lens _.eventId (_ {eventId = _})
 _image :: forall a b o. Lens {image :: a | o} {image :: b | o} a b
 _image = lens _.image (_ {image = _})
 
+_profiles :: forall a b o. Lens {profiles :: a | o} {profiles :: b | o} a b
+_profiles = lens _.profiles (_ {profiles = _})
+
 _savingImage :: forall a b o. Lens {savingImage :: a | o} {savingImage :: b | o} a b
 _savingImage = lens _.savingImage (_ {savingImage = _})
 
+_statistics :: forall a b o. Lens {statistics :: a | o} {statistics :: b | o} a b
+_statistics = lens _.statistics (_ {statistics = _})
+
+_eventStatistics :: forall a b o. Lens {eventStatistics :: a | o} {eventStatistics :: b | o} a b
+_eventStatistics = lens _.eventStatistics (_ {eventStatistics = _})
+
+_monthlyStatistics :: forall a b o. Lens {monthlyStatistics :: a | o} {monthlyStatistics :: b| o} a b
+_monthlyStatistics = lens _.monthlyStatistics (_ {monthlyStatistics = _})
+
+_photoboothId :: forall a b o. Lens {photoboothId :: a | o} {photoboothId :: b | o} a b
+_photoboothId = lens _.photoboothId (_ {photoboothId = _})
+
+_month :: forall a b o. Lens {month :: a | o} {month :: b | o} a b
+_month = lens _.month (_ {month = _})
+
+_pictures :: forall a b o. Lens {pictures :: a | o} {pictures :: b | o} a b
+_pictures = lens _.pictures (_ {pictures = _})
+
+_prints :: forall a b o. Lens {prints :: a | o} {prints :: b | o} a b
+_prints = lens _.prints (_ {prints = _})
+
+_events :: forall a b o. Lens {events :: a | o} {events :: b | o} a b
+_events = lens _.events (_ {events = _})

@@ -1,4 +1,4 @@
-module App.Client.Views.EventsPage (eventsPage) where
+module App.GUI.Views.EventsPage (eventsPage) where
 
 import Prelude
 
@@ -14,7 +14,7 @@ import Control.Monad.Eff (Eff())
 import Control.Monad.Eff.Ref (REF())
 import Control.Apply ((*>))
 
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.Date (Date(), Now(), now)
 import Data.Foldable (mconcat)
 import Data.Lens.Common
@@ -23,6 +23,7 @@ import Data.Lens.Traversal (traversed)
 import Data.Monoid (mempty)
 import Data.Tuple (Tuple(..))
 import Data.Array (cons)
+import Data.StrMap (StrMap(), lookup)
 
 import Prelude
 import DOM (DOM())
@@ -34,44 +35,50 @@ import App.Model.Event
 import App.Model.Date
 import App.Model.SavedImage
 import App.Model.Async
-import App.Client.Router
-import App.Client.Types
-import App.Client.State
-import App.Client.Components.Exec
-import App.Client.Components.FileInput
-import App.Client.Components.DateTimeField
-import App.Client.Views.Crud
+import App.Model.Profile
+import App.GUI.Router
+import App.GUI.Types
+import App.GUI.State
+import App.GUI.Components.Exec
+import App.GUI.Components.FileInput
+import App.GUI.Components.Select
+import App.GUI.Components.DateTimeField
+import App.GUI.Views.Crud
+import App.GUI.Views.Profiles
 import App.Endpoint
+import App.GUI.Load
 
 data EventsCommand eff = Crud (CrudCommand (EventWithState eff))
 
 eventsPage :: forall eff. String ->
                           AppUI (ANDRT eff) 
                           { collection :: AsyncModel (ANDRT eff) (Array (EventWithState (ANDRT eff)))
+                          , profiles :: AsyncModel (ANDRT eff) Profiles
                           , route :: Route
                           , new :: { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, images :: Array SavedImage}
                                    , state :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
                           , editing :: Maybe {index :: Int, previous :: (EventWithState (ANDRT eff)), saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}}
 eventsPage cn = with c
   where 
-    c s@{route: EventsPage cname} h =
-      let impls = { loadAll: loadEvents cname, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent 
-                  , initial: (now >>= \d -> return {id: Nothing, computername: cname, name: "", datefrom: d, dateuntil: d, profile: "", images: []})
+    c s h =
+      let impls = { loadAll: loadEvents cn, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent 
+                  , initial: (now >>= \d -> return {id: Nothing, computername: cn, name: "", datefrom: d, dateuntil: d, profile: "", images: []})
                   , constr: (\a ->{model: Event a, state: {savingImage: Initial, image: Nothing}})}
           handle (Crud command) = crudHandler s h impls command
        in withView (H.div [H.classA ""]) $ mconcat [
-           ui $ H.h1 [] $ H.text ("Events for: " <> cname),
-           withView (H.table [H.classA "table crud-table"] <<< H.tbody []) ((_collectionEditing $ showEvents handle) <> (_new $ makeNewEvent handle))
+           ui $ H.h1 [] $ H.text ("Events for: " <> cn),
+           withView (H.table [H.classA "table crud-table"] <<< H.tbody []) ((_collectionEditing $ showEvents handle (view (_profiles <<< _Done) s)) <> (_new $ makeNewEvent handle)),
+           _profiles loadProfiles
          ]
-    c _ _ = ui $ H.div [H.classA "alert alert-danger"] $ H.text "Something went wrong with the router!"
 
 -------- Existing + Edit -------------------
 
 showEvents :: forall eff. (EventsCommand (ANDRT eff) -> Eff (ANDRT eff) Unit)
+                          -> StrMap (Array String)
                           -> AppUI (ANDRT eff) { collection :: AsyncModel (ANDRT eff) (Array (EventWithState (ANDRT eff)))
                                                 , editing :: Maybe { index :: Int, previous :: (EventWithState (ANDRT eff))
                                                                    , saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}}
-showEvents handle = with c 
+showEvents handle profiles = with c 
                  <> (_collection <<< _Initial                 $ exec $ handle (Crud LoadAll))
                  <> (_collection <<< _Busy                    $ onResult (handle <<< Crud <<< Loaded) (handle <<< Crud <<< LoadingFailed)) 
                  <> (_editing <<< _Just <<< _saving <<< _Busy $ onResult (handle <<< Crud <<< EditSaved) (handle <<< Crud <<< EditSaveFailed))
@@ -87,7 +94,8 @@ showEvents handle = with c
                                                                            , withView (H.td []) $ (_model <<< _Event <<< _name) $ textField [H.classA "form-control"]
                                                                            , withView (H.td []) $ (_model <<< _Event <<< _datefrom) $ dateTimeField [H.classA "form-control"]
                                                                            , withView (H.td []) $ (_model <<< _Event <<< _dateuntil) $ dateTimeField [H.classA "form-control"]
-                                                                           , withView (H.td []) $ (_model <<< _Event <<< _profile) $ textField [H.classA "form-control"]
+                                                                           , withView (H.td []) $ (_model <<< _Event <<< _profile) $ select (fromMaybe [] $ lookup ev.computername profiles) 
+                                                                                                                                            id [H.classA "form-control"]
                                                                            , editEventButton handle i editing
                                                                            , ui $ H.td [] $ H.text ""
                                                                            ] 
@@ -136,7 +144,8 @@ makeNewEvent handle =
                             withView (H.td []) $ (_model <<< _name) $ textField [H.classA "form-control"],
                             withView (H.td []) $ (_model <<< _datefrom) $ dateTimeField [H.classA "form-control"],
                             withView (H.td []) $ (_model <<< _dateuntil) $ dateTimeField [H.classA "form-control"],
-                            withView (H.td []) $ (_model <<< _profile) $ textField [H.classA "form-control"],
+                            ui $ H.td [] $ H.text "",
+                            {-- withView (H.td []) $ (_model <<< _profile) $ textField [H.classA "form-control"], --}
                             withView (H.td []) $ _state $ (newEventButton handle),
                             ui $ H.td [] $ H.text ""
                           ]
@@ -153,9 +162,6 @@ newEventButton handle = with c
     c _ h = ui $ H.button [H.classA "btn btn-primary", H.onClick \_ -> handle $ Crud SaveNew] $ H.text "Save!"
 
 --------- Aff ----------------------------
-
-loadEvents :: forall eff. String -> Aff (ajax :: AJAX | eff) (Array (EventWithState (ajax :: AJAX | eff)))
-loadEvents s = execEndpoint getEvents s unit >>= \es -> return $ map {model: _, state: {savingImage: Initial, image: Nothing}} es
 
 saveNewEvent :: forall eff a. {model :: Event | a} -> Aff (ajax :: AJAX | eff) {model :: Event | a}
 saveNewEvent i = execEndpoint postEvents unit (view _model i) >>= \n -> return $ i {model = n}

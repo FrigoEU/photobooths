@@ -24,11 +24,11 @@ instance showPhotobooth       :: Show Photobooth where show = gShow
 
 instance photoboothIsForeign :: IsForeign Photobooth where
   read obj = do
-    id <- readProp "id" obj
-    cn <- readProp "computername" obj
-    al <- readProp "alias" obj
-    dp <- readProp "defaultprofile" obj
-    return $ Photobooth {id: Just id, computername: cn, alias: al, defaultprofile: dp}
+    id <- Just <$> readProp "id" obj
+    computername <- readProp "computername" obj
+    alias <- readProp "alias" obj
+    defaultprofile <- readProp "defaultprofile" obj
+    return $ Photobooth {id, computername, alias, defaultprofile}
 
 photoboothsTable = { name: "PHOTOBOOTHS"
                    , columns: fromArray [ Tuple "id" $ ColumnDef Integer [PrimaryKey]

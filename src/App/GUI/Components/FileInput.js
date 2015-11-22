@@ -1,6 +1,6 @@
 "use strict";
 
-//module App.Client.Components.FileInput
+//module App.GUI.Components.FileInput
 
 exports.name = function name(f){
   return f.name;

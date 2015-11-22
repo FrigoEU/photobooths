@@ -9,6 +9,7 @@ import Data.Tuple (Tuple(..))
 import App.Model.Photobooth as PB
 import App.Model.Event as E
 import App.Model.SavedImage as SI
+import App.Model.Statistic as S
 
 import Endpoint.Client
 
@@ -46,3 +47,12 @@ attachImage = FileEndpoint { serverUrl: "/api/attachfiletoevent/:eventid/:name"
 
 ------- Statistics ----------------------
 
+getStatistics :: Endpoint String Unit S.AllStatistics
+getStatistics = Endpoint { method: GET, serverUrl: "/api/statistics/:cname"
+                         , mkClientUrl: \s -> "/api/statistics/" <> s}
+
+------- Profiles ----------------------
+
+getProfiles :: Endpoint Unit Unit (Array (Tuple String (Array String)))
+getProfiles = Endpoint { method: GET, serverUrl: "/api/profiles"
+                       , mkClientUrl: const "/api/profiles"}

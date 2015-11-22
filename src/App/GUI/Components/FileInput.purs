@@ -1,4 +1,4 @@
-module App.Client.Components.FileInput (fileInput, onFileInput, name, accept) where
+module App.GUI.Components.FileInput (fileInput, onFileInput, name, accept) where
 
 import Prelude
 import Control.Monad.Eff (Eff())
@@ -15,7 +15,7 @@ import Data.Array ((!!))
 import Data.Foreign.Class (IsForeign)
 import Unsafe.Coerce
 
-import App.Client.Types
+import App.GUI.Types
 
 {-- instance myFileIsForeign :: IsForeign MyFile where --}
 {--   read = unsafeCoerce --}

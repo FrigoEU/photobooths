@@ -1,4 +1,4 @@
-module App.Client.Types where
+module App.GUI.Types where
 
 import OpticUI (UI(), Markup())
 
@@ -17,6 +17,7 @@ type AjaxRefDom eff = (ajax :: AJAX, ref :: REF, dom :: DOM | eff)
 type AjaxRefDomTimer eff = (ajax :: AJAX, ref :: REF, dom :: DOM, timer :: Timer | eff)
 type RefDom eff = (ref :: REF, dom :: DOM | eff)
 type RefDomTimer eff = (ref :: REF, dom :: DOM, timer :: Timer | eff)
+type TimerAjaxRef eff = (ref :: REF, ajax :: AJAX, timer :: Timer | eff)
 type AjaxNowRef eff = (ajax :: AJAX, now :: Now, ref :: REF | eff)
 type ANDR eff = (ajax :: AJAX, now :: Now, ref :: REF, dom :: DOM | eff)
 type ANDRT eff = (timer :: Timer, ajax :: AJAX, now :: Now, ref :: REF, dom :: DOM | eff)

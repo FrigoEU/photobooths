@@ -26,7 +26,7 @@ instance savedImageIsForeign :: IsForeign SavedImage where
     id <- readProp "id" obj
     name <- readProp "name" obj
     eventId <- readProp "eventid" obj
-    return $ SavedImage {id: id, name: name, eventId: eventId}
+    return $ SavedImage {id, name, eventId}
 
 savedImageTable = { name: "IMAGES"
                   , columns: fromArray [ Tuple "id" $ S.ColumnDef S.Integer [S.PrimaryKey]

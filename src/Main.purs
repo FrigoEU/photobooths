@@ -8,15 +8,20 @@ import Control.Monad.Aff (runAff, Aff())
 import Control.Monad.Error.Class (throwError)
 
 import Data.Date (now, Now(), Date())
-import Data.Array (tail, replicate, filter, length)
-import Data.StrMap (lookup)
+import Data.Array (tail, replicate, filter, length, filterM)
+import Data.StrMap (lookup, StrMap())
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..))
 import Data.Maybe
+import Data.Traversable
 
 import Database.AnyDB (ConnectionInfo (..), Query(..), withConnection, execute_, query_, DB(), queryOne_, execute, Connection(), query)
 import Database.AnyDB.SqlValue (toSql)
 import Node.Buffer (Buffer())
+import Node.Path (normalize, concat)
+import Node.FS (FS())
+import Node.FS.Aff (readdir, stat)
+import Node.FS.Stats (isDirectory)
 
 import SQL
 import Server.Core
@@ -57,13 +62,13 @@ myevent d = Event { id: Nothing
 
 myeventstatistic :: EventStatistic
 myeventstatistic = EventStatistic { eventId: 1
-                                  , photoboothId: 1
+                                  , computername: "mycomputername"
                                   , pictures: 200
                                   , prints: 190 }
 
 mymonthlystatistic :: MonthlyStatistic
 mymonthlystatistic = MonthlyStatistic { month: 1
-                                      , photoboothId: 1
+                                      , computername: "mycomputername"
                                       , pictures: 500
                                       , prints: 390 }
 
@@ -97,6 +102,8 @@ main = do
   hostEndpoint app getEvents eventsByCname
   hostEndpoint app postEvents newEvent
   hostEndpoint app putEvents updateEvent
+  hostEndpoint app getProfiles (const allProfiles)
+  hostEndpoint app getStatistics allStatistics
   hostFileEndpoint app attachImage saveImageToDb
   hostFile app "*" static
   listen app port 
@@ -120,7 +127,7 @@ eventsByCname {params: params} =
           in withConnection connectionInfo \conn -> do 
               partialEvs <- query_ q conn
               let ids = (\(PartialEvent {id: Just i}) -> i) <$> partialEvs
-              images <- selectImagesForEvents ids conn
+              images <- if length ids > 0 then selectImagesForEvents ids conn else return []
               let createEvent pe@(PartialEvent {id: Just i}) = mkEvent pe (filter (\(SavedImage im) -> im.eventId == i) images)
               return $ createEvent <$> partialEvs
 
@@ -211,7 +218,7 @@ selectImagesForEvents is conn =
 insertEventStatistic :: EventStatistic -> Query Unit
 insertEventStatistic (EventStatistic e) = insert eventStatisticsTable 
                                  (fromArray [ Tuple "eventId" $ show e.eventId
-                                            , Tuple "photoboothId" $ show e.photoboothId
+                                            , Tuple "computername" $ e.computername
                                             , Tuple "pictures" $ show e.pictures
                                             , Tuple "prints" $ show e.prints
                                             ]) ""
@@ -219,10 +226,26 @@ insertEventStatistic (EventStatistic e) = insert eventStatisticsTable
 insertMonthlyStatistic :: MonthlyStatistic -> Query Unit
 insertMonthlyStatistic (MonthlyStatistic e) = insert monthlyStatisticsTable 
                                    (fromArray [ Tuple "month" $ show e.month
-                                              , Tuple "photoboothId" $ show e.photoboothId
+                                              , Tuple "computername" $ e.computername
                                               , Tuple "pictures" $ show e.pictures
                                               , Tuple "prints" $ show e.prints
                                               ]) ""
+
+allProfiles :: forall eff. Aff (fs :: FS | eff) (Array (Tuple String (Array String)))
+allProfiles = do 
+  let prof = (normalize "./Profiles")
+  inProfiles <- readdir prof
+  dirsInProfiles <- flip filterM inProfiles (\path -> stat (concat [prof, path]) >>= (return <<< isDirectory))
+  flip traverse dirsInProfiles (\dir -> readdir (concat [prof, dir]) >>= (\profiles -> return $ Tuple dir profiles))
+
+allStatistics :: forall eff. Input Unit -> Aff (db :: DB | eff) AllStatistics
+allStatistics {params: params} = 
+  case lookup "cname" params of
+       Nothing -> throwError $ error "GetStatistics: No computername provided"
+       Just cname -> withConnection connectionInfo \conn -> do
+         eventStatistics <- query (Query "select * from eventstatistics where computername = ?") [toSql cname] conn
+         monthlyStatistics <- query (Query "select * from monthlystatistics where computername = ?") [toSql cname] conn
+         return $ AllStatistics {eventStatistics, monthlyStatistics}
 
 foreign import pInt :: forall a. Maybe a -> (a -> Maybe a) -> String -> Maybe Int
 
