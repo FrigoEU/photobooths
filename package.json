@@ -18,7 +18,7 @@
     "compile:netw": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking | java -jar compiler.jar --js_output_file netw.js",
     "compile:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - | java -jar compiler.jar --js_output_file static/client.js",
     "dev:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main -o server.js",
-    "dev:netw": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking",
+    "dev:netw": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking -o networking.js",
     "dev:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - -o static/client.js",
     "prestart": "npm run test",
     "start": "npm run compile:server & npm run compile:client && node server.js",
