@@ -17,7 +17,7 @@ import App.Model.Async
 import App.Model.Photobooth as PB
 import App.Model.Event as E
 import App.Model.Profile
-import App.Model.SavedImage
+import App.Model.SavedFile
 import App.Model.Statistic
 
 -------------------------------------------
@@ -33,7 +33,7 @@ initialState initRoute = do
   , eventsPage: 
     { new: 
       { model: 
-        { id: Nothing, computername: "", name: "", datefrom: dateNow, dateuntil: dateNow, profile: "", images: []}
+        { id: Nothing, computername: "", name: "", datefrom: dateNow, dateuntil: dateNow, profile: "", files: []}
       , state: Initial}
     , editing: Nothing}
   , photoboothsPage: 
@@ -50,7 +50,7 @@ type State eff = { route :: Route
                  , statistics :: AsyncModel eff AllStatistics
                  , eventsPage :: 
                    { new :: 
-                     { model :: { id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, images :: Array SavedImage}
+                     { model :: { id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                      , state :: AsyncModel eff (EventWithState eff)}
                    , editing :: Maybe {index:: Int, previous:: EventWithState eff, saving:: AsyncModel eff (EventWithState eff)}}
                  , photoboothsPage :: 
@@ -61,7 +61,7 @@ type State eff = { route :: Route
                    , editing :: Maybe {index:: Int, previous:: PB.Photobooth, saving:: AsyncModel eff PB.Photobooth}}
                  }
 
-type EventWithState eff = {model :: E.Event, state :: {savingImage :: AsyncModel eff SavedImage, image :: Maybe File}}
+type EventWithState eff = {model :: E.Event, state :: {savingFile :: AsyncModel eff SavedFile, file :: Maybe File}}
 
 ------ ROUTES --------------------------
 
@@ -160,20 +160,20 @@ _alias = lens _.alias (_ {alias = _})
 _defaultprofile :: forall a b o. Lens {defaultprofile :: a | o} {defaultprofile :: b | o} a b
 _defaultprofile = lens _.defaultprofile (_ {defaultprofile = _})
 
-_images :: forall a b o. Lens {images :: a | o} {images :: b | o} a b
-_images = lens _.images (_ {images = _})
+_files :: forall a b o. Lens {files :: a | o} {files :: b | o} a b
+_files = lens _.files (_ {files = _})
 
 _eventId :: forall a b o. Lens {eventId :: a | o} {eventId :: b | o} a b
 _eventId = lens _.eventId (_ {eventId = _})
 
-_image :: forall a b o. Lens {image :: a | o} {image :: b | o} a b
-_image = lens _.image (_ {image = _})
+_file :: forall a b o. Lens {file :: a | o} {file :: b | o} a b
+_file = lens _.file (_ {file = _})
 
 _profiles :: forall a b o. Lens {profiles :: a | o} {profiles :: b | o} a b
 _profiles = lens _.profiles (_ {profiles = _})
 
-_savingImage :: forall a b o. Lens {savingImage :: a | o} {savingImage :: b | o} a b
-_savingImage = lens _.savingImage (_ {savingImage = _})
+_savingFile :: forall a b o. Lens {savingFile :: a | o} {savingFile :: b | o} a b
+_savingFile = lens _.savingFile (_ {savingFile = _})
 
 _statistics :: forall a b o. Lens {statistics :: a | o} {statistics :: b | o} a b
 _statistics = lens _.statistics (_ {statistics = _})

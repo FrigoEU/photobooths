@@ -1,5 +1,6 @@
 module Server.Core (
-  makeApp, listen, hostEndpoint, hostFile, hostFileEndpoint, Input(), Handler(), App(), EXPRESS()
+  makeApp, listen, hostEndpoint, hostFile, hostFileUploadEndpoint, Input(), Handler(), App(), EXPRESS(),
+  hostStatic
 ) where
 
 import Prelude
@@ -33,9 +34,10 @@ foreign import get :: forall eff. App -> String -> Middleware -> (Request -> Res
 foreign import post :: forall eff. App -> String -> Middleware -> (Request -> Response -> (Eff (express :: EXPRESS | eff) Unit)) -> Eff (express :: EXPRESS | eff) Unit
 foreign import put :: forall eff. App -> String -> Middleware -> (Request -> Response -> (Eff (express :: EXPRESS | eff) Unit)) -> Eff (express :: EXPRESS | eff) Unit
 foreign import sendStr  :: forall eff. Response -> String -> Eff (express :: EXPRESS | eff) Unit
-foreign import sendFile :: forall eff. Response -> String -> Eff (express :: EXPRESS | eff) Unit
+foreign import sendBuffer :: forall eff. Response -> Buffer -> Eff (express :: EXPRESS | eff) Unit
+foreign import hostStatic :: forall eff. App -> String -> Eff (express :: EXPRESS | eff) Unit
 foreign import jsonParser :: Middleware
-foreign import jpegParser :: Middleware
+foreign import bufferParser :: Middleware
 foreign import noParser :: Middleware
 foreign import rawParser :: Middleware
 
@@ -74,13 +76,13 @@ hostEndpoint app (Endpoint {method: PUT, serverUrl: url}) f = put app url rawPar
                              (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
                              (parseBodyOrThrow (convert req) >>= f)
 
-hostFileEndpoint :: forall eff a b. (Generic b) =>
-                      App -> FileEndpoint a b 
+hostFileUploadEndpoint :: forall eff a b. (Generic b) =>
+                      App -> FileUploadEndpoint a b 
                       -> Handler (express :: EXPRESS, console :: CONSOLE | eff) Buffer b  
                       -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
-hostFileEndpoint app (FileEndpoint {serverUrl: url}) f = post app url jpegParser handler
+hostFileUploadEndpoint app (FileUploadEndpoint {serverUrl: url}) f = post app url bufferParser handler
   where handler req res = runAff (\err -> do
-                                     log $ "Failed hostFileEndpoint on " <> url <> message err
+                                     log $ "Failed hostFileUploadEndpoint on " <> url <> message err
                                      sendStr res $ message err)
                                  (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
                                  (f $ convertBuffer req)
@@ -92,14 +94,14 @@ parseBodyOrThrow a = either (\err -> throwError $ error $ show err)
                             (readJSONGeneric defaultOptions a.body)
 
 hostFile :: forall eff. 
-              App -> String -> (Input Unit -> Aff (express :: EXPRESS, console :: CONSOLE | eff) String) 
+              App -> String -> (Input Unit -> Aff (express :: EXPRESS, console :: CONSOLE | eff) Buffer) 
               -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
 hostFile app url f = get app url noParser handler
   where 
     handler req res = runAff (\err -> do
                                log $ "Failed hostFile " <> message err
                                sendStr res $ message err)
-                             (\a -> sendFile res a)
+                             (\a -> sendBuffer res a)
                              (parseBodyOrThrow (convert req) >>= f)
 
 convert :: Request -> Input String

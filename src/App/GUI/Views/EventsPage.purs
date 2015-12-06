@@ -33,7 +33,7 @@ import Network.HTTP.Affjax (AJAX())
 
 import App.Model.Event
 import App.Model.Date
-import App.Model.SavedImage
+import App.Model.SavedFile
 import App.Model.Async
 import App.Model.Profile
 import App.GUI.Router
@@ -55,15 +55,15 @@ eventsPage :: forall eff. String ->
                           { collection :: AsyncModel (ANDRT eff) (Array (EventWithState (ANDRT eff)))
                           , profiles :: AsyncModel (ANDRT eff) Profiles
                           , route :: Route
-                          , new :: { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, images :: Array SavedImage}
+                          , new :: { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                                    , state :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
                           , editing :: Maybe {index :: Int, previous :: (EventWithState (ANDRT eff)), saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}}
 eventsPage cn = with c
   where 
     c s h =
       let impls = { loadAll: loadEvents cn, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent 
-                  , initial: (now >>= \d -> return {id: Nothing, computername: cn, name: "", datefrom: d, dateuntil: d, profile: "", images: []})
-                  , constr: (\a ->{model: Event a, state: {savingImage: Initial, image: Nothing}})}
+                  , initial: (now >>= \d -> return {id: Nothing, computername: cn, name: "", datefrom: d, dateuntil: d, profile: "", files: []})
+                  , constr: (\a ->{model: Event a, state: {savingFile: Initial, file: Nothing}})}
           handle (Crud command) = crudHandler s h impls command
        in withView (H.div [H.classA ""]) $ mconcat [
            ui $ H.h1 [] $ H.text ("Events for: " <> cn),
@@ -101,10 +101,10 @@ showEvents handle profiles = with c
                                                                            ] 
     line _ editing i s@({model: Event ev, state: st}) h = 
       let fileSelected _ Nothing = return unit
-          fileSelected _ (Just f) = async (saveFile f (maybe (-1) id ev.id)) >>= (\a -> runHandler h (s {state = (st {savingImage = Busy a})}))
-          fileSaved si = runHandler h { model: over (_Event <<< _images) (cons si) s.model
-                                      , state: st {savingImage = Initial, image = Nothing}}
-          fileSaveErrored err = runHandler h (s {state = (st {savingImage = Errored err})})
+          fileSelected _ (Just f) = async (saveFile f (maybe (-1) id ev.id)) >>= (\a -> runHandler h (s {state = (st {savingFile = Busy a})}))
+          fileSaved si = runHandler h { model: over (_Event <<< _files) (cons si) s.model
+                                      , state: st {savingFile = Initial, file = Nothing}}
+          fileSaveErrored err = runHandler h (s {state = (st {savingFile = Errored err})})
        in mconcat [ ui $ H.td [] $ H.text $ maybe "" show ev.id
                   , ui $ H.td [] $ H.text $ ev.computername
                   , ui $ H.td [] $ H.text $ ev.name
@@ -112,11 +112,11 @@ showEvents handle profiles = with c
                   , ui $ H.td [] $ H.text $ iso8601 ev.dateuntil
                   , ui $ H.td [] $ H.text $ ev.profile
                   , withView (H.td []) $ editEventButton handle i editing
-                  , withView (H.td []) $ mconcat [ (_state <<< _image) $ fileInput [onFileInput fileSelected, accept ".jpg,.jpeg"]
-                                                 , (_model <<< _Event <<< _images) $ traversal traversed (with \(SavedImage si) _ -> ui $ H.div [] $ H.text si.name)
-                                                 , (_state <<< _savingImage <<< _Errored) $ with (\err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text $ message err)
+                  , withView (H.td []) $ mconcat [ (_state <<< _file) $ fileInput [onFileInput fileSelected, accept ".jpg,.jpeg"]
+                                                 , (_model <<< _Event <<< _files) $ traversal traversed (with \(SavedFile si) _ -> ui $ H.div [] $ H.text si.name)
+                                                 , (_state <<< _savingFile <<< _Errored) $ with (\err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text $ message err)
                                                  ] 
-                  , (_state <<< _savingImage <<< _Busy) $ onResult fileSaved fileSaveErrored
+                  , (_state <<< _savingFile <<< _Busy) $ onResult fileSaved fileSaveErrored
                   ] 
 
 
@@ -135,7 +135,7 @@ editEventButton handle i editing = c editing
 
 makeNewEvent :: forall eff. (EventsCommand (ANDR eff) -> Eff (ANDR eff) Unit)
                             -> AppUI (ANDR eff) 
-                            { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, images :: Array SavedImage}
+                            { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                             , state :: AsyncModel (ANDR eff) (EventWithState (ANDR eff))}
 makeNewEvent handle = 
   with \s h -> withView (H.tr []) $ mconcat [ 
@@ -169,5 +169,5 @@ saveNewEvent i = execEndpoint postEvents unit (view _model i) >>= \n -> return $
 saveUpdatedEvent :: forall eff a. {model :: Event | a} -> Aff (ajax :: AJAX | eff) {model :: Event | a}
 saveUpdatedEvent i = execEndpoint putEvents unit (view _model i) >>= \n -> return $ i {model = n}
 
-saveFile :: forall eff. File -> Int -> Aff (ajax :: AJAX | eff) SavedImage
-saveFile file i = sendJpeg attachImage file (Tuple i (name file))
+saveFile :: forall eff. File -> Int -> Aff (ajax :: AJAX | eff) SavedFile
+saveFile file i = execFileUploadEndpoint attachFile file (Tuple i (name file))

@@ -1,35 +1,35 @@
-module App.Model.SavedImage where
+module App.Model.SavedFile where
 
 import Prelude
 
 import SQL as S
 
-import Data.Foreign
 import Data.Foreign.Class
 import Data.Generic
-import Data.Lens (Lens(), lens)
 import Data.Tuple (Tuple(..))
 
 import App.Model.StrMap (fromArray)
 
-data SavedImage = SavedImage { id :: Int
+data SavedFile = SavedFile { id :: Int
                              , name :: String
                              , eventId :: Int }
 
-derive instance genericSavedImage :: Generic SavedImage
+derive instance genericSavedFile :: Generic SavedFile
 
-instance eqSavedImage         :: Eq SavedImage where eq = gEq 
-instance showSavedImage       :: Show SavedImage where show = gShow
+instance eqSavedFile         :: Eq SavedFile where eq = gEq 
+instance showSavedFile       :: Show SavedFile where show = gShow
 
-instance savedImageIsForeign :: IsForeign SavedImage where
+instance savedFileIsForeign :: IsForeign SavedFile where
   read obj = do
     id <- readProp "id" obj
     name <- readProp "name" obj
     eventId <- readProp "eventid" obj
-    return $ SavedImage {id, name, eventId}
+    return $ SavedFile {id, name, eventId}
 
-savedImageTable = { name: "IMAGES"
+savedFileTable = { name: "FILES"
                   , columns: fromArray [ Tuple "id" $ S.ColumnDef S.Integer [S.PrimaryKey]
                                        , Tuple "name" $ S.ColumnDef S.Char []
                                        , Tuple "eventid" $ S.ColumnDef S.Integer []
-                                       , Tuple "image" $ S.ColumnDef S.Blob []]}
+                                       , Tuple "file" $ S.ColumnDef S.Blob []
+                                       , Tuple "updatedon" $ S.ColumnDef S.Date []
+                                       ]}

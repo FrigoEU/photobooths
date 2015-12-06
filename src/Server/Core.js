@@ -62,9 +62,17 @@ exports.put = function get(app){
   };
 };
 
+exports.hostStatic = function(app){
+  return function(root){
+    return function(){
+      app.use(require("express").static(root));
+    };
+  };
+};
+
 var bodyParser = require("body-parser");
 exports.jsonParser = bodyParser.json();
-exports.jpegParser = bodyParser.raw({type: "jpg", limit: "5MB"});
+exports.bufferParser = bodyParser.raw({type: "*/*", limit: "5MB"});
 exports.rawParser = bodyParser.text({type: "*/*"});
 exports.noParser = null;
 
@@ -89,10 +97,10 @@ exports.sendStr = function sendStr(res){
     };
   };
 };
-exports.sendFile = function sendFile(res){
-  return function(string){
+exports.sendBuffer = function sendBuffer(res){
+  return function(buffer){
     return function(){
-      res.sendFile(string, {root: process.cwd()});
+      res.sendFile(buffer);
     };
   };
 };

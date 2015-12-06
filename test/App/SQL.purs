@@ -52,7 +52,7 @@ main = do
           execute_ (insert photoboothsTable (fromArray [ Tuple "id" $ show $ maybe 0 id m.id 
                                                        , Tuple "computername" m.computername
                                                        , Tuple "alias" m.alias
-                                                       , Tuple "defaultprofile" m.defaultprofile]) "") conn
+                                                       , Tuple "defaultprofile" m.defaultprofile]) false "") conn
           result <- query_ (selectStar photoboothsTable "" :: Query Photobooth) conn
           result `shouldEqual` [mybooth]
 
@@ -61,7 +61,7 @@ main = do
         withConnection connectionInfo \conn -> do
           let t = {name: "mytable", columns: fromArray [Tuple "id" $ ColumnDef Integer []]}
           execute_ (createTable t) conn
-          execute_ (insert t (fromArray [Tuple "id" $ show 5]) "") conn
+          execute_ (insert t (fromArray [Tuple "id" $ show 5]) false "") conn
           result <- query_ (selectStar t "" :: Query MyId) conn
           result `shouldEqual` [MyId {id: 5}]
 
@@ -85,6 +85,7 @@ main = do
     it "insert makes the correct SQL string" do
       insert {name: "mytable", columns: fromArray [Tuple "mycol1" $ ColumnDef Char [], Tuple "mycol2" $ ColumnDef Char []]} 
              (fromArray [Tuple "mycol1" "ab", Tuple "mycol2" "cd"]) 
+             false
              ""
         `shouldEqual`
         Query "INSERT INTO mytable (mycol1, mycol2) VALUES ('ab', 'cd');"

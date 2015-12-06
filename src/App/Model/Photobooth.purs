@@ -35,6 +35,7 @@ photoboothsTable = { name: "PHOTOBOOTHS"
                                         , Tuple "computername" $ ColumnDef Char [Unique]
                                         , Tuple "alias" $ ColumnDef Char []
                                         , Tuple "defaultprofile" $ ColumnDef Char []
+                                        , Tuple "updatedon" $ ColumnDef Date []
                                         ]}
 
 _Photobooth = lens  (\(Photobooth a) -> a) (\_ a -> Photobooth a)

@@ -7,15 +7,14 @@ import SQL as S
 import Data.Foreign
 import Data.Foreign.Class
 import Data.Generic
-import Data.Lens (Lens(), lens)
+import Data.Lens (lens)
 import Data.Tuple (Tuple(..))
 import Data.Date
-import Data.Time
 import Data.Maybe
 import Data.Either
 
 import App.Model.StrMap (fromArray)
-import App.Model.SavedImage
+import App.Model.SavedFile
 
 ------------------------------------------
 
@@ -25,7 +24,7 @@ data Event = Event { id :: Maybe Int
                    , datefrom :: Date
                    , dateuntil :: Date
                    , profile :: String 
-                   , images :: Array SavedImage}
+                   , files :: Array SavedFile}
 
 data PartialEvent = PartialEvent { id :: Maybe Int
                                  , computername :: String
@@ -34,16 +33,17 @@ data PartialEvent = PartialEvent { id :: Maybe Int
                                  , dateuntil :: Date
                                  , profile :: String }
 
-mkEvent :: PartialEvent -> Array SavedImage -> Event
+mkEvent :: PartialEvent -> Array SavedFile -> Event
 mkEvent (PartialEvent pe) im = Event { id: pe.id
                                      , computername: pe.computername
                                      , name: pe.name
                                      , datefrom: pe.datefrom
                                      , dateuntil: pe.dateuntil
                                      , profile: pe.profile 
-                                     , images: im}
+                                     , files: im}
 
 derive instance genericEvent :: Generic Event
+derive instance genericPartialEvent :: Generic PartialEvent
 
 instance eqEvent         :: Eq Event where eq = gEq 
 instance showEvent       :: Show Event where show = gShow
@@ -69,6 +69,7 @@ eventsTable = { name: "EVENTS"
                                    , Tuple "datefrom" $ S.ColumnDef S.Date []
                                    , Tuple "dateuntil" $ S.ColumnDef S.Date []
                                    , Tuple "profile" $ S.ColumnDef S.Char []
+                                   , Tuple "updatedon" $ S.ColumnDef S.Date []
                                    ]}
 
 _Event = lens  (\(Event a) -> a) (\_ a -> Event a)

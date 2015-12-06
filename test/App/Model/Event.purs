@@ -15,7 +15,7 @@ import Data.Either
 import Data.Maybe
 
 import App.Model.Event
-import App.Model.SavedImage
+import App.Model.SavedFile
 
 myEventMaker d = Event { id: Just 1
                        , computername: "mycomputername"
@@ -23,7 +23,7 @@ myEventMaker d = Event { id: Just 1
                        , datefrom: d
                        , dateuntil: d
                        , profile: "myprofile" 
-                       , images: [SavedImage {id: 1, name: "yup.jpg", eventId: 1}]}
+                       , files: [SavedFile {id: 1, name: "yup.jpg", eventId: 1}]}
 
 main = do
   describe "Event json encoding & decoding" do

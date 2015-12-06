@@ -27,7 +27,7 @@ instance showEventStatistic       :: Show EventStatistic where show = gShow
 instance eventStatisticIsForeign :: IsForeign EventStatistic where
   read obj = do
     computername <- readProp "computername" obj
-    eventId <- readProp "eventId" obj
+    eventId <- readProp "eventid" obj
     pictures <- readProp "pictures" obj
     prints <- readProp "prints" obj
     return $ EventStatistic { computername, eventId, pictures, prints }
@@ -35,13 +35,14 @@ instance eventStatisticIsForeign :: IsForeign EventStatistic where
 
 eventStatisticsTable = { name: "EVENTSTATISTICS" 
                        , columns: fromArray [ Tuple "computername" $ S.ColumnDef S.Char []
-                                            , Tuple "eventId" $ S.ColumnDef S.Integer []
+                                            , Tuple "eventid" $ S.ColumnDef S.Integer []
                                             , Tuple "pictures" $ S.ColumnDef S.Integer []
                                             , Tuple "prints" $ S.ColumnDef S.Integer []
+                                            , Tuple "updatedon" $ S.ColumnDef S.Date []
                                             ]}
 
 _EventStatistic = lens  (\(EventStatistic a) -> a) (\_ a -> EventStatistic a)
-createEventStatisticsTable = "CREATE TABLE EVENTSTATISTICS (computername CHAR, eventId INTEGER, pictures INTEGER, prints INTEGER, PRIMARY KEY (computername, eventId))"
+createEventStatisticsTable = "CREATE TABLE EVENTSTATISTICS (computername CHAR, eventid INTEGER, pictures INTEGER, prints INTEGER, updatedon CHAR, PRIMARY KEY (computername, eventid))"
 
 data MonthlyStatistic = MonthlyStatistic { computername :: String
                                          , month :: Int
@@ -67,10 +68,11 @@ monthlyStatisticsTable = { name: "MONTHLYSTATISTICS"
                                               , Tuple "month" $ S.ColumnDef S.Integer []
                                               , Tuple "pictures" $ S.ColumnDef S.Integer []
                                               , Tuple "prints" $ S.ColumnDef S.Integer []
+                                              , Tuple "updatedon" $ S.ColumnDef S.Date []
                                               ]}
 
 
-createMonthlyStatisticsTable = "CREATE TABLE MONTHLYSTATISTICS (computername CHAR, month INTEGER, pictures INTEGER, prints INTEGER, PRIMARY KEY (computername, month))"
+createMonthlyStatisticsTable = "CREATE TABLE MONTHLYSTATISTICS (computername CHAR, month INTEGER, pictures INTEGER, prints INTEGER, updatedon CHAR, PRIMARY KEY (computername, month))"
 _MonthlyStatistic = lens  (\(MonthlyStatistic a) -> a) (\_ a -> MonthlyStatistic a)
 
 data AllStatistics = AllStatistics { eventStatistics :: Array EventStatistic

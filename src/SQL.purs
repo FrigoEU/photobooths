@@ -1,7 +1,7 @@
 module SQL where
 
 import Prelude
-import Data.String (joinWith, trim) 
+import Data.String (joinWith) 
 import Database.AnyDB (Query (..))
 import Data.Array (zip, sort, sortBy, length)
 import Data.Tuple (Tuple(..), fst, snd)
@@ -50,14 +50,14 @@ createColumnDefs s = joinWith ", " $ map (\(Tuple name cdef) -> name ++ " " ++ s
 createTable :: forall a. Table -> Query a
 createTable {name: s, columns: fs} = Query $ "CREATE TABLE " ++ s ++ parens (createColumnDefs fs)
 
-insert :: forall a . Table -> StrMap String -> String -> Query a
-insert {name: name, columns: fds} fs str = 
+insert :: forall a . Table -> StrMap String -> Boolean -> String -> Query a
+insert {name: name, columns: fds} fs repl str = 
   let sortedKeys = sort $ keys fs
       sortedValues = (map snd <<<
                       sortBy (\f1 f2 -> compare (fst f1) (fst f2)) <<< 
                       toArray)
                       fs
-  in Query $ "INSERT INTO " ++ name ++ 
+  in Query $ "INSERT " ++ (if repl then " or replace " else "") ++  "INTO " ++ name ++ 
              parens (joinWith ", " sortedKeys) ++
              " VALUES" ++ 
              parens (joinWith ", " $ (map \str -> "'" ++ str ++ "'") sortedValues) ++ ";" ++
@@ -65,7 +65,7 @@ insert {name: name, columns: fds} fs str =
 
 
 insertGet :: forall a. Table -> StrMap String -> Query a
-insertGet t@({name: name}) fs = insert t fs $
+insertGet t@({name: name}) fs = insert t fs false $
                                 " SELECT * FROM " ++ name ++ 
                                 " WHERE id = last_insert_rowid();"
 
@@ -97,3 +97,23 @@ selectLastInserted t = selectStar t "WHERE id = last_insert_rowid()"
 
 parens :: String -> String
 parens s = " (" ++ s ++ ")"
+
+updatedonInsertTrigger :: forall a. Table -> Array String -> Query a
+updatedonInsertTrigger {name: n} on = Query $ updatedonTrigger "INSERT" n on
+
+updatedonUpdateTrigger :: forall a. Table -> Array String -> Query a
+updatedonUpdateTrigger {name: n} on = Query $ updatedonTrigger "UPDATE" n on
+
+updatedonTrigger :: String -> String -> Array String -> String
+updatedonTrigger upd_ins n on = joinWith " " [ "CREATE TRIGGER updatedon_" <> upd_ins <> "_" <> n
+                                              , "AFTER"
+                                              , upd_ins
+                                              , "ON "  <> n
+                                              , "BEGIN"
+                                              , "UPDATE"
+                                              , n
+                                              , "SET updatedon = datetime('now')"
+                                              , "WHERE"
+                                              , joinWith " AND " $ map (\col -> col <> " = new." <> col) on
+                                              , "; END; " 
+                                              ]
