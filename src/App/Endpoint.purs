@@ -32,7 +32,7 @@ putPhotobooths = Endpoint { method: PUT, serverUrl: "/api/photobooths"
 
 getPhotobooth :: Endpoint String Unit (Maybe PB.Photobooth)
 getPhotobooth = Endpoint { method: GET, serverUrl: "/api/photobooths/:cname"
-                         , mkClientUrl: \s -> "api/photobooths/" <> s}
+                         , mkClientUrl: \s -> "/api/photobooths/" <> s}
 
 ------- Events -------------------------
 
@@ -54,11 +54,11 @@ attachFile = FileUploadEndpoint { serverUrl: "/api/attachfiletoevent/:eventid/:n
 
 getNewEvents :: Endpoint (Tuple String Date) Unit (Array E.PartialEvent)
 getNewEvents = Endpoint { method: GET, serverUrl: "/api/newevents/:cname/:date"
-                        , mkClientUrl: \(Tuple s d) -> "api/newevents/" <> s <> "/" <> iso8601 d}
+                        , mkClientUrl: \(Tuple s d) -> "/api/newevents/" <> s <> "/" <> iso8601 d}
 
 getNewFiles :: Endpoint (Tuple String Date) Unit (Array SI.SavedFile)
 getNewFiles = Endpoint { method: GET, serverUrl: "/api/newfiles/:cname/:date"
-                        , mkClientUrl: \(Tuple s d) -> "api/newfiles/" <> s <> "/" <> iso8601 d}
+                        , mkClientUrl: \(Tuple s d) -> "/api/newfiles/" <> s <> "/" <> iso8601 d}
 
 ------- Statistics ----------------------
 
@@ -79,4 +79,4 @@ getProfiles = Endpoint { method: GET, serverUrl: "/api/profiles"
 getProfileFiles :: Endpoint (Tuple String String) Unit (Array String)
 getProfileFiles = Endpoint {method: GET, serverUrl: "/api/profiles/:cname/:pname"
                            , mkClientUrl: \(Tuple cname pname) -> 
-                                             "api/profiles/" <> cname <> "/" <> pname}
+                                             "/api/profiles/" <> cname <> "/" <> pname}

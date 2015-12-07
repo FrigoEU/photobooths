@@ -208,7 +208,6 @@ updateEvent ({body: (Event e@{id: Just i}), params: p, url: u}) =
            Just pe@(PartialEvent {id: Nothing}) -> return $ mkEvent pe []
            Just pe@(PartialEvent {id: Just i}) -> selectFilesForEvent i conn >>= \ims -> return $ mkEvent pe ims
 
-{-- insertSavedFile :: forall eff. SavedFile -> Aff (db :: DB | eff) Unit --}
 upsertSavedFile :: SavedFile -> Query Unit
 upsertSavedFile (SavedFile sf) = insert savedFileTable
                               (fromArray [ Tuple "id" $ show sf.id
