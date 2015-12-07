@@ -3,8 +3,10 @@ module App.DB where
 import Prelude
 
 import Control.Monad.Eff.Exception (error)
+--import Control.Monad.Eff.Class
 import Control.Monad.Aff (Aff())
 import Control.Monad.Error.Class (throwError)
+--import Control.Monad.Eff.Console (log, CONSOLE())
 
 import Data.Date (Date())
 import Data.Array (replicate, filter, length)
@@ -15,6 +17,7 @@ import Data.Maybe
 import Data.Traversable
 import Data.Monoid (mempty)
 import Unsafe.Coerce
+import Data.Foreign
 import Data.Foreign.Class
 --import Control.Apply ((*>))
 
@@ -298,17 +301,19 @@ addStatistics c (AllStatistics {eventStatistics, monthlyStatistics}) = do
   
 newtype BufferForHttp = BufferForHttp Buffer
 
-instance foreignBufferForHttp :: IsForeign BufferForHttp
-  where read = unsafeCoerce
+instance foreignBufferForHttp :: IsForeign BufferForHttp where 
+  read obj = do
+    file :: Foreign <- readProp "file" obj
+    return $ BufferForHttp $ unsafeFromForeign file
         
 unpack :: BufferForHttp -> Buffer
 unpack (BufferForHttp b) = b
   
 getFileById :: forall eff. Input Unit -> Aff (db :: DB | eff) Buffer
-getFileById {params} =
+getFileById {params} = do
   let q = (Query "select file from files where id = ?" :: Query BufferForHttp)
-   in case lookup "id" params of
-           Nothing -> throwError $ error $ "getFileById: No id provided!"
-           Just id -> withConnection connectionInfo (\c -> 
-             queryOne q [toSql id] c >>= \mf -> maybe (throwError $ error $ "No file found") (unpack >>> return) mf)
+  case lookup "id" params of
+         Nothing -> throwError $ error $ "getFileById: No id provided!"
+         Just id -> withConnection connectionInfo (\c -> 
+           queryOne q [toSql id] c >>= \mf -> maybe (throwError $ error $ "No file found") (unpack >>> return) mf)
 

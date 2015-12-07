@@ -100,7 +100,7 @@ exports.sendStr = function sendStr(res){
 exports.sendBuffer = function sendBuffer(res){
   return function(buffer){
     return function(){
-      res.sendFile(buffer);
+      res.send(buffer);
     };
   };
 };

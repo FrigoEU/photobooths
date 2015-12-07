@@ -54,10 +54,9 @@ main = do
                                                   \c -> addStatistics c b)
   hostEndpoint app getProfileFiles $ readCnamePname "GetProfileFiles" findProfileFiles
   hostFileUploadEndpoint app attachFile saveFileToDb
-  hostFile app "files/:id" getFileById
+  hostFile app "/api/files/:id" getFileById
   hostStatic app "static"
   hostStatic app "profiles"
-  {-- hostFile app "*" static --}
   listen app port
   log $ "Starting server on " ++ show port
 
