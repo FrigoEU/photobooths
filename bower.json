@@ -17,7 +17,7 @@
     "purescript-foreign-generic": "^0.2.0",
     "purescript-express": "master",
     "purescript-optic-ui": "https://github.com/FrigoEU/purescript-optic-ui.git#master",
-    "purescript-affjax": "master",
+    "purescript-affjax": "https://github.com/FrigoEU/purescript-affjax.git#master",
     "purescript-maps": "master",
     "purescript-timers": "master",
     "purescript-node-buffer": "master",

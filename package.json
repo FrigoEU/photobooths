@@ -1,11 +1,13 @@
 {
   "dependencies": {
-    "any-db-sqlite3": "^2.1.4",
     "any-db": "^2.1.0",
+    "any-db-sqlite3": "^2.1.4",
+    "any-db-transaction": "^2.2.2",
+    "body-parser": "*",
+    "compression": "^1.6.0",
     "express": "*",
     "virtual-dom": "latest",
-    "body-parser": "*",
-    "compression": "^1.6.0"
+    "xhr2": "^0.1.3"
   },
   "devDependencies": {
     "browserify": "latest",
@@ -21,12 +23,12 @@
     "dev:netw": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking -o networking.js",
     "dev:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - -o static/client.js",
     "prestart": "npm run test",
-    "start": "npm run compile:server & npm run compile:client && node server.js",
+    "start": "npm run compile:server && npm run compile:client && node server.js",
     "predev": "npm run test",
-    "dev":   "npm run dev:server     & npm run dev:client     && node server.js",
-    "netw": "npm run dev:netw & node networking.js",
+    "dev": "npm run dev:server     && npm run dev:client     && node server.js",
+    "netw": "npm run dev:netw && node networking.js",
     "watch:client": "watch  'npm run test && npm run dev:client' src/ --ignoreDotFiles",
     "--nodemon": "to check if it's a good solution for reloading serverside code",
-    "debug": "node-debug --web-port 8989 server.js"
+    "debug": "node-debug --web-port 8989 networking.js"
   }
 }
