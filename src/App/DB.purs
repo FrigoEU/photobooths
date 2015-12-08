@@ -258,10 +258,13 @@ allStatistics :: forall eff. Input Unit -> Aff (db :: DB | eff) AllStatistics
 allStatistics {params: params} =
   case lookup "cname" params of
        Nothing -> throwError $ error "GetStatistics: No computername provided"
-       Just cname -> withConnection connectionInfo \conn -> do
-         eventStatistics <- query (Query "select * from eventstatistics where computername = ?") [toSql cname] conn
-         monthlyStatistics <- query (Query "select * from monthlystatistics where computername = ?") [toSql cname] conn
-         return $ AllStatistics {eventStatistics, monthlyStatistics}
+       Just cname -> withConnection connectionInfo \conn -> queryAllStatistics conn cname
+       
+queryAllStatistics :: forall eff. Connection -> String -> Aff (db :: DB | eff) AllStatistics
+queryAllStatistics conn cname = do
+  eventStatistics <- query (Query "select * from eventstatistics where computername = ?") [toSql cname] conn
+  monthlyStatistics <- query (Query "select * from monthlystatistics where computername = ?") [toSql cname] conn
+  return $ AllStatistics {eventStatistics, monthlyStatistics}
 
 foreign import pInt :: forall a. Maybe a -> (a -> Maybe a) -> String -> Maybe Int
 

@@ -43,8 +43,8 @@ main = do
   let cname = "mycomputername"
   let baseurl = "http://localhost:8080"
   runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do
-    dropDB conn
-    makeDB conn
+    --dropDB conn
+    --makeDB conn
     liftEff $ log "Initial SQL Done"
     pbm <- execEndpoint_ baseurl getPhotobooth cname unit
     case pbm of
@@ -57,15 +57,15 @@ main = do
     withTransaction (\tc -> traverse (\pe -> execute_ (upsertPartialEvent pe) conn) pes) conn
     liftEff $ log "Synced Events"
     maybeLastUpdatedFiles <- queryOne getLastUpdateFiles [] conn
-    liftEff $ log "1"
     lastUpdatedFiles <- defaultDate maybeLastUpdatedFiles (fromStringStrict "2010-01-01T00:00:00.000Z")
-    liftEff $ log "2"
     files <- execEndpoint_ baseurl getNewFiles (Tuple cname lastUpdatedFiles) unit
-    liftEff $ log "3"
     withTransaction (\tc -> traverse (\sf -> execute_ (upsertSavedFile sf) conn) files) conn
     liftEff $ log "Synced Files"
     eventids <- query getEmptyFileEntries [] conn
     flip traverse eventids (\(WrappedId id) -> downloadFileById baseurl id >>= (\b -> saveFile conn id b))
+    stats <- queryAllStatistics conn cname
+    execEndpoint_ baseurl postStatistics unit stats
+    liftEff $ log "Synced statistics"
     liftEff $ log "Synced File contents"
     
     

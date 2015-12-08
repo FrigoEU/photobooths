@@ -1509,8 +1509,7 @@ var PS = { };
   exports["index"] = index;
   exports["!!"] = $bang$bang;
   exports["zipWith"] = $foreign.zipWith;
-  exports["snoc"] = $foreign.snoc;
-  exports["length"] = $foreign.length;;
+  exports["snoc"] = $foreign.snoc;;
  
 })(PS["Data.Array"] = PS["Data.Array"] || {});
 (function(exports) {
@@ -2600,12 +2599,14 @@ var PS = { };
   var toSql = function (dict) {
       return dict.toSql;
   };
+  var isSqlValueString = new IsSqlValue($foreign.unsafeToSqlValue);
   var isSqlValueInt = new IsSqlValue(function (_3) {
       return $foreign.unsafeToSqlValue(Data_Int.toNumber(_3));
   });                                                            
   var isSqlValueBuffer = new IsSqlValue($foreign.unsafeToSqlValue);
   exports["IsSqlValue"] = IsSqlValue;
   exports["toSql"] = toSql;
+  exports["isSqlValueString"] = isSqlValueString;
   exports["isSqlValueInt"] = isSqlValueInt;
   exports["isSqlValueBuffer"] = isSqlValueBuffer;;
  
@@ -2830,61 +2831,6 @@ var PS = { };
       };
       return ColumnDef;
   })();
-  var updatedonTrigger = function (upd_ins) {
-      return function (n) {
-          return function (on) {
-              return Data_String.joinWith(" ")([ "CREATE TRIGGER updatedon_" + (upd_ins + ("_" + n)), "AFTER", upd_ins, "ON " + n, "BEGIN", "UPDATE", n, "SET updatedon = datetime('now')", "WHERE", Data_String.joinWith(" AND ")(Prelude.map(Prelude.functorArray)(function (col) {
-                  return col + (" = new." + col);
-              })(on)), "; END; " ]);
-          };
-      };
-  };
-  var updatedonUpdateTrigger = function (_10) {
-      return function (on) {
-          return Database_AnyDB.Query(updatedonTrigger("UPDATE")(_10.name)(on));
-      };
-  };
-  var updatedonInsertTrigger = function (_9) {
-      return function (on) {
-          return Database_AnyDB.Query(updatedonTrigger("INSERT")(_9.name)(on));
-      };
-  };
-  var showFieldType = new Prelude.Show(function (_12) {
-      if (_12 instanceof Char) {
-          return "CHAR";
-      };
-      if (_12 instanceof Integer) {
-          return "INTEGER";
-      };
-      if (_12 instanceof $$Date) {
-          return "CHAR";
-      };
-      if (_12 instanceof Blob) {
-          return "BLOB";
-      };
-      throw new Error("Failed pattern match at SQL line 34, column 1 - line 40, column 1: " + [ _12.constructor.name ]);
-  });
-  var showColumnConstraint = new Prelude.Show(function (_13) {
-      if (_13 instanceof PrimaryKey) {
-          return "PRIMARY KEY";
-      };
-      if (_13 instanceof Unique) {
-          return "UNIQUE";
-      };
-      throw new Error("Failed pattern match at SQL line 40, column 1 - line 44, column 1: " + [ _13.constructor.name ]);
-  });
-  var showColumnDef = new Prelude.Show(function (_11) {
-      return Prelude.show(showFieldType)(_11.value0) + ((function () {
-          var _36 = Data_Array.length(_11.value1) > 0;
-          if (_36) {
-              return " ";
-          };
-          if (!_36) {
-              return "";
-          };
-          throw new Error("Failed pattern match at SQL line 30, column 1 - line 34, column 1: " + [ _36.constructor.name ]);
-      })() + Data_String.joinWith(", ")(Prelude.map(Prelude.functorArray)(Prelude.show(showColumnConstraint))(_11.value1)));
-  });
   var parens = function (s) {
       return " (" + (s + ")");
   };
@@ -2913,17 +2859,6 @@ var PS = { };
           };
       };
   };
-  var dropTable = function (_2) {
-      return Database_AnyDB.Query("DROP TABLE IF EXISTS " + _2.name);
-  };
-  var createColumnDefs = function (s) {
-      return Data_String.joinWith(", ")(Prelude.map(Prelude.functorArray)(function (_0) {
-          return _0.value0 + (" " + Prelude.show(showColumnDef)(_0.value1));
-      })(App_Model_StrMap.toArray(s)));
-  };
-  var createTable = function (_3) {
-      return Database_AnyDB.Query("CREATE TABLE " + (_3.name + parens(createColumnDefs(_3.columns))));
-  };
   exports["Char"] = Char;
   exports["Integer"] = Integer;
   exports["Date"] = $$Date;
@@ -2931,17 +2866,8 @@ var PS = { };
   exports["PrimaryKey"] = PrimaryKey;
   exports["Unique"] = Unique;
   exports["ColumnDef"] = ColumnDef;
-  exports["updatedonTrigger"] = updatedonTrigger;
-  exports["updatedonUpdateTrigger"] = updatedonUpdateTrigger;
-  exports["updatedonInsertTrigger"] = updatedonInsertTrigger;
   exports["parens"] = parens;
-  exports["insert"] = insert;
-  exports["createTable"] = createTable;
-  exports["createColumnDefs"] = createColumnDefs;
-  exports["dropTable"] = dropTable;
-  exports["showColumnDef"] = showColumnDef;
-  exports["showFieldType"] = showFieldType;
-  exports["showColumnConstraint"] = showColumnConstraint;;
+  exports["insert"] = insert;;
  
 })(PS["SQL"] = PS["SQL"] || {});
 (function(exports) {
@@ -3294,21 +3220,273 @@ var PS = { };
   var App_Model_StrMap = PS["App.Model.StrMap"];
   var Data_Either = PS["Data.Either"];
   var Data_Foreign_Index = PS["Data.Foreign.Index"];
-  var Data_Lens_Lens = PS["Data.Lens.Lens"];
-  var monthlyStatisticsTable = {
-      name: "MONTHLYSTATISTICS", 
-      columns: App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("computername")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("month")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("pictures")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("prints")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("updatedon")(new SQL.ColumnDef((SQL["Date"]).value, [  ])) ])
-  };                                                                                 
-  var eventStatisticsTable = {
-      name: "EVENTSTATISTICS", 
-      columns: App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("computername")(new SQL.ColumnDef(SQL.Char.value, [  ])), Data_Tuple.Tuple.create("eventid")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("pictures")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("prints")(new SQL.ColumnDef(SQL.Integer.value, [  ])), Data_Tuple.Tuple.create("updatedon")(new SQL.ColumnDef((SQL["Date"]).value, [  ])) ])
-  };                                                                           
-  var createMonthlyStatisticsTable = "CREATE TABLE MONTHLYSTATISTICS (computername CHAR, month INTEGER, pictures INTEGER, prints INTEGER, updatedon CHAR, PRIMARY KEY (computername, month))";
-  var createEventStatisticsTable = "CREATE TABLE EVENTSTATISTICS (computername CHAR, eventid INTEGER, pictures INTEGER, prints INTEGER, updatedon CHAR, PRIMARY KEY (computername, eventid))";
-  exports["createMonthlyStatisticsTable"] = createMonthlyStatisticsTable;
-  exports["monthlyStatisticsTable"] = monthlyStatisticsTable;
-  exports["createEventStatisticsTable"] = createEventStatisticsTable;
-  exports["eventStatisticsTable"] = eventStatisticsTable;;
+  var Data_Lens_Lens = PS["Data.Lens.Lens"];     
+  var MonthlyStatistic = (function () {
+      function MonthlyStatistic(value0) {
+          this.value0 = value0;
+      };
+      MonthlyStatistic.create = function (value0) {
+          return new MonthlyStatistic(value0);
+      };
+      return MonthlyStatistic;
+  })();
+  var EventStatistic = (function () {
+      function EventStatistic(value0) {
+          this.value0 = value0;
+      };
+      EventStatistic.create = function (value0) {
+          return new EventStatistic(value0);
+      };
+      return EventStatistic;
+  })();
+  var AllStatistics = (function () {
+      function AllStatistics(value0) {
+          this.value0 = value0;
+      };
+      AllStatistics.create = function (value0) {
+          return new AllStatistics(value0);
+      };
+      return AllStatistics;
+  })();
+  var monthlyStatisticIsForeign = new Data_Foreign_Class.IsForeign(function (obj) {
+      return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.stringIsForeign)(Data_Foreign_Index.indexString)("computername")(obj))(function (_7) {
+          return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("month")(obj))(function (_6) {
+              return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("pictures")(obj))(function (_5) {
+                  return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("prints")(obj))(function (_4) {
+                      return Prelude["return"](Data_Either.applicativeEither)(new MonthlyStatistic({
+                          computername: _7, 
+                          month: _6, 
+                          pictures: _5, 
+                          prints: _4
+                      }));
+                  });
+              });
+          });
+      });
+  });
+  var genericMonthlyStatistic = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.Model.Statistic.MonthlyStatistic" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(MonthlyStatistic.create))((function (r) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 4) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (computername_1) {
+                      return function (month_1) {
+                          return function (pictures_1) {
+                              return function (prints_1) {
+                                  return {
+                                      computername: computername_1, 
+                                      month: month_1, 
+                                      pictures: pictures_1, 
+                                      prints: prints_1
+                                  };
+                              };
+                          };
+                      };
+                  }))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[2]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[3]).recValue(Prelude.unit)));
+              };
+              return Data_Maybe.Nothing.value;
+          })($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd("App.Model.Statistic.MonthlyStatistic", [ {
+          sigConstructor: "App.Model.Statistic.MonthlyStatistic", 
+          sigValues: [ function ($dollarq_1) {
+              return new Data_Generic.SigRecord([ {
+                  recLabel: "computername", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "month", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "pictures", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "prints", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              } ]);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      return new Data_Generic.SProd("App.Model.Statistic.MonthlyStatistic", [ function ($dollarq) {
+          return new Data_Generic.SRecord([ {
+              recLabel: "computername", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.computername);
+              }
+          }, {
+              recLabel: "month", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.month);
+              }
+          }, {
+              recLabel: "pictures", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.pictures);
+              }
+          }, {
+              recLabel: "prints", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.prints);
+              }
+          } ]);
+      } ]);
+  });                                                                                      
+  var genericEventStatistic = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.Model.Statistic.EventStatistic" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(EventStatistic.create))((function (r) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 4) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (computername_1) {
+                      return function (eventId_1) {
+                          return function (pictures_1) {
+                              return function (prints_1) {
+                                  return {
+                                      computername: computername_1, 
+                                      eventId: eventId_1, 
+                                      pictures: pictures_1, 
+                                      prints: prints_1
+                                  };
+                              };
+                          };
+                      };
+                  }))(Data_Generic.fromSpine(Data_Generic.genericString)((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[1]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[2]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericInt)((r.value0[3]).recValue(Prelude.unit)));
+              };
+              return Data_Maybe.Nothing.value;
+          })($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd("App.Model.Statistic.EventStatistic", [ {
+          sigConstructor: "App.Model.Statistic.EventStatistic", 
+          sigValues: [ function ($dollarq_1) {
+              return new Data_Generic.SigRecord([ {
+                  recLabel: "computername", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "eventId", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "pictures", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "prints", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericInt)(Data_Generic.anyProxy);
+                  }
+              } ]);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      return new Data_Generic.SProd("App.Model.Statistic.EventStatistic", [ function ($dollarq) {
+          return new Data_Generic.SRecord([ {
+              recLabel: "computername", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0.computername);
+              }
+          }, {
+              recLabel: "eventId", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.eventId);
+              }
+          }, {
+              recLabel: "pictures", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.pictures);
+              }
+          }, {
+              recLabel: "prints", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericInt)($dollarx.value0.prints);
+              }
+          } ]);
+      } ]);
+  });                                                                                  
+  var genericAllStatistics = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.Model.Statistic.AllStatistics" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(AllStatistics.create))((function (r) {
+              if (r instanceof Data_Generic.SRecord && r.value0.length === 2) {
+                  return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(function (eventStatistics_1) {
+                      return function (monthlyStatistics_1) {
+                          return {
+                              eventStatistics: eventStatistics_1, 
+                              monthlyStatistics: monthlyStatistics_1
+                          };
+                      };
+                  }))(Data_Generic.fromSpine(Data_Generic.genericArray(genericEventStatistic))((r.value0[0]).recValue(Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericArray(genericMonthlyStatistic))((r.value0[1]).recValue(Prelude.unit)));
+              };
+              return Data_Maybe.Nothing.value;
+          })($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd("App.Model.Statistic.AllStatistics", [ {
+          sigConstructor: "App.Model.Statistic.AllStatistics", 
+          sigValues: [ function ($dollarq_1) {
+              return new Data_Generic.SigRecord([ {
+                  recLabel: "eventStatistics", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericArray(genericEventStatistic))(Data_Generic.anyProxy);
+                  }
+              }, {
+                  recLabel: "monthlyStatistics", 
+                  recValue: function ($dollarq_2) {
+                      return Data_Generic.toSignature(Data_Generic.genericArray(genericMonthlyStatistic))(Data_Generic.anyProxy);
+                  }
+              } ]);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      return new Data_Generic.SProd("App.Model.Statistic.AllStatistics", [ function ($dollarq) {
+          return new Data_Generic.SRecord([ {
+              recLabel: "eventStatistics", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericArray(genericEventStatistic))($dollarx.value0.eventStatistics);
+              }
+          }, {
+              recLabel: "monthlyStatistics", 
+              recValue: function ($dollarq_1) {
+                  return Data_Generic.toSpine(Data_Generic.genericArray(genericMonthlyStatistic))($dollarx.value0.monthlyStatistics);
+              }
+          } ]);
+      } ]);
+  });
+  var eventStatisticIsForeign = new Data_Foreign_Class.IsForeign(function (obj) {
+      return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.stringIsForeign)(Data_Foreign_Index.indexString)("computername")(obj))(function (_3) {
+          return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("eventid")(obj))(function (_2) {
+              return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("pictures")(obj))(function (_1) {
+                  return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("prints")(obj))(function (_0) {
+                      return Prelude["return"](Data_Either.applicativeEither)(new EventStatistic({
+                          computername: _3, 
+                          eventId: _2, 
+                          pictures: _1, 
+                          prints: _0
+                      }));
+                  });
+              });
+          });
+      });
+  });
+  exports["AllStatistics"] = AllStatistics;
+  exports["MonthlyStatistic"] = MonthlyStatistic;
+  exports["EventStatistic"] = EventStatistic;
+  exports["genericEventStatistic"] = genericEventStatistic;
+  exports["eventStatisticIsForeign"] = eventStatisticIsForeign;
+  exports["genericMonthlyStatistic"] = genericMonthlyStatistic;
+  exports["monthlyStatisticIsForeign"] = monthlyStatisticIsForeign;
+  exports["genericAllStatistics"] = genericAllStatistics;;
  
 })(PS["App.Model.Statistic"] = PS["App.Model.Statistic"] || {});
 (function(exports) {
@@ -3330,30 +3508,6 @@ var PS = { };
   exports["iso8601"] = $foreign.iso8601;;
  
 })(PS["App.Model.Date"] = PS["App.Model.Date"] || {});
-(function(exports) {
-  // Generated by psc version 0.7.6.1
-  "use strict";
-  var Prelude = PS["Prelude"];
-  var SQL = PS["SQL"];
-  var Database_AnyDB = PS["Database.AnyDB"];
-  var Data_Date = PS["Data.Date"];
-  var Data_Generic = PS["Data.Generic"];
-  var Data_Foreign = PS["Data.Foreign"];
-  var Data_Foreign_Class = PS["Data.Foreign.Class"];
-  var Data_Tuple = PS["Data.Tuple"];
-  var Data_Maybe = PS["Data.Maybe"];
-  var Data_Either = PS["Data.Either"];
-  var App_Model_StrMap = PS["App.Model.StrMap"];
-  var Data_Foreign_Index = PS["Data.Foreign.Index"];
-  var networkingStateTable = {
-      name: "NETWORKINGSTATE", 
-      columns: App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("lastsentstatistics")(new SQL.ColumnDef((SQL["Date"]).value, [  ])) ])
-  };                                                                               
-  var createNetworkingStateTable = "CREATE TABLE NETWORKINGSTATE (lastsentstatistics CHAR); INSERT INTO NETWORKINGSTATE (lastsentstatistics) VALUES (date('now'))";
-  exports["createNetworkingStateTable"] = createNetworkingStateTable;
-  exports["networkingStateTable"] = networkingStateTable;;
- 
-})(PS["App.Model.NetworkingState"] = PS["App.Model.NetworkingState"] || {});
 (function(exports) {
   // Generated by psc version 0.7.6.1
   "use strict";
@@ -3396,58 +3550,23 @@ var PS = { };
       return SQL.insert(App_Model_Photobooth.photoboothsTable)(App_Model_StrMap.fromArray([ Data_Maybe.maybe(Data_Monoid.mempty(Data_Tuple.monoidTuple(Data_Monoid.monoidString)(Data_Monoid.monoidString)))(function (s) {
           return Data_Tuple.Tuple.create("id")(Prelude.show(Prelude.showInt)(s));
       })(_17.value0.id), new Data_Tuple.Tuple("computername", _17.value0.computername), new Data_Tuple.Tuple("alias", _17.value0.alias), new Data_Tuple.Tuple("defaultprofile", _17.value0.defaultprofile) ]))(true)("");
-  }; 
-  var makeDB = function (conn) {
-      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.createTable(App_Model_Photobooth.photoboothsTable))(conn))(function () {
-          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonInsertTrigger(App_Model_Photobooth.photoboothsTable)([ "id" ]))(conn))(function () {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonUpdateTrigger(App_Model_Photobooth.photoboothsTable)([ "id" ]))(conn))(function () {
-                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.createTable(App_Model_Event.eventsTable))(conn))(function () {
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonInsertTrigger(App_Model_Event.eventsTable)([ "id" ]))(conn))(function () {
-                          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonUpdateTrigger(App_Model_Event.eventsTable)([ "id" ]))(conn))(function () {
-                              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.createTable(App_Model_SavedFile.savedFileTable))(conn))(function () {
-                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonInsertTrigger(App_Model_SavedFile.savedFileTable)([ "id" ]))(conn))(function () {
-                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonUpdateTrigger(App_Model_SavedFile.savedFileTable)([ "id" ]))(conn))(function () {
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(App_Model_Statistic.createEventStatisticsTable)(conn))(function () {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonInsertTrigger(App_Model_Statistic.eventStatisticsTable)([ "computername", "eventid" ]))(conn))(function () {
-                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonUpdateTrigger(App_Model_Statistic.eventStatisticsTable)([ "computername", "eventid" ]))(conn))(function () {
-                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(App_Model_Statistic.createMonthlyStatisticsTable)(conn))(function () {
-                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonInsertTrigger(App_Model_Statistic.monthlyStatisticsTable)([ "computername", "month" ]))(conn))(function () {
-                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.updatedonUpdateTrigger(App_Model_Statistic.monthlyStatisticsTable)([ "computername", "month" ]))(conn))(function () {
-                                                                  return Database_AnyDB.execute_(App_Model_NetworkingState.createNetworkingStateTable)(conn);
-                                                              });
-                                                          });
-                                                      });
-                                                  });
-                                              });
-                                          });
-                                      });
-                                  });
-                              });
-                          });
-                      });
-                  });
-              });
-          });
-      });
-  };                                                                                      
-  var dropDB = function (conn) {
-      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.dropTable(App_Model_Photobooth.photoboothsTable))(conn))(function () {
-          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.dropTable(App_Model_Event.eventsTable))(conn))(function () {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.dropTable(App_Model_SavedFile.savedFileTable))(conn))(function () {
-                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.dropTable(App_Model_Statistic.eventStatisticsTable))(conn))(function () {
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.execute_(SQL.dropTable(App_Model_Statistic.monthlyStatisticsTable))(conn))(function () {
-                          return Database_AnyDB.execute_(SQL.dropTable(App_Model_NetworkingState.networkingStateTable))(conn);
-                      });
-                  });
-              });
-          });
-      });
   };
+  var queryAllStatistics = function (conn) {
+      return function (cname) {
+          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.query(App_Model_Statistic.eventStatisticIsForeign)("select * from eventstatistics where computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(conn))(function (_8) {
+              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.query(App_Model_Statistic.monthlyStatisticIsForeign)("select * from monthlystatistics where computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(conn))(function (_7) {
+                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(new App_Model_Statistic.AllStatistics({
+                      eventStatistics: _8, 
+                      monthlyStatistics: _7
+                  }));
+              });
+          });
+      };
+  };
+  exports["queryAllStatistics"] = queryAllStatistics;
   exports["upsertSavedFile"] = upsertSavedFile;
   exports["upsertPartialEvent"] = upsertPartialEvent;
-  exports["upsertPB"] = upsertPB;
-  exports["makeDB"] = makeDB;
-  exports["dropDB"] = dropDB;;
+  exports["upsertPB"] = upsertPB;;
  
 })(PS["App.DB"] = PS["App.DB"] || {});
 (function(exports) {
@@ -4484,6 +4603,11 @@ var PS = { };
   var App_Model_Statistic = PS["App.Model.Statistic"];
   var App_Model_Date = PS["App.Model.Date"];
   var Endpoint_Client = PS["Endpoint.Client"];
+  var postStatistics = new Endpoint_Client.Endpoint({
+      method: Network_HTTP_Method.POST.value, 
+      serverUrl: "/api/statistics", 
+      mkClientUrl: Prelude["const"]("/api/statistics")
+  });
   var getPhotobooth = new Endpoint_Client.Endpoint({
       method: Network_HTTP_Method.GET.value, 
       serverUrl: "/api/photobooths/:cname", 
@@ -4505,6 +4629,7 @@ var PS = { };
           return "/api/newevents/" + (_1.value0 + ("/" + App_Model_Date.iso8601(_1.value1)));
       }
   });
+  exports["postStatistics"] = postStatistics;
   exports["getNewFiles"] = getNewFiles;
   exports["getNewEvents"] = getNewEvents;
   exports["getPhotobooth"] = getPhotobooth;;
@@ -4616,7 +4741,8 @@ var PS = { };
   var Data_Generic = PS["Data.Generic"];
   var App_Model_Photobooth = PS["App.Model.Photobooth"];
   var App_Model_Event = PS["App.Model.Event"];
-  var App_Model_SavedFile = PS["App.Model.SavedFile"];     
+  var App_Model_SavedFile = PS["App.Model.SavedFile"];
+  var App_Model_Statistic = PS["App.Model.Statistic"];     
   var WrappedId = (function () {
       function WrappedId(value0) {
           this.value0 = value0;
@@ -4635,8 +4761,8 @@ var PS = { };
       };
       return LastUpdated;
   })();
-  var toStr = function (_12) {
-      return _12.value0;
+  var toStr = function (_13) {
+      return _13.value0;
   };
   var saveFile = function (c) {
       return function (i) {
@@ -4650,13 +4776,13 @@ var PS = { };
       memory: false
   });
   var isForeignWrappedId = new Data_Foreign_Class.IsForeign(function (obj) {
-      return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("id")(obj))(function (_9) {
-          return Prelude["return"](Data_Either.applicativeEither)(new WrappedId(_9));
+      return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("id")(obj))(function (_10) {
+          return Prelude["return"](Data_Either.applicativeEither)(new WrappedId(_10));
       });
   });
   var isForeignLastUpdated = new Data_Foreign_Class.IsForeign(function (obj) {
-      return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.stringIsForeign)(Data_Foreign_Index.indexString)("lastupdatedon")(obj))(function (_8) {
-          return Prelude["return"](Data_Either.applicativeEither)(new LastUpdated(_8));
+      return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.stringIsForeign)(Data_Foreign_Index.indexString)("lastupdatedon")(obj))(function (_9) {
+          return Prelude["return"](Data_Either.applicativeEither)(new LastUpdated(_9));
       });
   });
   var getLastUpdateFiles = Database_AnyDB.Query("select coalesce(max(updatedon), '2010-01-01 00:00:00') as lastupdatedon from files");
@@ -4672,8 +4798,8 @@ var PS = { };
               username: Data_Maybe.Nothing.value, 
               password: Data_Maybe.Nothing.value
           };
-          return Prelude.bind(Control_Monad_Aff.bindAff)(Network_HTTP_Affjax.affjax(Network_HTTP_Affjax_Request.requestableUnit)(Network_HTTP_Affjax_Response.responsableBuffer)(req))(function (_10) {
-              return Prelude["return"](Control_Monad_Aff.applicativeAff)(_10.response);
+          return Prelude.bind(Control_Monad_Aff.bindAff)(Network_HTTP_Affjax.affjax(Network_HTTP_Affjax_Request.requestableUnit)(Network_HTTP_Affjax_Response.responsableBuffer)(req))(function (_11) {
+              return Prelude["return"](Control_Monad_Aff.applicativeAff)(_11.response);
           });
       };
   };
@@ -4684,53 +4810,49 @@ var PS = { };
           };
       };
   };
-  var main = Control_Monad_Aff.runAff(function (_32) {
-      return Control_Monad_Eff_Console.log(Prelude.show(Control_Monad_Eff_Exception.showError)(_32));
+  var main = Control_Monad_Aff.runAff(function (_34) {
+      return Control_Monad_Eff_Console.log(Prelude.show(Control_Monad_Eff_Exception.showError)(_34));
   })(Prelude["const"](Control_Monad_Eff_Console.log("Everything synced!")))(Database_AnyDB.withConnection(networkingConnectionInfo)(function (conn) {
-      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.dropDB(conn))(function () {
-          return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.makeDB(conn))(function () {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Initial SQL Done")))(function () {
-                  return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(Data_Generic.genericUnit)(Data_Generic.genericMaybe(App_Model_Photobooth.genericPhotobooth))("http://localhost:8080")(App_Endpoint.getPhotobooth)("mycomputername")(Prelude.unit))(function (_7) {
-                      return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
-                          if (_7 instanceof Data_Maybe.Nothing) {
-                              return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No photobooth instance found for: " + "mycomputername"));
-                          };
-                          if (_7 instanceof Data_Maybe.Just) {
-                              return Database_AnyDB.execute_(App_DB.upsertPB(_7.value0))(conn);
-                          };
-                          throw new Error("Failed pattern match at App.Networking line 42, column 1 - line 72, column 1: " + [ _7.constructor.name ]);
-                      })())(function () {
-                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced Photobooth(s)")))(function () {
-                              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.queryOne(isForeignLastUpdated)(getLastUpdateEvents)([  ])(conn))(function (_6) {
-                                  return Prelude.bind(Control_Monad_Aff.bindAff)(defaultDate(Control_Monad_Aff.monadErrorAff)(_6)(Data_Date.fromStringStrict("2010-01-01T00:00:00.000Z")))(function (_5) {
-                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Event.genericPartialEvent))("http://localhost:8080")(App_Endpoint.getNewEvents)(new Data_Tuple.Tuple("mycomputername", _5))(Prelude.unit))(function (_4) {
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB_Transaction.withTransaction(function (tc) {
-                                              return Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (pe) {
-                                                  return Database_AnyDB.execute_(App_DB.upsertPartialEvent(pe))(conn);
-                                              })(_4);
-                                          })(conn))(function () {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced Events")))(function () {
-                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.queryOne(isForeignLastUpdated)(getLastUpdateFiles)([  ])(conn))(function (_3) {
-                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("1")))(function () {
-                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(defaultDate(Control_Monad_Aff.monadErrorAff)(_3)(Data_Date.fromStringStrict("2010-01-01T00:00:00.000Z")))(function (_2) {
-                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("2")))(function () {
-                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_SavedFile.genericSavedFile))("http://localhost:8080")(App_Endpoint.getNewFiles)(new Data_Tuple.Tuple("mycomputername", _2))(Prelude.unit))(function (_1) {
-                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("3")))(function () {
-                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB_Transaction.withTransaction(function (tc) {
-                                                                              return Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (sf) {
-                                                                                  return Database_AnyDB.execute_(App_DB.upsertSavedFile(sf))(conn);
-                                                                              })(_1);
-                                                                          })(conn))(function () {
-                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced Files")))(function () {
-                                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.query(isForeignWrappedId)(getEmptyFileEntries)([  ])(conn))(function (_0) {
-                                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(_0)(function (_11) {
-                                                                                          return Prelude[">>="](Control_Monad_Aff.bindAff)(downloadFileById("http://localhost:8080")(_11.value0))(function (b) {
-                                                                                              return saveFile(conn)(_11.value0)(b);
-                                                                                          });
-                                                                                      }))(function () {
-                                                                                          return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced File contents"));
-                                                                                      });
-                                                                                  });
+      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Initial SQL Done")))(function () {
+          return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(Data_Generic.genericUnit)(Data_Generic.genericMaybe(App_Model_Photobooth.genericPhotobooth))("http://localhost:8080")(App_Endpoint.getPhotobooth)("mycomputername")(Prelude.unit))(function (_8) {
+              return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
+                  if (_8 instanceof Data_Maybe.Nothing) {
+                      return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No photobooth instance found for: " + "mycomputername"));
+                  };
+                  if (_8 instanceof Data_Maybe.Just) {
+                      return Database_AnyDB.execute_(App_DB.upsertPB(_8.value0))(conn);
+                  };
+                  throw new Error("Failed pattern match at App.Networking line 42, column 1 - line 72, column 1: " + [ _8.constructor.name ]);
+              })())(function () {
+                  return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced Photobooth(s)")))(function () {
+                      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.queryOne(isForeignLastUpdated)(getLastUpdateEvents)([  ])(conn))(function (_7) {
+                          return Prelude.bind(Control_Monad_Aff.bindAff)(defaultDate(Control_Monad_Aff.monadErrorAff)(_7)(Data_Date.fromStringStrict("2010-01-01T00:00:00.000Z")))(function (_6) {
+                              return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Event.genericPartialEvent))("http://localhost:8080")(App_Endpoint.getNewEvents)(new Data_Tuple.Tuple("mycomputername", _6))(Prelude.unit))(function (_5) {
+                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB_Transaction.withTransaction(function (tc) {
+                                      return Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (pe) {
+                                          return Database_AnyDB.execute_(App_DB.upsertPartialEvent(pe))(conn);
+                                      })(_5);
+                                  })(conn))(function () {
+                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced Events")))(function () {
+                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.queryOne(isForeignLastUpdated)(getLastUpdateFiles)([  ])(conn))(function (_4) {
+                                              return Prelude.bind(Control_Monad_Aff.bindAff)(defaultDate(Control_Monad_Aff.monadErrorAff)(_4)(Data_Date.fromStringStrict("2010-01-01T00:00:00.000Z")))(function (_3) {
+                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_SavedFile.genericSavedFile))("http://localhost:8080")(App_Endpoint.getNewFiles)(new Data_Tuple.Tuple("mycomputername", _3))(Prelude.unit))(function (_2) {
+                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB_Transaction.withTransaction(function (tc) {
+                                                          return Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (sf) {
+                                                              return Database_AnyDB.execute_(App_DB.upsertSavedFile(sf))(conn);
+                                                          })(_2);
+                                                      })(conn))(function () {
+                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced Files")))(function () {
+                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.query(isForeignWrappedId)(getEmptyFileEntries)([  ])(conn))(function (_1) {
+                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(_1)(function (_12) {
+                                                                      return Prelude[">>="](Control_Monad_Aff.bindAff)(downloadFileById("http://localhost:8080")(_12.value0))(function (b) {
+                                                                          return saveFile(conn)(_12.value0)(b);
+                                                                      });
+                                                                  }))(function () {
+                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.queryAllStatistics(conn)("mycomputername"))(function (_0) {
+                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint_(App_Model_Statistic.genericAllStatistics)(Data_Generic.genericUnit)("http://localhost:8080")(App_Endpoint.postStatistics)(Prelude.unit)(_0))(function () {
+                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced statistics")))(function () {
+                                                                                  return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Synced File contents"));
                                                                               });
                                                                           });
                                                                       });
