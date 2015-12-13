@@ -14,7 +14,7 @@ import Data.Tuple (Tuple(..))
 import Data.Maybe
 import Data.Traversable
 import Data.Monoid (mempty)
-import Unsafe.Coerce
+import Data.Foreign
 import Data.Foreign.Class
 --import Control.Apply ((*>))
 
@@ -300,8 +300,10 @@ addStatistics c (AllStatistics {eventStatistics, monthlyStatistics}) = do
   
 newtype BufferForHttp = BufferForHttp Buffer
 
-instance foreignBufferForHttp :: IsForeign BufferForHttp
-  where read = unsafeCoerce
+instance foreignBufferForHttp :: IsForeign BufferForHttp where 
+  read obj = do
+    file <- readProp "file" obj
+    return $ BufferForHttp $ unsafeFromForeign file
         
 unpack :: BufferForHttp -> Buffer
 unpack (BufferForHttp b) = b
