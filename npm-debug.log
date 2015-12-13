@@ -1,0 +1,38 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'run', 'dev' ]
+2 info using npm@3.3.8
+3 info using node@v0.12.2
+4 verbose run-script [ 'predev', 'dev', 'postdev' ]
+5 info lifecycle @~predev: @
+6 verbose lifecycle @~predev: unsafe-perm in lifecycle true
+7 verbose lifecycle @~predev: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/Simon/psc-proj/klikhut/node_modules/.bin:/Users/Simon/Library/Android/sdk/platform-tools:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Library/Frameworks/Python.framework/Versions/3.5/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:~/purescript/.cabal-sandbox/bin/:/Users/Simon/.fzf/bin
+8 verbose lifecycle @~predev: CWD: /Users/Simon/psc-proj/klikhut
+9 silly lifecycle @~predev: Args: [ '-c', 'npm run test' ]
+10 silly lifecycle @~predev: Returned: code: 1  signal: null
+11 info lifecycle @~predev: Failed to exec predev script
+12 verbose stack Error: @ predev: `npm run test`
+12 verbose stack Exit status 1
+12 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:233:16)
+12 verbose stack     at EventEmitter.emit (events.js:110:17)
+12 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:24:14)
+12 verbose stack     at ChildProcess.emit (events.js:110:17)
+12 verbose stack     at maybeClose (child_process.js:1015:16)
+12 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:1087:5)
+13 verbose pkgid @
+14 verbose cwd /Users/Simon/psc-proj/klikhut
+15 error Darwin 15.0.0
+16 error argv "node" "/usr/local/bin/npm" "run" "dev"
+17 error node v0.12.2
+18 error npm  v3.3.8
+19 error code ELIFECYCLE
+20 error @ predev: `npm run test`
+20 error Exit status 1
+21 error Failed at the @ predev script 'npm run test'.
+21 error This is most likely a problem with the  package,
+21 error not with npm itself.
+21 error Tell the author that this fails on your system:
+21 error     npm run test
+21 error You can get their info via:
+21 error     npm owner ls
+21 error There is likely additional logging output above.
+22 verbose exit [ 1, true ]

@@ -304,11 +304,7 @@ newtype BufferForHttp = BufferForHttp Buffer
 
 instance foreignBufferForHttp :: IsForeign BufferForHttp where 
   read obj = do
-<<<<<<< HEAD
-    file :: Foreign <- readProp "file" obj
-=======
     file <- readProp "file" obj
->>>>>>> aa9c8a3238986319835a130ce823cb8efd6e7206
     return $ BufferForHttp $ unsafeFromForeign file
         
 unpack :: BufferForHttp -> Buffer
