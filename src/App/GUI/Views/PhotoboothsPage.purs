@@ -3,40 +3,36 @@ module App.GUI.Views.PhotoboothsPage (photoboothsPage) where
 import OpticUI.Markup.HTML as H
 import OpticUI.Markup as H
 import OpticUI.Components (textField)
-import OpticUI (with, withView, traversal, ui, text, UI(), Markup(), runHandler, foreach, Handler())
-import OpticUI.Components.Async (onResult, async)
+import OpticUI (with, withView, ui, text, foreach)
+import OpticUI.Components.Async (onResult)
 
 import Control.Monad.Aff (Aff())
-import Control.Monad.Eff.Exception (message, Error())
+import Control.Monad.Eff.Exception (message)
 import Control.Monad.Eff (Eff())
 import Control.Monad.Eff.Ref (REF())
-import Control.Apply ((*>))
 
-import Data.Lens (lens, traversed, Lens(), set, over, view)
-import Data.Lens.Common (_Just, _Nothing)
-import Data.Foldable (Foldable, mconcat)
-import Data.Array (snoc, (!!), updateAt)
+import Data.Lens (view)
+import Data.Lens.Common (_Just)
+import Data.Foldable (mconcat)
 import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.Monoid (mempty)
-import Data.StrMap (StrMap(), empty, lookup)
+import Data.StrMap (StrMap(), lookup)
 
-import Prelude
+import Prelude (Unit, bind, unit, ($), const, id, (<<<), (==), (++), (<>), return, (>>=)) 
 import DOM (DOM())
-import DOM.Timer(Timer(), timeout)
 import Network.HTTP.Affjax (AJAX())
 
-import App.Model.Photobooth
-import App.Model.Async
-import App.Model.Profile
-import App.Model.StrMap
-import App.GUI.Router
-import App.GUI.Types
-import App.GUI.State
-import App.GUI.Components.Exec
-import App.GUI.Components.Select
-import App.GUI.Views.Crud
-import App.GUI.Views.Profiles
-import App.Endpoint
+import App.Model.Photobooth (Photobooth(Photobooth), _Photobooth) 
+import App.Model.Async (AsyncModel, _Errored, _Busy, _Done, _Initial) 
+import App.Model.Profile (Profiles) 
+import App.GUI.Router (Nav) 
+import App.GUI.Types (AppUI, RefDomTimer, RefDom, AjaxRefDomTimer) 
+import App.GUI.State (Route(StatisticsPage, EventsPage), _defaultprofile, _alias, _saving, _editing, _collection, _state, _model, _computername, _profiles, _new, _collectionEditing) 
+import App.GUI.Components.Exec (exec) 
+import App.GUI.Components.Select (select) 
+import App.GUI.Views.Crud (CrudCommand(StartEdit, SaveEdit, CancelEdit, EditSaveFailed, EditSaved, LoadingFailed, Loaded, LoadAll, NewSaveFailed, NewSaved, SaveNew), crudHandler) 
+import App.GUI.Views.Profiles (loadProfiles) 
+import App.Endpoint (putPhotobooths, execEndpoint, postPhotobooths, getPhotobooths) 
 
 
 ------ PHOTOBOOTH UI's -----------
@@ -57,12 +53,13 @@ photoboothsPage goto = with $ \s h ->
       handle (Crud a) = crudHandler s h impls a
       handle (ToEvents name) = goto (EventsPage name)
       handle (ToStatistics name) = goto (StatisticsPage name)
-  in withView (H.div [H.classA ""] <<< H.table [H.classA "table crud-table"] <<< H.tbody []) $ mconcat [
+  in ui (H.h1 [H.classA "page-title"] $ H.text "Photobooths")
+  <> (withView (H.div [H.classA "crud-table-wrapper"] <<< H.table [H.classA "table crud-table"] <<< H.tbody []) $ mconcat [
         ui $ H.tr [] $ mconcat [H.th [] $ H.text "Name", H.th [] $ H.text "Alias", H.th [] $ H.text "Default Profile", H.th [] $ H.text "Actions", H.th [] $ H.text "Link"],
         _collectionEditing (listPhotobooths handle (view _editing s >>= \ed -> return ed.index) (view (_profiles <<< _Done) s)),
         _new $ (makeNewPb handle),
         _profiles loadProfiles
-      ]
+      ])
 
 makeNewPb :: forall eff. (PhotoboothsCommand -> Eff (RefDom eff) Unit) 
                          -> AppUI (RefDom eff) { model :: {id :: Maybe Int, computername :: String, alias :: String, defaultprofile :: String}
@@ -72,7 +69,8 @@ makeNewPb handle = with \model h -> withView (H.tr []) $ mconcat [
   withView (H.td []) $ (_model <<< _alias) $ textField [H.classA "form-control"],
   ui $ H.td [] $ H.text "",
   {-- withView (H.td []) $ (_model <<< _defaultprofile) $ textField [H.classA "form-control"], --}
-  withView (H.td []) $ _state $ (makeNewPbButton handle)
+  withView (H.td []) $ _state $ (makeNewPbButton handle),
+  ui $ H.td [] $ H.text ""
 ]
 
 makeNewPbButton :: forall eff. (PhotoboothsCommand -> Eff (ref :: REF | eff) Unit) -> AppUI (ref :: REF | eff) (AsyncModel (ref :: REF | eff) Photobooth) 

@@ -25,7 +25,6 @@ import Data.Tuple (Tuple(..))
 import Data.Array (cons)
 import Data.StrMap (StrMap(), lookup)
 
-import Prelude
 import DOM (DOM())
 import DOM.Timer(Timer(), timeout)
 import DOM.File.Types (File())
@@ -65,12 +64,24 @@ eventsPage cn = with c
                   , initial: (now >>= \d -> return {id: Nothing, computername: cn, name: "", datefrom: d, dateuntil: d, profile: "", files: []})
                   , constr: (\a ->{model: Event a, state: {savingFile: Initial, file: Nothing}})}
           handle (Crud command) = crudHandler s h impls command
-       in withView (H.div [H.classA ""]) $ mconcat [
-           ui $ H.h1 [] $ H.text ("Events for: " <> cn),
-           withView (H.table [H.classA "table crud-table"] <<< H.tbody []) ((_collectionEditing $ showEvents handle (view (_profiles <<< _Done) s)) <> (_new $ makeNewEvent handle)),
+       in mconcat [
+           ui $ H.h1 [H.classA "page-title"] $ H.text ("Events for: " <> cn),
+           withView (H.div [H.classA "crud-table-wrapper"] <<< H.table [H.classA "table crud-table"] <<< H.tbody []) 
+                      ( ui tableHeader
+                      <> (_collectionEditing $ showEvents handle (view (_profiles <<< _Done) s)) 
+                      <> (_new $ makeNewEvent handle)),
            _profiles loadProfiles
          ]
 
+tableHeader :: Markup 
+tableHeader = H.tr [] $ mconcat [ H.th [H.attr "style" "width: 28px;"] $ H.text ""
+                                , H.th [] $ H.text "Computer"
+                                , H.th [] $ H.text "Name"
+                                , H.th [] $ H.text "Start"
+                                , H.th [] $ H.text "End"
+                                , H.th [] $ H.text "Profile"
+                                , H.th [] $ H.text "Actions"
+                                , H.th [] $ H.text "Files"]
 -------- Existing + Edit -------------------
 
 showEvents :: forall eff. (EventsCommand (ANDRT eff) -> Eff (ANDRT eff) Unit)
@@ -96,8 +107,8 @@ showEvents handle profiles = with c
                                                                            , withView (H.td []) $ (_model <<< _Event <<< _dateuntil) $ dateTimeField [H.classA "form-control"]
                                                                            , withView (H.td []) $ (_model <<< _Event <<< _profile) $ select (fromMaybe [] $ lookup ev.computername profiles) 
                                                                                                                                             id [H.classA "form-control"]
-                                                                           , editEventButton handle i editing
-                                                                           , ui $ H.td [] $ H.text ""
+                                                                           , withView (H.td []) $ editEventButton handle i editing
+                                                                           , withView (H.td []) $ (ui $ H.br [] $ H.text "") <> listFiles
                                                                            ] 
     line _ editing i s@({model: Event ev, state: st}) h = 
       let fileSelected _ Nothing = return unit
@@ -113,11 +124,12 @@ showEvents handle profiles = with c
                   , ui $ H.td [] $ H.text $ ev.profile
                   , withView (H.td []) $ editEventButton handle i editing
                   , withView (H.td []) $ mconcat [ (_state <<< _file) $ fileInput [onFileInput fileSelected]
-                                                 , (_model <<< _Event <<< _files) $ traversal traversed (with \(SavedFile si) _ -> ui $ H.div [] $ H.text si.name)
+                                                 , listFiles
                                                  , (_state <<< _savingFile <<< _Errored) $ with (\err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text $ message err)
                                                  ] 
                   , (_state <<< _savingFile <<< _Busy) $ onResult fileSaved fileSaveErrored
                   ] 
+    listFiles = (_model <<< _Event <<< _files) $ traversal traversed (with \(SavedFile si) _ -> ui $ H.div [] $ H.text si.name)
 
 
 editEventButton :: forall eff a b c. (EventsCommand eff -> Eff eff Unit) -> Int -> Maybe {index :: Int, saving :: AsyncModel eff a | b} -> AppUI eff c

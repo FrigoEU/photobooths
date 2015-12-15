@@ -37,6 +37,7 @@ import App.Endpoint
 import App.Model.Photobooth
 import App.Model.Event
 import App.Model.SavedFile
+import App.FS
 
 networkingConnectionInfo :: ConnectionInfo
 networkingConnectionInfo = Sqlite3
@@ -139,43 +140,6 @@ instance isForeignLastUpdated :: IsForeign LastUpdated where
     
 toStr :: LastUpdated -> String
 toStr (LastUpdated s) = s
-
-mkEventDir :: Int -> FilePath
-mkEventDir i =  concat ["clientprofiles", "event_" <> show i]
-
-mkTempEventDir :: Int -> FilePath
-mkTempEventDir i = concat ["clientprofiles", "tmp_event_" <> show i]
-
-defaultDir :: FilePath
-defaultDir = concat ["clientprofiles", "default"]
-
--- mkdir throws if the directory already exists, safeMkdir doesn't
-safeMkdir :: forall eff. FilePath -> Aff (fs :: FS | eff) Unit
-safeMkdir f = exists f >>= (\doesExist -> if (not doesExist) then mkdir f else return unit)
-
--- rmdir doesn't remove folders when they're not empty, rmdirRecur does
-rmdirRecur :: forall eff. FilePath -> Aff (fs :: FS | eff) Unit
-rmdirRecur d = do 
-  exist <- exists d
-  if (not exist) then return unit
-                 else do filesToDelete <- readdir d
-                         traverse (\f -> unlink $ concat [d, f]) filesToDelete
-                         rmdir d
-  
-overWriteFile :: forall eff. FilePath -> Buffer -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit
-overWriteFile f b = do
-  exist <- exists f
-  if (exist) then unlink f
-             else return unit
-  writeFile f b 
-
-copyDir :: forall eff. FilePath -> FilePath -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit
-copyDir from to = do
-  rmdirRecur to
-  filesToCopy <- readdir from
-  mkdir to
-  traverse (\f -> readFile (concat [from, f]) >>= writeFile (concat [to, f])) filesToCopy
-  return unit
 
 data WrappedId = WrappedId Int
 instance isForeignWrappedId :: IsForeign WrappedId where

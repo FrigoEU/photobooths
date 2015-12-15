@@ -1,6 +1,45 @@
+body {
+  font-family: 'Droid Sans', sans-serif;
+}
+
 .crud-table{
+  table-layout: fixed;
+}
+.crud-table th{
+  color: #EBEBEB;
+  background-color: #484848;
 }
 .crud-table > tbody > tr > td{
   height: 50px;
   vertical-align: middle;
+  border-left: 1px solid #EBEBEB;
+  border-bottom: 1px solid #EBEBEB;
+}
+
+h1.page-title {
+  margin: 0px;
+  padding: 10px;
+  color: #484848;
+  background-color: #EBEBEB;
+}
+
+.crud-table-wrapper{
+}
+
+.btn{
+  margin-left: 5px;
+}
+.btn{
+  width: 120px;
+  border: 0px;
+  border-radius: 0px;
+}
+.btn-primary{
+  color: #FFF;
+  background-color: #1E91F5;
+}
+.form-control{
+  border: 0;
+  outline: 1px solid #CCC;
+  background-color: white;
 }

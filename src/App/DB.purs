@@ -3,9 +3,9 @@ module App.DB where
 import Prelude
 
 import Control.Monad.Eff.Exception (error)
+import Control.Monad.Error.Class (throwError)
 --import Control.Monad.Eff.Class
 import Control.Monad.Aff (Aff())
-import Control.Monad.Error.Class (throwError)
 --import Control.Monad.Eff.Console (log, CONSOLE())
 
 import Data.Date (Date())
@@ -34,6 +34,7 @@ import App.Model.Statistic
 import App.Model.Date
 import App.Model.StrMap
 import App.Model.NetworkingState
+import App.Model.WorkerState
 import App.DB
 
 ----- THIS FILE SHOULD NOT HAVE ANYTHING WITH "INPUT" TYPE IN IT ----------
@@ -51,6 +52,7 @@ dropDB conn = do
   execute_ (dropTable eventStatisticsTable) conn
   execute_ (dropTable monthlyStatisticsTable) conn
   execute_ (dropTable networkingStateTable) conn
+  execute_ (dropTable workerStateTable) conn
 
 makeDB :: forall eff. Connection -> Aff (db :: DB | eff) Unit
 makeDB conn = do
@@ -70,6 +72,7 @@ makeDB conn = do
   execute_ (updatedonInsertTrigger monthlyStatisticsTable ["computername", "month"]) conn
   execute_ (updatedonUpdateTrigger monthlyStatisticsTable ["computername", "month"]) conn
   execute_ createNetworkingStateTable conn
+  execute_ createWorkerStateTable conn
   
 loadWithDummy :: forall eff. Connection -> Date -> Aff (db :: DB | eff) Unit
 loadWithDummy conn dateNow = do
@@ -318,3 +321,24 @@ getFileById {params} = do
          Just id -> withConnection connectionInfo (\c -> 
            queryOne q [toSql id] c >>= \mf -> maybe (throwError $ error $ "No file found") (unpack >>> return) mf)
 
+updateWorkerState :: forall eff. Connection -> WorkerState -> Aff (db :: DB | eff) Unit 
+updateWorkerState c (WorkerState ws) = 
+  let q = Query "update WORKERSTATE set activeeventid = ?"
+   in execute q [toSql ws.active] c
+   
+queryActiveEvent :: forall eff. Connection -> Date -> Aff (db :: DB | eff) (Maybe PartialEvent)
+queryActiveEvent c d = 
+  let q = Query $ "select * from EVENTS where " 
+               <> "datefrom < '2015-12-13T10:27:04.038Z' " 
+               <> "and dateuntil > '2015-12-13T10:27:04.038Z' "
+   in queryOne q [toSql $ iso8601 d] c
+
+getMonthlyStatistic :: forall e. String -> Connection -> Int -> Aff (db :: DB | e) MonthlyStatistic 
+getMonthlyStatistic cname c m = 
+  let q = Query "select * from monthlystatistics where month = ?"
+      handle Nothing = MonthlyStatistic { computername: cname
+                                        , month: m
+                                        , pictures: 0
+                                        , prints: 0}
+      handle (Just i) = i
+   in queryOne q [toSql m] c >>= (return <<< handle)
