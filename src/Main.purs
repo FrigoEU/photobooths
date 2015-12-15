@@ -12,8 +12,8 @@ import Data.Date (now, Date(), Now(), fromStringStrict)
 import Data.Array (filterM)
 import Data.StrMap (lookup)
 import Data.Tuple (Tuple(..))
-import Data.Maybe
-import Data.Traversable
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.Traversable (traverse)
 --import Control.Apply ((*>))
 
 import Database.AnyDB (DB(), withConnection, Connection())
@@ -34,10 +34,10 @@ port = 8080
 main :: forall eff. Eff (now :: Now, console :: CONSOLE, db :: DB, express :: EXPRESS, fs :: FS | eff) Unit
 main = do
   dateNow <- now
-  runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection connectionInfo \conn -> do
-      dropDB conn
-      makeDB conn
-      loadWithDummy conn dateNow
+  --runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection connectionInfo \conn -> do
+      --dropDB conn
+      --makeDB conn
+      --loadWithDummy conn dateNow
   app <- makeApp
   hostEndpoint app getPhotobooth $ readCname "GetPhotobooth" queryPhotobooth
   hostEndpoint app getPhotobooths allPhotobooths
@@ -99,6 +99,6 @@ readCnamePname s f {params} =
 
 
 findProfileFiles :: forall eff. String -> String -> Aff (fs :: FS | eff) (Array String)
-findProfileFiles cname pname = ((<$>) \path -> concat [cname, pname, path]) <$> readdir (concat ["./profiles", cname, pname])
+findProfileFiles cname pname = ((<$>) \path -> concat [cname, pname, path]) <$> readdir (concat ["profiles", cname, pname])
 
 --testFindProfileFiles = runAff (log <<< show) (\s -> traverse log s *> return unit) (findProfileFiles "mycomputername" "profile1")

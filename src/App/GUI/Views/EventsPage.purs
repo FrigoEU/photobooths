@@ -112,7 +112,7 @@ showEvents handle profiles = with c
                   , ui $ H.td [] $ H.text $ iso8601 ev.dateuntil
                   , ui $ H.td [] $ H.text $ ev.profile
                   , withView (H.td []) $ editEventButton handle i editing
-                  , withView (H.td []) $ mconcat [ (_state <<< _file) $ fileInput [onFileInput fileSelected, accept ".jpg,.jpeg"]
+                  , withView (H.td []) $ mconcat [ (_state <<< _file) $ fileInput [onFileInput fileSelected]
                                                  , (_model <<< _Event <<< _files) $ traversal traversed (with \(SavedFile si) _ -> ui $ H.div [] $ H.text si.name)
                                                  , (_state <<< _savingFile <<< _Errored) $ with (\err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text $ message err)
                                                  ] 

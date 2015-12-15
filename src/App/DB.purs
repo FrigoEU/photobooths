@@ -289,10 +289,10 @@ queryNewFiles :: forall eff. Connection -> String -> Date -> Aff (db :: DB | eff
 queryNewFiles conn cname d = query q [toSql cname, toSql d] conn
   where
     q = Query $
-        "Select * from FILES i " <>
-        "Join Events e on e.id = i.eventid " <>
+        "Select f.* from FILES f " <>
+        "Join Events e on e.id = f.eventid " <>
         "where e.computername = ? " <>
-        "and i.updatedon > ? "
+        "and f.updatedon > ? "
 
 addStatistics :: forall eff. Connection -> AllStatistics -> Aff (db :: DB | eff) Unit
 addStatistics c (AllStatistics {eventStatistics, monthlyStatistics}) = do
