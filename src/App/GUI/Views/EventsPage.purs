@@ -65,7 +65,7 @@ eventsPage cn = with c
                   , constr: (\a ->{model: Event a, state: {savingFile: Initial, file: Nothing}})}
           handle (Crud command) = crudHandler s h impls command
        in mconcat [
-           ui $ H.h1 [H.classA "page-title"] $ H.text ("Events for: " <> cn),
+           ui $ H.h1 [H.classA "page-title"] $ H.text "Events for: " <> H.em [] (H.text cn),
            withView (H.div [H.classA "crud-table-wrapper"] <<< H.table [H.classA "table crud-table"] <<< H.tbody []) 
                       ( ui tableHeader
                       <> (_collectionEditing $ showEvents handle (view (_profiles <<< _Done) s)) 
@@ -135,13 +135,13 @@ showEvents handle profiles = with c
 editEventButton :: forall eff a b c. (EventsCommand eff -> Eff eff Unit) -> Int -> Maybe {index :: Int, saving :: AsyncModel eff a | b} -> AppUI eff c
 editEventButton handle i editing = c editing
   where 
-    c Nothing                          = ui $ H.button [H.classA "btn btn-primary", H.onClick (const $ handle $ Crud $ StartEdit i)] $ H.text "Edit!"
+    c Nothing                          = ui $ H.button [H.classA "btn btn-action", H.onClick (const $ handle $ Crud $ StartEdit i)] $ H.text "Edit!"
     c (Just {index: selI}) | selI /= i = ui $ H.div [] $ H.text ""
     c (Just {saving: Busy _})          = (ui $ H.button [H.classA "btn btn-warning"] $ H.text "Saving")
     c (Just {saving: Errored err})     = (ui $ H.button [H.classA "btn btn-danger", H.onClick \_ -> handle (Crud SaveEdit)] $ H.text "Save failed, try again")
                                       <> (ui $ H.div [H.classA "alert alert-danger"] $ H.text $ message err)
     c (Just {saving: _})               = (ui $ H.button [H.classA "btn btn-success", H.onClick \_ -> handle (Crud SaveEdit)] $ H.text "Save edit")
-                                      <> (ui $ H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (Crud CancelEdit)] $ H.text "Cancel edit")
+                                      <> (ui $ H.button [H.classA "btn btn-warning", H.onClick \_ -> handle (Crud CancelEdit)] $ H.text "Cancel edit")
 
 -------- New -------------------------------
 
@@ -152,7 +152,7 @@ makeNewEvent :: forall eff. (EventsCommand (ANDR eff) -> Eff (ANDR eff) Unit)
 makeNewEvent handle = 
   with \s h -> withView (H.tr []) $ mconcat [ 
                             ui $ H.td [] $ H.text "",
-                            withView (H.td []) $ (_model <<< _computername) $ textField [H.classA "form-control"],
+                            ui $ H.td [] $ H.text s.model.computername,
                             withView (H.td []) $ (_model <<< _name) $ textField [H.classA "form-control"],
                             withView (H.td []) $ (_model <<< _datefrom) $ dateTimeField [H.classA "form-control"],
                             withView (H.td []) $ (_model <<< _dateuntil) $ dateTimeField [H.classA "form-control"],
@@ -171,7 +171,7 @@ newEventButton handle = with c
     c (Errored err) h = (ui $ H.button [H.classA "btn btn-danger", H.onClick \_ -> handle $ Crud SaveNew] 
                               $ H.text "Saving Failed, Try Again?")
                      <> (ui $ H.div [H.classA "alert alert-danger"] $ text ("Event not saved: " <> message err))
-    c _ h = ui $ H.button [H.classA "btn btn-primary", H.onClick \_ -> handle $ Crud SaveNew] $ H.text "Save!"
+    c _ h = ui $ H.button [H.classA "btn btn-action", H.onClick \_ -> handle $ Crud SaveNew] $ H.text "Save!"
 
 --------- Aff ----------------------------
 

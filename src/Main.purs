@@ -5,7 +5,7 @@ import Prelude
 import Control.Monad.Eff (Eff ())
 import Control.Monad.Eff.Exception (error, Error())
 import Control.Monad.Eff.Console (log, CONSOLE())
-import Control.Monad.Aff (runAff, Aff())
+import Control.Monad.Aff (Aff())
 import Control.Monad.Error.Class (throwError, MonadError)
 
 import Data.Date (now, Date(), Now(), fromStringStrict)
@@ -22,7 +22,7 @@ import Node.FS (FS())
 import Node.FS.Aff (readdir, stat)
 import Node.FS.Stats (isDirectory)
 
-import Server.Core
+import Server.Core 
 
 import App.Endpoint
 import App.DB

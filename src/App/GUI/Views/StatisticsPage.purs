@@ -37,7 +37,7 @@ statisticsPage :: forall eff.
                   String ->
                   AppUI (ref :: REF | eff) { statistics :: AsyncModel (ref :: REF | eff) AllStatistics 
                                            , events :: AsyncModel (ref :: REF | eff) (Array (EventWithState (ref :: REF | eff)))}
-statisticsPage cn = ui (H.h1 [H.classA "page-title"] $ H.text ("Statistics for: " <> cn)) <> (with \s h -> mconcat [
+statisticsPage cn = ui (H.h1 [H.classA "page-title"] $ H.text "Statistics for: " <> H.em [] (H.text cn)) <> (with \s h -> mconcat [
      (_statistics <<< _Busy) $ onResult (\a -> runHandler h (set _statistics (Done a) s)) (\err -> runHandler h (set _statistics (Errored err) s)) <> (ui $ H.div [] $ H.text "Loading statistics"),
      (_statistics <<< _Errored) $ with \err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text ("Statistics failed to load: " <> message err),
      (_events <<< _Busy) $ onResult (\a -> runHandler h (set _events (Done a) s)) (\err -> runHandler h (set _events (Errored err) s)) <> (ui $ H.div [] $ H.text "Loading events"),

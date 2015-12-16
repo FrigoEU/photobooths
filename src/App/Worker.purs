@@ -1,6 +1,6 @@
 module App.Worker where
 
-import Prelude (Unit, bind, show, (<>), unit, return, ($), (>>=), flip, (+), (<$>), (/=), const, (<<<)) 
+import Prelude (Unit(), bind, show, (<>), unit, return, ($), (>>=), flip, (+), (<$>), (/=), const, (<<<)) 
 
 import Control.Monad.Aff (Aff(), runAff)
 import Control.Monad.Eff.Console (log)
@@ -8,11 +8,11 @@ import Control.Monad.Eff.Exception (error)
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Eff.Class (liftEff) 
 
-import Database.AnyDB (DB, Connection, ConnectionInfo(Sqlite3), Query(Query), execute_, queryOne_, withConnection) 
+import Database.AnyDB (DB(), Connection(), ConnectionInfo(Sqlite3), Query(Query), execute_, queryOne_, withConnection) 
 
-import Node.FS (FS) 
+import Node.FS (FS()) 
 import Node.FS.Aff (readFile, readdir, unlink, rename) 
-import Node.Path (FilePath, concat, basename) 
+import Node.Path (FilePath(), concat, basename) 
 import Node.Buffer (BUFFER())
 
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir) 
@@ -23,8 +23,8 @@ import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(Mon
 
 import Data.Traversable (traverse) 
 import Data.Maybe (Maybe(Just, Nothing), maybe) 
-import Data.Date (Date, now) 
-import Data.Date.Locale (Locale, month) 
+import Data.Date (Date(), now) 
+import Data.Date.Locale (Locale(), month) 
 import Data.Array (length)
 
 

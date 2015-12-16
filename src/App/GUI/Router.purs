@@ -39,6 +39,7 @@ nav_ s (r@(PhotoboothsPage)) = return $ Tuple "/photobooths" (set _route r s)
 nav_ s (r@(EventsPage cname)) = do
   eventsAsync <- async $ loadEvents cname
   let modifications = (set _route r) <<<
+                      (set (_eventsPage <<< _new <<< _model <<< _computername) cname) <<<
                       (set _events (Busy eventsAsync))
   return $ Tuple ("/events/" <> cname) (modifications s)
 nav_ s (r@(StatisticsPage cname)) = do

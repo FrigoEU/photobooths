@@ -40,6 +40,7 @@ instance showFieldType :: Show FieldType where
 instance showColumnConstraint :: Show ColumnConstraint where
   show PrimaryKey = "PRIMARY KEY"
   show Unique = "UNIQUE"
+  
 
 dropTable :: forall a. Table -> Query a
 dropTable {name: s} =  Query $ "DROP TABLE IF EXISTS " ++ s

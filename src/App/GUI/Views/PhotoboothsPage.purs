@@ -18,19 +18,19 @@ import Data.Maybe (Maybe(..), maybe, fromMaybe)
 import Data.Monoid (mempty)
 import Data.StrMap (StrMap(), lookup)
 
-import Prelude (Unit, bind, unit, ($), const, id, (<<<), (==), (++), (<>), return, (>>=)) 
+import Prelude 
 import DOM (DOM())
 import Network.HTTP.Affjax (AJAX())
 
 import App.Model.Photobooth (Photobooth(Photobooth), _Photobooth) 
-import App.Model.Async (AsyncModel, _Errored, _Busy, _Done, _Initial) 
-import App.Model.Profile (Profiles) 
-import App.GUI.Router (Nav) 
-import App.GUI.Types (AppUI, RefDomTimer, RefDom, AjaxRefDomTimer) 
-import App.GUI.State (Route(StatisticsPage, EventsPage), _defaultprofile, _alias, _saving, _editing, _collection, _state, _model, _computername, _profiles, _new, _collectionEditing) 
+import App.Model.Async (AsyncModel(), _Errored, _Busy, _Done, _Initial) 
+import App.Model.Profile (Profiles()) 
+import App.GUI.Router (Nav()) 
+import App.GUI.Types (AppUI(), RefDomTimer(), RefDom(), AjaxRefDomTimer()) 
+import App.GUI.State
 import App.GUI.Components.Exec (exec) 
 import App.GUI.Components.Select (select) 
-import App.GUI.Views.Crud (CrudCommand(StartEdit, SaveEdit, CancelEdit, EditSaveFailed, EditSaved, LoadingFailed, Loaded, LoadAll, NewSaveFailed, NewSaved, SaveNew), crudHandler) 
+import App.GUI.Views.Crud 
 import App.GUI.Views.Profiles (loadProfiles) 
 import App.Endpoint (putPhotobooths, execEndpoint, postPhotobooths, getPhotobooths) 
 
@@ -76,7 +76,7 @@ makeNewPb handle = with \model h -> withView (H.tr []) $ mconcat [
 makeNewPbButton :: forall eff. (PhotoboothsCommand -> Eff (ref :: REF | eff) Unit) -> AppUI (ref :: REF | eff) (AsyncModel (ref :: REF | eff) Photobooth) 
 makeNewPbButton handle = 
   with \new h -> mconcat [
-       _Initial $ ui $ H.button [H.classA "btn btn-primary", H.onClick \_ -> handle $ Crud SaveNew] $ text "Save shit",
+       _Initial $ ui $ H.button [H.classA "btn btn-action", H.onClick \_ -> handle $ Crud SaveNew] $ text "Save shit",
        _Busy $ mconcat [
            ui $ H.button [H.classA "btn btn-warning"] $ text "Saving PB",
            onResult (\newS -> handle $ Crud (NewSaved newS)) (handle <<< Crud <<< NewSaveFailed)
@@ -113,14 +113,18 @@ showPB handle (Just selInd) profiles i | i == selInd = with \(Photobooth pb) h -
     ui $ H.td [] $ mconcat [
       H.button [H.classA "btn btn-warning", H.onClick \_ -> handle $ Crud CancelEdit] $ text "Cancel",
       H.button [H.classA "btn btn-success", H.onClick \_ -> handle $ Crud SaveEdit] $ text "Save"
-      ]
+      ],
+    ui $ H.td [] $ mconcat [
+        H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToEvents pb.computername)] $ text "Zie events",
+        H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToStatistics pb.computername)] $ text "Zie statistieken"
+      ] 
   ]
 showPB handle a _ i = with \(Photobooth pb) h -> 
   ui $ H.tr [] $ mconcat [
     H.td [] $ text pb.computername,
     H.td [] $ text pb.alias,
     H.td [] $ text pb.defaultprofile,
-    maybe (H.td [] $ H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (Crud $ StartEdit i)] $ text "Edit") (const mempty) a,
+    maybe (H.td [] $ H.button [H.classA "btn btn-action", H.onClick \_ -> handle (Crud $ StartEdit i)] $ text "Edit") (const $ H.td [] $ text "") a,
     H.td [] $ mconcat [
         H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToEvents pb.computername)] $ text "Zie events",
         H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToStatistics pb.computername)] $ text "Zie statistieken"
