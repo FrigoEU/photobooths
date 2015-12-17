@@ -43,6 +43,7 @@ workerConnI = Sqlite3 { filename: "workerdb"
 
 main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
   let cname = "mycomputername"
+      
   ------ Move photos into photohistory folder -------------
   safeMkdir historyFolder
   safeMkdir mainPhotosDir
@@ -65,6 +66,7 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
                                     then switchEvents dateNow conn cname active newActive
                                     else return unit
   return unit
+  
   
 switchEvents :: forall eff. Date -> Connection -> String -> Active -> Active ->
                 Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale | eff) Unit 
@@ -101,6 +103,11 @@ switchEvents dateNow conn cname old new = do
   updateWorkerState conn $ WorkerState {active: new}
               
   return unit
+  
+  
+  
+  
+  
   
 killPrograms :: forall eff. Aff eff Unit
 killPrograms = return unit
