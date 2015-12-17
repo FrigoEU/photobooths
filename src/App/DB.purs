@@ -212,6 +212,7 @@ selectFilesForEvent :: forall eff. Int -> Connection -> Aff (db :: DB | eff) (Ar
 selectFilesForEvent i conn = query (selectStar savedFileTable "WHERE eventid = ?") [toSql i] conn
 
 selectFilesForEvents :: forall eff. Array Int -> Connection -> Aff (db :: DB | eff) (Array SavedFile)
+selectFilesForEvents [] _    = return []
 selectFilesForEvents is conn =
   query (selectStar savedFileTable $ "WHERE eventid = (" <> qs <>")") (map toSql is) conn
     where

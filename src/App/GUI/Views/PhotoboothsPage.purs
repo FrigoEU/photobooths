@@ -81,8 +81,6 @@ showPB handle (Just selInd) profiles editing i | i == selInd = with \(Photobooth
         , (_Photobooth <<< _alias) $ textField [H.classA "form-control"]
         , (_Photobooth <<< _defaultprofile) $ select (fromMaybe [] $ lookup pb.computername profiles) id [H.classA "form-control"]
         , editButton (handle <<< Crud) i editing
-        , ui $ (H.button [H.classA "btn btn-warning", H.onClick \_ -> handle $ Crud CancelEdit] $ text "Cancel")
-          <> (H.button [H.classA "btn btn-success", H.onClick \_ -> handle $ Crud SaveEdit] $ text "Save")
         , ui $ linkButtons handle pb.computername
         ]
 showPB handle selInd       _         editing i = with \(Photobooth pb) h -> 

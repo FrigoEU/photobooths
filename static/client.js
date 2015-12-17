@@ -6447,7 +6447,6 @@ var PS = { };
   var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
   var Data_Lens = PS["Data.Lens"];
   var Data_String = PS["Data.String"];
-  var Data_Maybe = PS["Data.Maybe"];
   var Data_Tuple = PS["Data.Tuple"];
   var Data_Either = PS["Data.Either"];
   var App_Model_Async = PS["App.Model.Async"];
@@ -6487,7 +6486,7 @@ var PS = { };
                   })()();
               };
           };
-          throw new Error("Failed pattern match at App.GUI.Router line 38, column 1 - line 39, column 1: " + [ s.constructor.name, _4.constructor.name ]);
+          throw new Error("Failed pattern match at App.GUI.Router line 37, column 1 - line 39, column 1: " + [ s.constructor.name, _4.constructor.name ]);
       };
   };
   var nav = function (s) {
@@ -6502,42 +6501,40 @@ var PS = { };
       };
   };
   var match$prime = function (str) {
-      return Data_Either.either(Data_Maybe.Just.create)(Prelude["const"](Data_Maybe.Nothing.value))((function () {
-          var t = Data_String.drop(2)(str);
+      var t = Data_String.drop(2)(str);
+      return Prelude.bind(Data_Either.bindEither)((function () {
+          var _15 = Prelude["=="](Prelude.eqString)(t)("photobooths");
+          if (_15) {
+              return new Data_Either.Left(App_GUI_State.PhotoboothsPage.value);
+          };
+          if (!_15) {
+              return new Data_Either.Right(Prelude.unit);
+          };
+          throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ _15.constructor.name ]);
+      })())(function () {
           return Prelude.bind(Data_Either.bindEither)((function () {
-              var _15 = Prelude["=="](Prelude.eqString)(t)("photobooths");
-              if (_15) {
-                  return new Data_Either.Left(App_GUI_State.PhotoboothsPage.value);
+              var _16 = Prelude["=="](Prelude.eqString)(Data_String.take(6)(t))("events");
+              if (_16) {
+                  return new Data_Either.Left(new App_GUI_State.EventsPage(Data_String.drop(7)(t)));
               };
-              if (!_15) {
+              if (!_16) {
                   return new Data_Either.Right(Prelude.unit);
               };
-              throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ _15.constructor.name ]);
+              throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ _16.constructor.name ]);
           })())(function () {
-              return Prelude.bind(Data_Either.bindEither)((function () {
-                  var _16 = Prelude["=="](Prelude.eqString)(Data_String.take(6)(t))("events");
-                  if (_16) {
-                      return new Data_Either.Left(new App_GUI_State.EventsPage(Data_String.drop(7)(t)));
-                  };
-                  if (!_16) {
-                      return new Data_Either.Right(Prelude.unit);
-                  };
-                  throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ _16.constructor.name ]);
-              })())(function () {
-                  var _17 = Prelude["=="](Prelude.eqString)(Data_String.take(10)(t))("statistics");
-                  if (_17) {
-                      return new Data_Either.Left(new App_GUI_State.StatisticsPage(Data_String.drop(11)(t)));
-                  };
-                  if (!_17) {
-                      return new Data_Either.Right(Prelude.unit);
-                  };
-                  throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ _17.constructor.name ]);
-              });
+              var _17 = Prelude["=="](Prelude.eqString)(Data_String.take(10)(t))("statistics");
+              if (_17) {
+                  return new Data_Either.Left(new App_GUI_State.StatisticsPage(Data_String.drop(11)(t)));
+              };
+              if (!_17) {
+                  return new Data_Either.Right(Prelude.unit);
+              };
+              throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ _17.constructor.name ]);
           });
-      })());
+      });
   };
   var match = function (str) {
-      return Data_Maybe.maybe(App_GUI_State.PhotoboothsPage.value)(Prelude.id(Prelude.categoryFn))(match$prime(str));
+      return Data_Either.either(Prelude.id(Prelude.categoryFn))(Prelude["const"](App_GUI_State.PhotoboothsPage.value))(match$prime(str));
   };
   exports["match"] = match;
   exports["nav_"] = nav_;
@@ -7202,8 +7199,8 @@ var PS = { };
   var makeNewPb = function (handle) {
       var c = function (model) {
           return function (h) {
-              return App_GUI_Components_Markup.rowUI([ App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), OpticUI_Core.ui(App_GUI_Components_Markup.emptyTd), App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_Components_CrudButtons.newButton(function (_37) {
-                  return handle(Crud.create(_37));
+              return App_GUI_Components_Markup.rowUI([ App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), OpticUI_Core.ui(App_GUI_Components_Markup.emptyTd), App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_Components_CrudButtons.newButton(function (_33) {
+                  return handle(Crud.create(_33));
               })), OpticUI_Core.ui(App_GUI_Components_Markup.emptyTd) ]);
           };
       };
@@ -7212,36 +7209,32 @@ var PS = { };
   var loadPbs = Endpoint_Client.execEndpoint(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Photobooth.genericPhotobooth))(App_Endpoint.getPhotobooths)(Prelude.unit)(Prelude.unit);
   var linkButtons = function (handle) {
       return function (cn) {
-          return Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_6) {
+          return Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_4) {
               return handle(new ToEvents(cn));
-          }) ])(OpticUI_Markup.text("Zie events")))(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_7) {
+          }) ])(OpticUI_Markup.text("Zie events")))(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (_5) {
               return handle(new ToStatistics(cn));
           }) ])(OpticUI_Markup.text("Zie statistieken")));
       };
   };
   var showPB = function (handle) {
-      return function (_8) {
+      return function (_6) {
           return function (profiles) {
               return function (editing) {
                   return function (i) {
-                      if (_8 instanceof Data_Maybe.Just && i === _8.value0) {
-                          return OpticUI_Core["with"](function (_3) {
+                      if (_6 instanceof Data_Maybe.Just && i === _6.value0) {
+                          return OpticUI_Core["with"](function (_1) {
                               return function (h) {
-                                  return App_GUI_Components_Markup.rowUI([ OpticUI_Core.ui(OpticUI_Markup.text(_3.value0.computername)), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._defaultprofile(OpticUI_Core.uiStrong)(App_GUI_Components_Select.select(Data_Maybe.fromMaybe([  ])(Data_StrMap.lookup(_3.value0.computername)(profiles)))(Prelude.id(Prelude.categoryFn))([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_Components_CrudButtons.editButton(function (_38) {
-                                      return handle(Crud.create(_38));
-                                  })(i)(editing), OpticUI_Core.ui(Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-warning"), OpticUI_Markup_HTML.onClick(function (_1) {
-                                      return handle(new Crud(App_GUI_Views_Crud.CancelEdit.value));
-                                  }) ])(OpticUI_Markup.text("Cancel")))(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-success"), OpticUI_Markup_HTML.onClick(function (_2) {
-                                      return handle(new Crud(App_GUI_Views_Crud.SaveEdit.value));
-                                  }) ])(OpticUI_Markup.text("Save")))), OpticUI_Core.ui(linkButtons(handle)(_3.value0.computername)) ]);
+                                  return App_GUI_Components_Markup.rowUI([ OpticUI_Core.ui(OpticUI_Markup.text(_1.value0.computername)), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._defaultprofile(OpticUI_Core.uiStrong)(App_GUI_Components_Select.select(Data_Maybe.fromMaybe([  ])(Data_StrMap.lookup(_1.value0.computername)(profiles)))(Prelude.id(Prelude.categoryFn))([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_Components_CrudButtons.editButton(function (_34) {
+                                      return handle(Crud.create(_34));
+                                  })(i)(editing), OpticUI_Core.ui(linkButtons(handle)(_1.value0.computername)) ]);
                               };
                           });
                       };
-                      return OpticUI_Core["with"](function (_5) {
+                      return OpticUI_Core["with"](function (_3) {
                           return function (h) {
-                              return App_GUI_Components_Markup.rowUI(Prelude["<$>"](Prelude.functorArray)(OpticUI_Core.ui)([ OpticUI_Markup.text(_5.value0.computername), OpticUI_Markup.text(_5.value0.alias), OpticUI_Markup.text(_5.value0.defaultprofile), Data_Maybe.maybe(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-action"), OpticUI_Markup_HTML.onClick(function (_4) {
+                              return App_GUI_Components_Markup.rowUI(Prelude["<$>"](Prelude.functorArray)(OpticUI_Core.ui)([ OpticUI_Markup.text(_3.value0.computername), OpticUI_Markup.text(_3.value0.alias), OpticUI_Markup.text(_3.value0.defaultprofile), Data_Maybe.maybe(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-action"), OpticUI_Markup_HTML.onClick(function (_2) {
                                   return handle(Crud.create(new App_GUI_Views_Crud.StartEdit(i)));
-                              }) ])(OpticUI_Markup.text("Edit")))(Prelude["const"](OpticUI_Markup.text("")))(_8), linkButtons(handle)(_5.value0.computername) ]));
+                              }) ])(OpticUI_Markup.text("Edit")))(Prelude["const"](OpticUI_Markup.text("")))(_6), linkButtons(handle)(_3.value0.computername) ]));
                           };
                       });
                   };
@@ -7253,25 +7246,25 @@ var PS = { };
       return function (selInd) {
           return function (profiles) {
               var showColl = function (e) {
-                  return function (_10) {
+                  return function (_8) {
                       return function (h) {
-                          if (_10 instanceof App_Model_Async.Initial) {
+                          if (_8 instanceof App_Model_Async.Initial) {
                               return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Nothing loaded yet")))))(App_Model_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_Components_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(App_GUI_Views_Crud.LoadAll.value)))));
                           };
-                          if (_10 instanceof App_Model_Async.Busy) {
-                              return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))))(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_39) {
-                                  return handle(Crud.create(App_GUI_Views_Crud.Loaded.create(_39)));
-                              })(function (_40) {
-                                  return handle(Crud.create(App_GUI_Views_Crud.LoadingFailed.create(_40)));
+                          if (_8 instanceof App_Model_Async.Busy) {
+                              return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))))(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_35) {
+                                  return handle(Crud.create(App_GUI_Views_Crud.Loaded.create(_35)));
+                              })(function (_36) {
+                                  return handle(Crud.create(App_GUI_Views_Crud.LoadingFailed.create(_36)));
                               })));
                           };
-                          if (_10 instanceof App_Model_Async.Done) {
+                          if (_8 instanceof App_Model_Async.Done) {
                               return App_Model_Async._Done(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.foreach(OpticUI_Markup.markupMonoid)(Data_Traversable.traversableArray)(showPB(handle)(selInd)(profiles)(e)));
                           };
-                          if (_10 instanceof App_Model_Async.Errored) {
-                              return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(_10.value0)))));
+                          if (_8 instanceof App_Model_Async.Errored) {
+                              return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(_8.value0)))));
                           };
-                          throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 70, column 7 - line 72, column 7: " + [ e.constructor.name, _10.constructor.name, h.constructor.name ]);
+                          throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 70, column 7 - line 72, column 7: " + [ e.constructor.name, _8.constructor.name, h.constructor.name ]);
                       };
                   };
               };
@@ -7279,10 +7272,10 @@ var PS = { };
                   return function (_0) {
                       return App_GUI_State._collection(OpticUI_Core.uiStrong)(OpticUI_Core["with"](showColl(Data_Lens_Getter.view(App_GUI_State._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))));
                   };
-              }), App_GUI_State._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_State._saving(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_41) {
-                  return handle(Crud.create(App_GUI_Views_Crud.EditSaved.create(_41)));
-              })(function (_42) {
-                  return handle(Crud.create(App_GUI_Views_Crud.EditSaveFailed.create(_42)));
+              }), App_GUI_State._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_State._saving(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function (_37) {
+                  return handle(Crud.create(App_GUI_Views_Crud.EditSaved.create(_37)));
+              })(function (_38) {
+                  return handle(Crud.create(App_GUI_Views_Crud.EditSaveFailed.create(_38)));
               }))))) ]);
           };
       };
@@ -7302,22 +7295,22 @@ var PS = { };
                   }), 
                   constr: App_Model_Photobooth.Photobooth.create
               };
-              var handle = function (_9) {
-                  if (_9 instanceof Crud) {
-                      return App_GUI_Views_Crud.crudHandler(s)(h)(impls)(_9.value0);
+              var handle = function (_7) {
+                  if (_7 instanceof Crud) {
+                      return App_GUI_Views_Crud.crudHandler(s)(h)(impls)(_7.value0);
                   };
-                  if (_9 instanceof ToEvents) {
-                      return $$goto(new App_GUI_State.EventsPage(_9.value0));
+                  if (_7 instanceof ToEvents) {
+                      return $$goto(new App_GUI_State.EventsPage(_7.value0));
                   };
-                  if (_9 instanceof ToStatistics) {
-                      return $$goto(new App_GUI_State.StatisticsPage(_9.value0));
+                  if (_7 instanceof ToStatistics) {
+                      return $$goto(new App_GUI_State.StatisticsPage(_7.value0));
                   };
-                  throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 42, column 1 - line 49, column 1: " + [ _9.constructor.name ]);
+                  throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 42, column 1 - line 49, column 1: " + [ _7.constructor.name ]);
               };
               return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(App_GUI_Components_Markup.pageTitle(OpticUI_Markup.text("Photobooths"))))(OpticUI_Core.withView(App_GUI_Components_Markup.crudTable)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.tableHeader(Prelude.functorArray)(Data_Foldable.foldableArray)([  ])([ "Name", "Alias", "Default Profile", "Actions", "Link" ])), App_GUI_State._collectionEditing(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._editing(Data_Profunctor_Star.strongStar(Data_Const.functorConst)))(s))(function (ed) {
                   return Prelude["return"](Data_Maybe.applicativeMaybe)(ed.index);
-              }))(Data_Lens_Getter.view(function (_43) {
-                  return App_GUI_State._profiles(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(App_Model_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_StrMap.monoidStrMap(Prelude.semigroupArray))))(_43));
+              }))(Data_Lens_Getter.view(function (_39) {
+                  return App_GUI_State._profiles(Data_Profunctor_Star.strongStar(Data_Const.functorConst))(App_Model_Async._Done(Data_Profunctor_Star.choiceStar(Data_Const.applicativeConst(Data_StrMap.monoidStrMap(Prelude.semigroupArray))))(_39));
               })(s))), App_GUI_State._new(OpticUI_Core.uiStrong)(makeNewPb(handle)), App_GUI_State._profiles(OpticUI_Core.uiStrong)(App_GUI_Views_Profiles.loadProfiles) ])));
           };
       });

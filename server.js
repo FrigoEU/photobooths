@@ -3778,11 +3778,11 @@ var PS = { };
   var BufferForHttp = function (x) {
       return x;
   };
-  var upsertMonthlyStatistic = function (_22) {
-      return SQL.insert(App_Model_Statistic.monthlyStatisticsTable)(App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("month")(Prelude.show(Prelude.showInt)(_22.value0.month)), Data_Tuple.Tuple.create("computername")(_22.value0.computername), Data_Tuple.Tuple.create("pictures")(Prelude.show(Prelude.showInt)(_22.value0.pictures)), Data_Tuple.Tuple.create("prints")(Prelude.show(Prelude.showInt)(_22.value0.prints)) ]))(true)("");
+  var upsertMonthlyStatistic = function (_23) {
+      return SQL.insert(App_Model_Statistic.monthlyStatisticsTable)(App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("month")(Prelude.show(Prelude.showInt)(_23.value0.month)), Data_Tuple.Tuple.create("computername")(_23.value0.computername), Data_Tuple.Tuple.create("pictures")(Prelude.show(Prelude.showInt)(_23.value0.pictures)), Data_Tuple.Tuple.create("prints")(Prelude.show(Prelude.showInt)(_23.value0.prints)) ]))(true)("");
   };
-  var upsertEventStatistic = function (_21) {
-      return SQL.insert(App_Model_Statistic.eventStatisticsTable)(App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("eventId")(Prelude.show(Prelude.showInt)(_21.value0.eventId)), Data_Tuple.Tuple.create("computername")(_21.value0.computername), Data_Tuple.Tuple.create("pictures")(Prelude.show(Prelude.showInt)(_21.value0.pictures)), Data_Tuple.Tuple.create("prints")(Prelude.show(Prelude.showInt)(_21.value0.prints)) ]))(true)("");
+  var upsertEventStatistic = function (_22) {
+      return SQL.insert(App_Model_Statistic.eventStatisticsTable)(App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("eventId")(Prelude.show(Prelude.showInt)(_22.value0.eventId)), Data_Tuple.Tuple.create("computername")(_22.value0.computername), Data_Tuple.Tuple.create("pictures")(Prelude.show(Prelude.showInt)(_22.value0.pictures)), Data_Tuple.Tuple.create("prints")(Prelude.show(Prelude.showInt)(_22.value0.prints)) ]))(true)("");
   };
   var updatePB = function (conn) {
       return function (_18) {
@@ -3800,13 +3800,16 @@ var PS = { };
           throw new Error("Failed pattern match at App.DB line 169, column 1 - line 170, column 1: " + [ conn.constructor.name, _18.constructor.name ]);
       };
   };
-  var unpack = function (_24) {
-      return _24;
+  var unpack = function (_25) {
+      return _25;
   };
-  var selectFilesForEvents = function (is) {
+  var selectFilesForEvents = function (_21) {
       return function (conn) {
-          var qs = Data_String.joinWith(", ")(Data_Array.replicate(Data_Array.length(is))("?"));
-          return Database_AnyDB.query(App_Model_SavedFile.savedFileIsForeign)(SQL.selectStar(App_Model_SavedFile.savedFileTable)("WHERE eventid = (" + (qs + ")")))(Prelude.map(Prelude.functorArray)(Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt))(is))(conn);
+          if (_21.length === 0) {
+              return Prelude["return"](Control_Monad_Aff.applicativeAff)([  ]);
+          };
+          var qs = Data_String.joinWith(", ")(Data_Array.replicate(Data_Array.length(_21))("?"));
+          return Database_AnyDB.query(App_Model_SavedFile.savedFileIsForeign)(SQL.selectStar(App_Model_SavedFile.savedFileTable)("WHERE eventid = (" + (qs + ")")))(Prelude.map(Prelude.functorArray)(Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt))(_21))(conn);
       };
   };
   var selectFilesForEvent = function (i) {
@@ -3887,18 +3890,18 @@ var PS = { };
                   return Data_Maybe.fromMaybe(-1)(_12.value0.id);
               })(_1);
               return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
-                  var _71 = Data_Array.length(ids) > -1;
-                  if (_71) {
+                  var _74 = Data_Array.length(ids) > -1;
+                  if (_74) {
                       return selectFilesForEvents(ids)(conn);
                   };
-                  if (!_71) {
+                  if (!_74) {
                       return Prelude["return"](Control_Monad_Aff.applicativeAff)([  ]);
                   };
-                  throw new Error("Failed pattern match at App.DB line 110, column 1 - line 111, column 1: " + [ _71.constructor.name ]);
+                  throw new Error("Failed pattern match at App.DB line 110, column 1 - line 111, column 1: " + [ _74.constructor.name ]);
               })())(function (_0) {
-                  var createEvent = function (_26) {
-                      return App_Model_Event.mkEvent(_26)(Data_Array.filter(function (_13) {
-                          return _13.value0.eventId === Data_Maybe.fromMaybe(0)(_26.value0.id);
+                  var createEvent = function (_27) {
+                      return App_Model_Event.mkEvent(_27)(Data_Array.filter(function (_13) {
+                          return _13.value0.eventId === Data_Maybe.fromMaybe(0)(_27.value0.id);
                       })(_0));
                   };
                   return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude["<$>"](Prelude.functorArray)(createEvent)(_1));
@@ -3969,13 +3972,13 @@ var PS = { };
       return Database_AnyDB.query_(App_Model_Photobooth.photoboothIsForeign)(SQL.selectStar(App_Model_Photobooth.photoboothsTable)(""))(conn);
   };
   var addStatistics = function (c) {
-      return function (_23) {
+      return function (_24) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (s) {
               return Database_AnyDB.execute_(upsertMonthlyStatistic(s))(c);
-          })(_23.value0.monthlyStatistics))(function (_10) {
+          })(_24.value0.monthlyStatistics))(function (_10) {
               return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (s) {
                   return Database_AnyDB.execute_(upsertEventStatistic(s))(c);
-              })(_23.value0.eventStatistics))(function (_9) {
+              })(_24.value0.eventStatistics))(function (_9) {
                   return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
               });
           });
