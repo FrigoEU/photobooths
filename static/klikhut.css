@@ -57,3 +57,6 @@ h1.page-title em{
   outline: 1px solid #CCC;
   background-color: white;
 }
+.indexed-tr tr th:first-child{
+  width: 28px;
+}

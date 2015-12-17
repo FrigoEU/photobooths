@@ -4,24 +4,21 @@ import Prelude
 
 import OpticUI.Markup.HTML as H
 import OpticUI.Markup as H
-import OpticUI (with, withView, traversal, ui, text, UI(), Markup(), runHandler, foreach)
+import OpticUI (with, ui, runHandler)
 import OpticUI.Components.Async (onResult, async)
 
-import Control.Monad.Eff.Exception (message, Error())
-import Control.Monad.Eff (Eff())
+import Control.Monad.Eff.Exception (message)
 import Control.Monad.Aff (Aff())
 
 import Data.Monoid (mempty)
 import Data.StrMap (StrMap())
 
-import Prelude
 import Network.HTTP.Affjax (AJAX())
 
 import App.Model.Profile
 import App.Model.Async
 import App.Model.StrMap
 import App.GUI.Types
-import App.GUI.State
 import App.GUI.Components.Exec
 import App.Endpoint
 

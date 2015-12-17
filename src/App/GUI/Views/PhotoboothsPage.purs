@@ -9,13 +9,11 @@ import OpticUI.Components.Async (onResult)
 import Control.Monad.Aff (Aff())
 import Control.Monad.Eff.Exception (message)
 import Control.Monad.Eff (Eff())
-import Control.Monad.Eff.Ref (REF())
 
 import Data.Lens (view)
 import Data.Lens.Common (_Just)
 import Data.Foldable (mconcat)
 import Data.Maybe (Maybe(..), maybe, fromMaybe)
-import Data.Monoid (mempty)
 import Data.StrMap (StrMap(), lookup)
 
 import Prelude 
@@ -23,13 +21,15 @@ import DOM (DOM())
 import Network.HTTP.Affjax (AJAX())
 
 import App.Model.Photobooth (Photobooth(Photobooth), _Photobooth) 
-import App.Model.Async (AsyncModel(), _Errored, _Busy, _Done, _Initial) 
+import App.Model.Async (AsyncModel(..), _Busy, _Done, _Initial) 
 import App.Model.Profile (Profiles()) 
 import App.GUI.Router (Nav()) 
 import App.GUI.Types (AppUI(), RefDomTimer(), RefDom(), AjaxRefDomTimer()) 
 import App.GUI.State
 import App.GUI.Components.Exec (exec) 
 import App.GUI.Components.Select (select) 
+import App.GUI.Components.CrudButtons
+import App.GUI.Components.Markup
 import App.GUI.Views.Crud 
 import App.GUI.Views.Profiles (loadProfiles) 
 import App.Endpoint (putPhotobooths, execEndpoint, postPhotobooths, getPhotobooths) 
@@ -53,83 +53,62 @@ photoboothsPage goto = with $ \s h ->
       handle (Crud a) = crudHandler s h impls a
       handle (ToEvents name) = goto (EventsPage name)
       handle (ToStatistics name) = goto (StatisticsPage name)
-  in ui (H.h1 [H.classA "page-title"] $ H.text "Photobooths")
-  <> (withView (H.div [H.classA "crud-table-wrapper"] <<< H.table [H.classA "table crud-table"] <<< H.tbody []) $ mconcat [
-        ui $ H.tr [] $ mconcat [H.th [] $ H.text "Name", H.th [] $ H.text "Alias", H.th [] $ H.text "Default Profile", H.th [] $ H.text "Actions", H.th [] $ H.text "Link"],
-        _collectionEditing (listPhotobooths handle (view _editing s >>= \ed -> return ed.index) (view (_profiles <<< _Done) s)),
-        _new $ (makeNewPb handle),
-        _profiles loadProfiles
-      ])
+   in ui (pageTitle $ H.text "Photobooths")
+   <> (withView crudTable $ mconcat [ ui $ tableHeader [] ["Name", "Alias", "Default Profile", "Actions", "Link"]
+                                    , _collectionEditing (listPhotobooths handle (view _editing s >>= \ed -> return ed.index) (view (_profiles <<< _Done) s))
+                                    , _new (makeNewPb handle)
+                                    , _profiles loadProfiles
+                                    ])
 
 makeNewPb :: forall eff. (PhotoboothsCommand -> Eff (RefDom eff) Unit) 
                          -> AppUI (RefDom eff) { model :: {id :: Maybe Int, computername :: String, alias :: String, defaultprofile :: String}
                                                 , state :: AsyncModel (RefDom eff) Photobooth}
-makeNewPb handle = with \model h -> withView (H.tr []) $ mconcat [
-  withView (H.td []) $ (_model <<< _computername) $ textField [H.classA "form-control"],
-  withView (H.td []) $ (_model <<< _alias) $ textField [H.classA "form-control"],
-  ui $ H.td [] $ H.text "",
-  {-- withView (H.td []) $ (_model <<< _defaultprofile) $ textField [H.classA "form-control"], --}
-  withView (H.td []) $ _state $ (makeNewPbButton handle),
-  ui $ H.td [] $ H.text ""
-]
-
-makeNewPbButton :: forall eff. (PhotoboothsCommand -> Eff (ref :: REF | eff) Unit) -> AppUI (ref :: REF | eff) (AsyncModel (ref :: REF | eff) Photobooth) 
-makeNewPbButton handle = 
-  with \new h -> mconcat [
-       _Initial $ ui $ H.button [H.classA "btn btn-action", H.onClick \_ -> handle $ Crud SaveNew] $ text "Save shit",
-       _Busy $ mconcat [
-           ui $ H.button [H.classA "btn btn-warning"] $ text "Saving PB",
-           onResult (\newS -> handle $ Crud (NewSaved newS)) (handle <<< Crud <<< NewSaveFailed)
-         ],
-       _Errored $ with \err _ -> mconcat [
-           ui $ H.button [H.classA "btn btn-danger"] $ text "Failed!",
-           ui $ H.div [H.classA "alert alert-danger"] $ text ("Photobooth not saved: " <> message err)
-         ]
-      ]
+makeNewPb handle = with c 
+  where 
+    c model h = rowUI [ (_model <<< _computername) $ textField [H.classA "form-control"]
+                      , (_model <<< _alias)        $ textField [H.classA "form-control"]
+                      , ui emptyTd
+                      , _state                     $ (newButton (handle <<< Crud))
+                      , ui emptyTd
+                      ]
 
 listPhotobooths :: forall eff obj. (PhotoboothsCommand -> Eff (RefDomTimer eff) Unit) -> Maybe Int -> StrMap (Array String)
-                   -> AppUI (RefDomTimer eff) {collection :: (AsyncModel (RefDomTimer eff) (Array Photobooth)), editing :: Maybe {saving :: AsyncModel (RefDomTimer eff) Photobooth | obj}} 
+                  -> AppUI (RefDomTimer eff) {collection :: (AsyncModel (RefDomTimer eff) (Array Photobooth)), editing :: Maybe {index :: Int, saving :: AsyncModel (RefDomTimer eff) Photobooth | obj}} 
 listPhotobooths handle selInd profiles = mconcat [
-  _collection $ with \pbs h -> mconcat [
-       _Initial $ (exec $ handle $ Crud LoadAll) 
-               <> (ui $ H.tr [] $ H.td [] $ text "Nothing loaded yet"),
-       _Busy $ mconcat [ ui $ H.tr [] $ H.td [] $ text "Loading photobooths"
-                       , onResult (handle <<< Crud <<< Loaded) (handle <<< Crud <<< LoadingFailed) ],
-       _Done $ foreach (showPB handle selInd profiles),
-       _Errored $ with \err _ -> ui $ H.tr [] $ H.td [] $ text ("Photobooths failed to load: " <> message err)],
-  (_editing <<< _Just <<< _saving <<< _Busy) $ onResult (\edited -> handle $ Crud (EditSaved edited)) (handle <<< Crud <<< EditSaveFailed),
-  (_editing <<< _Just <<< _saving <<< _Errored) $ with \err h -> mconcat [ ui $ H.td [] mempty 
-                                                                         , ui $ H.td [] mempty
-                                                                         , ui $ H.td [] mempty
-                                                                         , ui $ H.div [H.classA "alert alert-danger"] $ text ("Photobooth edit failed to get saved: " ++ message err) 
-                                                                         ]]
+  with (\s _ -> _collection $ with (showColl $ view _editing s)),
+  (_editing <<< _Just <<< _saving <<< _Busy) $ onResult (handle <<< Crud <<< EditSaved) (handle <<< Crud <<< EditSaveFailed)
+  ]
+    where
+      showColl _ Initial       h = (ui $ H.tr [] $ H.td [] $ text "Nothing loaded yet")
+                                <> _Initial (exec $ handle $ Crud LoadAll) 
+      showColl _ (Busy _)      h = ui (H.tr [] $ H.td [] $ text "Loading photobooths")
+                                <> _Busy (onResult (handle <<< Crud <<< Loaded) (handle <<< Crud <<< LoadingFailed))
+      showColl e (Done _)      h = _Done $ foreach (showPB handle selInd profiles e)
+      showColl _ (Errored err) h = ui $ H.tr [] $ H.td [] $ text ("Photobooths failed to load: " <> message err)
+ 
+showPB :: forall eff obj a. (PhotoboothsCommand -> Eff (dom :: DOM | eff) Unit) -> Maybe Int -> StrMap (Array String) -> Maybe { index :: Int, saving :: AsyncModel (dom :: DOM | eff) a | obj } -> Int 
+                            -> AppUI (dom :: DOM | eff) Photobooth
+showPB handle (Just selInd) profiles editing i | i == selInd = with \(Photobooth pb) h -> 
+  rowUI [ ui $ text pb.computername
+        , (_Photobooth <<< _alias) $ textField [H.classA "form-control"]
+        , (_Photobooth <<< _defaultprofile) $ select (fromMaybe [] $ lookup pb.computername profiles) id [H.classA "form-control"]
+        , editButton (handle <<< Crud) i editing
+        , ui $ (H.button [H.classA "btn btn-warning", H.onClick \_ -> handle $ Crud CancelEdit] $ text "Cancel")
+          <> (H.button [H.classA "btn btn-success", H.onClick \_ -> handle $ Crud SaveEdit] $ text "Save")
+        , ui $ linkButtons handle pb.computername
+        ]
+showPB handle selInd       _         editing i = with \(Photobooth pb) h -> 
+  rowUI $ ui <$> [ text pb.computername
+                 , text pb.alias
+                 , text pb.defaultprofile
+                 , maybe (H.button [H.classA "btn btn-action", H.onClick \_ -> handle (Crud $ StartEdit i)] $ text "Edit") (const $ text "") selInd
+                 , linkButtons handle pb.computername
+                 ]
 
-showPB :: forall eff. (PhotoboothsCommand -> Eff (dom :: DOM | eff) Unit) -> Maybe Int -> StrMap (Array String) -> Int -> AppUI (dom :: DOM | eff) Photobooth
-showPB handle (Just selInd) profiles i | i == selInd = with \(Photobooth pb) h -> 
-  withView (H.tr []) $ mconcat [
-    ui $ H.td [] $ text pb.computername,
-    withView (H.td []) $ (_Photobooth <<< _alias) $ textField [H.classA "form-control"],
-    withView (H.td []) $ (_Photobooth <<< _defaultprofile) $ select (fromMaybe [] $ lookup pb.computername profiles) id [H.classA "form-control"],
-    ui $ H.td [] $ mconcat [
-      H.button [H.classA "btn btn-warning", H.onClick \_ -> handle $ Crud CancelEdit] $ text "Cancel",
-      H.button [H.classA "btn btn-success", H.onClick \_ -> handle $ Crud SaveEdit] $ text "Save"
-      ],
-    ui $ H.td [] $ mconcat [
-        H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToEvents pb.computername)] $ text "Zie events",
-        H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToStatistics pb.computername)] $ text "Zie statistieken"
-      ] 
-  ]
-showPB handle a _ i = with \(Photobooth pb) h -> 
-  ui $ H.tr [] $ mconcat [
-    H.td [] $ text pb.computername,
-    H.td [] $ text pb.alias,
-    H.td [] $ text pb.defaultprofile,
-    maybe (H.td [] $ H.button [H.classA "btn btn-action", H.onClick \_ -> handle (Crud $ StartEdit i)] $ text "Edit") (const $ H.td [] $ text "") a,
-    H.td [] $ mconcat [
-        H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToEvents pb.computername)] $ text "Zie events",
-        H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToStatistics pb.computername)] $ text "Zie statistieken"
-      ] 
-  ]
+linkButtons :: forall eff. (PhotoboothsCommand -> Eff eff Unit) -> String -> H.Markup 
+linkButtons handle cn = H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToEvents cn)] (text "Zie events")
+                     <> H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToStatistics cn)] (text "Zie statistieken")
+
 
 ------ AFF -------------
 
