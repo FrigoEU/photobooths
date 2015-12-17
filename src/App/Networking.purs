@@ -16,9 +16,9 @@ import Data.Foreign
 import Data.Foreign.Class
 
 import Node.Buffer (Buffer(), BUFFER())
-import Node.FS.Aff (readdir, stat, mkdir, writeFile, rename, exists, rmdir, readFile, unlink)
+import Node.FS.Aff (readdir, mkdir, writeFile, exists)
 import Node.FS (FS())
-import Node.Path (normalize, concat, FilePath(), resolve, basename)
+import Node.Path (normalize, concat, basename)
 
 import Network.HTTP.Affjax 
 import Network.HTTP.Method (Method(..))

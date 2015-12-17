@@ -5,9 +5,9 @@ import Prelude
 import Control.Monad.Aff (Aff())
 
 import Node.Buffer (Buffer(), BUFFER())
-import Node.FS.Aff (readdir, stat, mkdir, writeFile, rename, exists, rmdir, readFile, unlink)
+import Node.FS.Aff (readdir, mkdir, writeFile, exists, rmdir, readFile, unlink)
 import Node.FS (FS())
-import Node.Path (normalize, concat, FilePath(), resolve, basename)
+import Node.Path (concat, FilePath())
 
 import Data.Traversable
 

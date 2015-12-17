@@ -5,7 +5,7 @@ import Control.Monad.Eff (Eff())
 
 import OpticUI(animate, with)
 
-import Data.Lens (view, set)
+import Data.Lens (view)
 import Data.Tuple (Tuple(..))
 
 import App.GUI.Views.PhotoboothsPage

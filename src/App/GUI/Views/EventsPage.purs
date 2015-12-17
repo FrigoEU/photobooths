@@ -67,7 +67,7 @@ eventsPage cn = with c
                       , _profiles loadProfiles
                       ]
 
--------- Existing + Edit -------------------
+-------- List -------------------
 showEvents :: forall eff. (EventsCommand (ANDRT eff) -> Eff (ANDRT eff) Unit)
                           -> StrMap (Array String)
                           -> AppUI (ANDRT eff) { collection :: AsyncModel (ANDRT eff) (Array (EventWithState (ANDRT eff)))

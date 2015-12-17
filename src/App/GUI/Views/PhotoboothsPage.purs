@@ -35,8 +35,6 @@ import App.GUI.Views.Profiles (loadProfiles)
 import App.Endpoint (putPhotobooths, execEndpoint, postPhotobooths, getPhotobooths) 
 
 
------- PHOTOBOOTH UI's -----------
-
 data PhotoboothsCommand = Crud (CrudCommand Photobooth)
                         | ToEvents String
                         | ToStatistics String
@@ -59,18 +57,8 @@ photoboothsPage goto = with $ \s h ->
                                     , _new (makeNewPb handle)
                                     , _profiles loadProfiles
                                     ])
-
-makeNewPb :: forall eff. (PhotoboothsCommand -> Eff (RefDom eff) Unit) 
-                         -> AppUI (RefDom eff) { model :: {id :: Maybe Int, computername :: String, alias :: String, defaultprofile :: String}
-                                                , state :: AsyncModel (RefDom eff) Photobooth}
-makeNewPb handle = with c 
-  where 
-    c model h = rowUI [ (_model <<< _computername) $ textField [H.classA "form-control"]
-                      , (_model <<< _alias)        $ textField [H.classA "form-control"]
-                      , ui emptyTd
-                      , _state                     $ (newButton (handle <<< Crud))
-                      , ui emptyTd
-                      ]
+                                    
+------ LIST --------------
 
 listPhotobooths :: forall eff obj. (PhotoboothsCommand -> Eff (RefDomTimer eff) Unit) -> Maybe Int -> StrMap (Array String)
                   -> AppUI (RefDomTimer eff) {collection :: (AsyncModel (RefDomTimer eff) (Array Photobooth)), editing :: Maybe {index :: Int, saving :: AsyncModel (RefDomTimer eff) Photobooth | obj}} 
@@ -108,6 +96,20 @@ showPB handle selInd       _         editing i = with \(Photobooth pb) h ->
 linkButtons :: forall eff. (PhotoboothsCommand -> Eff eff Unit) -> String -> H.Markup 
 linkButtons handle cn = H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToEvents cn)] (text "Zie events")
                      <> H.button [H.classA "btn btn-primary", H.onClick \_ -> handle (ToStatistics cn)] (text "Zie statistieken")
+
+----------- NEW ---------------------
+
+makeNewPb :: forall eff. (PhotoboothsCommand -> Eff (RefDom eff) Unit) 
+                         -> AppUI (RefDom eff) { model :: {id :: Maybe Int, computername :: String, alias :: String, defaultprofile :: String}
+                                                , state :: AsyncModel (RefDom eff) Photobooth}
+makeNewPb handle = with c 
+  where 
+    c model h = rowUI [ (_model <<< _computername) $ textField [H.classA "form-control"]
+                      , (_model <<< _alias)        $ textField [H.classA "form-control"]
+                      , ui emptyTd
+                      , _state                     $ (newButton (handle <<< Crud))
+                      , ui emptyTd
+                      ]
 
 
 ------ AFF -------------

@@ -62,6 +62,7 @@ instance partialEventIsForeign :: IsForeign PartialEvent where
     profile <- readProp "profile" obj
     return $ PartialEvent {id, computername, name, datefrom, dateuntil, profile}
 
+eventsTable :: S.Table 
 eventsTable = { name: "EVENTS" 
               , columns: fromArray [ Tuple "id" $ S.ColumnDef S.Integer [S.PrimaryKey]
                                    , Tuple "computername" $ S.ColumnDef S.Char []
