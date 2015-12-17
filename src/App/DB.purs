@@ -21,7 +21,6 @@ import Database.AnyDB.SqlValue (toSql)
 import Node.Buffer (Buffer())
 
 import SQL
-import Server.Core
 
 import App.Model.Photobooth
 import App.Model.Event
@@ -118,8 +117,8 @@ queryEvents conn cname =
          return $ createEvent <$> partialEvs
 
 
-newPB :: forall eff. Connection -> Input Photobooth -> Aff (db :: DB | eff) Photobooth
-newPB conn {body: pb} = do
+newPB :: forall eff. Connection -> Photobooth -> Aff (db :: DB | eff) Photobooth
+newPB conn pb = do
   execute_ (insertPB pb) conn
   res <- queryOne_ (selectLastInserted photoboothsTable) conn
   maybe (throwError $ error $ "Failed to create Photobooth") return res
@@ -139,8 +138,8 @@ upsertPB (Photobooth pb) = insert photoboothsTable
                                          , Tuple "defaultprofile" pb.defaultprofile
                                          ]) true ""
 
-newEvent :: forall eff. Connection -> Input Event -> Aff (db :: DB | eff) Event
-newEvent conn {body: ev} = do
+newEvent :: forall eff. Connection -> Event -> Aff (db :: DB | eff) Event
+newEvent conn ev = do
     execute_ (insertEvent ev) conn
     res <- queryOne_ (selectLastInserted eventsTable) conn
     case res of
@@ -167,19 +166,19 @@ upsertPartialEvent (PartialEvent e) = insert eventsTable
                                    , Tuple "profile" $ e.profile
                                    ]) true ""
 
-updatePB :: forall eff. Connection -> Input Photobooth -> Aff (db :: DB | eff) Photobooth
-updatePB _    ({body: (Photobooth    {id: Nothing})}) =
+updatePB :: forall eff. Connection -> Photobooth -> Aff (db :: DB | eff) Photobooth
+updatePB _    (Photobooth    {id: Nothing}) =
   throwError $ error $ "updatePhotobooth impossible without id!"
-updatePB conn ({body: (Photobooth pb@{id: Just i})}) =
+updatePB conn (Photobooth pb@{id: Just i}) =
   let query = update photoboothsTable i (fromArray [Tuple "alias" pb.alias, Tuple "defaultprofile" pb.defaultprofile]) ""
    in do execute_ query conn
          res <- queryOne_ (selectStarId photoboothsTable i) conn
          maybe (throwError $ error $ "Failed to update Photobooth") return res
 
-updateEvent :: forall eff. Connection -> Input Event -> Aff (db :: DB | eff) Event
-updateEvent _    ({body: (Event    {id: Nothing})}) =
+updateEvent :: forall eff. Connection -> Event -> Aff (db :: DB | eff) Event
+updateEvent _    (Event    {id: Nothing}) =
   throwError $ error $ "updateEvent impossible without id"
-updateEvent conn ({body: (Event e@{id: Just i}), url: u}) =
+updateEvent conn (Event e@{id: Just i}) =
   let query = update eventsTable i (fromArray [ Tuple "computername" e.computername
                                               , Tuple "name" e.name
                                               , Tuple "datefrom" $ iso8601 e.datefrom
@@ -201,9 +200,9 @@ upsertSavedFile (SavedFile sf) = insert savedFileTable
                                          , Tuple "eventId" $ show sf.eventId
                                          ]) true ""
 
-saveFileToDb :: forall eff. Connection -> Int -> String -> Input Buffer 
+saveFileToDb :: forall eff. Connection -> Int -> String -> Buffer 
                             -> Aff (db :: DB | eff) SavedFile
-saveFileToDb conn eventId name {body: buff} = do
+saveFileToDb conn eventId name buff = do
   let query = Query $ "INSERT INTO " <> savedFileTable.name <> " (name, eventid, File) VALUES (?, ?, ?)"
   execute query [toSql name, toSql eventId, toSql buff] conn
   res <- queryOne_ (selectLastInserted savedFileTable) conn
