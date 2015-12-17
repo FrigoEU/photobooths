@@ -12,11 +12,12 @@ import Data.Date (now, Date(), Now(), fromStringStrict)
 import Data.Array (filterM)
 import Data.StrMap (lookup)
 import Data.Tuple (Tuple(..))
-import Data.Maybe (Maybe(Just, Nothing))
+import Data.Maybe (maybe)
 import Data.Traversable (traverse)
+import Data.Either
 --import Control.Apply ((*>))
 
-import Database.AnyDB (DB(), withConnection, Connection())
+import Database.AnyDB (DB(), withConnection, Connection(), ConnectionInfo(..))
 import Node.Path (normalize, concat)
 import Node.FS (FS())
 import Node.FS.Aff (readdir, stat)
@@ -31,6 +32,14 @@ import App.DB
 port :: Int
 port = 8080
 
+connectionInfo :: ConnectionInfo
+connectionInfo = Sqlite3
+  { filename: "klikhutdb"
+  , memory: false }
+
+withServerConn :: forall a eff. (Connection -> Aff (db :: DB | eff) a) -> Aff (db :: DB | eff) a 
+withServerConn = withConnection connectionInfo
+
 main :: forall eff. Eff (now :: Now, console :: CONSOLE, db :: DB, express :: EXPRESS, fs :: FS | eff) Unit
 main = do
   dateNow <- now
@@ -39,22 +48,21 @@ main = do
       --makeDB conn
       --loadWithDummy conn dateNow
   app <- makeApp
-  hostEndpoint app getPhotobooth $ readCname "GetPhotobooth" queryPhotobooth
-  hostEndpoint app getPhotobooths allPhotobooths
-  hostEndpoint app postPhotobooths newPB
-  hostEndpoint app putPhotobooths updatePB
-  hostEndpoint app getEvents eventsByCname
-  hostEndpoint app postEvents newEvent
-  hostEndpoint app putEvents updateEvent
-  hostEndpoint app getNewEvents $ readCnameDate "GetNewEvents" queryNewEvents
+  hostEndpoint app getPhotobooth $ readParams1 "cname" "GetPhotobooth" \c -> withServerConn \conn -> queryPhotobooth conn c
+  hostEndpoint app getPhotobooths (const $ withServerConn allPhotobooths)
+  hostEndpoint app postPhotobooths \inp -> withServerConn \conn -> newPB conn inp
+  hostEndpoint app putPhotobooths \inp -> withServerConn \conn -> updatePB conn inp
+  hostEndpoint app getEvents $ readParams1 "cname" "GetEvents" \c -> withServerConn \conn -> queryEvents conn c
+  hostEndpoint app postEvents \inp -> withServerConn \conn -> newEvent conn inp
+  hostEndpoint app putEvents \inp -> withServerConn \conn -> updateEvent conn inp
+  hostEndpoint app getNewEvents $ readCnameDateParams "GetNewEvents" \c d -> withServerConn \conn -> queryNewEvents conn c d
   hostEndpoint app getProfiles (const allProfiles)
-  hostEndpoint app getStatistics allStatistics
-  hostEndpoint app getNewFiles $ readCnameDate "GetNewFiles" queryNewFiles
-  hostEndpoint app postStatistics (\{body: b} -> withConnection connectionInfo $ 
-                                                  \c -> addStatistics c b)
-  hostEndpoint app getProfileFiles $ readCnamePname "GetProfileFiles" findProfileFiles
-  hostFileUploadEndpoint app attachFile saveFileToDb
-  hostFile app "/api/files/:id" getFileById
+  hostEndpoint app getStatistics $ readParams1 "cname" "AllStatistics" \c -> withServerConn \conn -> queryAllStatistics conn c
+  hostEndpoint app getNewFiles $ readCnameDateParams "GetNewFiles" \c d -> withServerConn \conn -> queryNewFiles conn c d
+  hostEndpoint app postStatistics \{body} -> withServerConn \c -> addStatistics c body
+  hostEndpoint app getProfileFiles $ readParams2 "cname" "pname" "GetProfileFiles" findProfileFiles
+  hostFileUploadEndpoint app attachFile $ \p -> readParams2 "eventid" "name" "AttachFile" (\e n -> safeParseIntE "AttachFile" e >>= \eventId -> withServerConn \conn -> saveFileToDb conn eventId n p) p
+  hostFile app "/api/files/:id" $ readParams1 "id" "GetFile" \stri -> safeParseIntE "GetFile" stri >>= \id -> withServerConn \conn -> getFileById conn id
   hostStatic app "static"
   hostStatic app "profiles"
   listen app port
@@ -68,36 +76,26 @@ allProfiles = do
   dirsInProfiles <- flip filterM inProfiles (\path -> stat (concat [prof, path]) >>= (return <<< isDirectory))
   flip traverse dirsInProfiles (\dir -> readdir (concat [prof, dir]) >>= (\profiles -> return $ Tuple dir profiles))
 
+readCnameDateParams :: forall a b m. (MonadError Error m) => String -> (String -> Date -> m a) -> Input b -> m a
+readCnameDateParams label f i = readParams2 "cname" "date" label (\cname d -> fromStringStrictE label d >>= (\date -> f cname date)) i
 
--- TODO REFACTOR! -----
-readCname :: forall a eff. String -> (Connection -> String -> Aff (db :: DB | eff) a) -> Input Unit -> Aff (db :: DB | eff) a
-readCname s f {params} =
-  case lookup "cname" params of
-       Nothing -> throwError $ error $ s <> ": No computername provided"
-       Just cname -> withConnection connectionInfo (\c -> f c cname)
+readParams1 :: forall a m. (MonadError Error m) => String -> String -> (String -> m a) -> Input Unit -> m a
+readParams1 key label f {params} =
+  maybe (throwError $ error (label <> ": No " <> key <> " provided")) f (lookup key params)
 
-readCnameDate :: forall a b eff. String -> (Connection -> String -> Date -> Aff (db :: DB | eff) a) -> Input b -> Aff (db :: DB | eff) a
-readCnameDate s f {params} =
-  case lookup "cname" params of
-       Nothing -> throwError $ error $ s <> ": No computername provided"
-       Just cname -> case lookup "date" params of
-                          Nothing -> throwError $ error $ s <> ": No date provided"
-                          Just date -> case fromStringStrict date of
-                                            Nothing -> throwError $ error $ s <> ": Invalid date provided"
-                                            Just d -> withConnection connectionInfo (\c -> f c cname d)
-                                            
+readParams2 :: forall a b m. (MonadError Error m) => String -> String -> String -> (String -> String -> m a) -> Input b -> m a
+readParams2 key1 key2 s f {params} = 
+  either (\key -> throwError $ error $ s <> ": No" <> key <> " provided") (\(Tuple a b) -> f a b )
+    (do e1 <- maybe (Left key1) Right $ lookup key1 params
+        e2 <- maybe (Left key2) Right $ lookup key2 params
+        return $ Tuple e1 e2)
+  
+fromStringStrictE :: forall m. (MonadError Error m) => String -> String -> m Date
+fromStringStrictE label s = maybe (throwError $ error $ label <> ": Invalid date provided") return (fromStringStrict s)
 
-readCnamePname :: forall a b m. (MonadError Error m) => String -> (String -> String -> m a) -> Input b -> m a
-readCnamePname s f {params} = 
-  case lookup "cname" params of
-       Nothing -> throwError $ error $ s <> ": No computername provided"
-       Just cname -> case lookup "pname" params of
-                          Nothing -> throwError $ error $ s <> ": No profilename provided"
-                          Just pname -> f cname pname
-                          
-
-
-
+safeParseIntE :: forall m. (MonadError Error m) => String -> String -> m Int
+safeParseIntE label s = maybe (throwError $ error $ label <> ": Invalid int provided") return (safeParseInt s)
+  
 findProfileFiles :: forall eff. String -> String -> Aff (fs :: FS | eff) (Array String)
 findProfileFiles cname pname = ((<$>) \path -> concat [cname, pname, path]) <$> readdir (concat ["profiles", cname, pname])
 

@@ -11,8 +11,8 @@ import Data.Tuple (Tuple(..))
 import App.Model.StrMap (fromArray)
 
 data SavedFile = SavedFile { id :: Int
-                             , name :: String
-                             , eventId :: Int }
+                           , name :: String
+                           , eventId :: Int }
 
 derive instance genericSavedFile :: Generic SavedFile
 

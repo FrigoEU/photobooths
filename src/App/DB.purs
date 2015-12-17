@@ -4,13 +4,10 @@ import Prelude
 
 import Control.Monad.Eff.Exception (error)
 import Control.Monad.Error.Class (throwError)
---import Control.Monad.Eff.Class
 import Control.Monad.Aff (Aff())
---import Control.Monad.Eff.Console (log, CONSOLE())
 
 import Data.Date (Date())
 import Data.Array (replicate, filter, length)
-import Data.StrMap (lookup)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..))
 import Data.Maybe
@@ -18,9 +15,8 @@ import Data.Traversable
 import Data.Monoid (mempty)
 import Data.Foreign
 import Data.Foreign.Class
---import Control.Apply ((*>))
 
-import Database.AnyDB (ConnectionInfo (..), Query(..), withConnection, execute_, query_, DB(), queryOne_, execute, Connection(), query, queryOne)
+import Database.AnyDB (Query(..), execute_, query_, DB(), queryOne_, execute, Connection(), query, queryOne)
 import Database.AnyDB.SqlValue (toSql)
 import Node.Buffer (Buffer())
 
@@ -38,11 +34,6 @@ import App.Model.WorkerState
 import App.DB
 
 ----- THIS FILE SHOULD NOT HAVE ANYTHING WITH "INPUT" TYPE IN IT ----------
-
-connectionInfo :: ConnectionInfo
-connectionInfo = Sqlite3
-  { filename: "klikhutdb"
-  , memory: false }
 
 dropDB :: forall eff. Connection -> Aff (db :: DB | eff) Unit
 dropDB conn = do
@@ -114,26 +105,21 @@ mymonthlystatistic = MonthlyStatistic { month: 1
                                       , pictures: 500
                                       , prints: 390 }
 
-allPhotobooths :: forall eff. Input Unit -> Aff (db :: DB | eff) (Array Photobooth)
-allPhotobooths _ = withConnection connectionInfo
-                   \conn -> query_ (selectStar photoboothsTable "" :: Query Photobooth) conn
+allPhotobooths :: forall eff. Connection -> Aff (db :: DB | eff) (Array Photobooth)
+allPhotobooths conn = query_ (selectStar photoboothsTable "" :: Query Photobooth) conn
 
-eventsByCname :: forall eff. Input Unit -> Aff (db :: DB | eff) (Array Event)
-eventsByCname {params: params} =
-  case lookup "cname" params of
-       Nothing -> throwError $ error "GetEvents: No computername provided"
-       Just cname ->
-         let q = selectStar eventsTable (" WHERE computername = '" <> cname <> "'") :: Query PartialEvent
-          in withConnection connectionInfo \conn -> do
-              partialEvs <- query_ q conn
-              let ids = (\(PartialEvent {id: mi}) -> fromMaybe 0 mi) <$> partialEvs
-              files <- if length ids > 0 then selectFilesForEvents ids conn else return []
-              let createEvent pe@(PartialEvent {id: mi}) = mkEvent pe (filter (\(SavedFile im) -> im.eventId == (fromMaybe 0 mi)) files)
-              return $ createEvent <$> partialEvs
+queryEvents :: forall eff. Connection -> String -> Aff (db :: DB | eff) (Array Event)
+queryEvents conn cname = 
+  let q = (Query "Select * from EVENTS WHERE computername = ?" :: Query PartialEvent)
+   in do partialEvs <- query q [toSql cname] conn
+         let ids = (\(PartialEvent {id: mi}) -> fromMaybe (-1) mi) <$> partialEvs
+         files <- if length ids > -1 then selectFilesForEvents ids conn else return []
+         let createEvent pe@(PartialEvent {id: mi}) = mkEvent pe (filter (\(SavedFile im) -> im.eventId == (fromMaybe 0 mi)) files)
+         return $ createEvent <$> partialEvs
 
 
-newPB :: forall eff. Input Photobooth -> Aff (db :: DB | eff) Photobooth
-newPB ({body: pb}) = withConnection connectionInfo \conn -> do
+newPB :: forall eff. Connection -> Input Photobooth -> Aff (db :: DB | eff) Photobooth
+newPB conn {body: pb} = do
   execute_ (insertPB pb) conn
   res <- queryOne_ (selectLastInserted photoboothsTable) conn
   maybe (throwError $ error $ "Failed to create Photobooth") return res
@@ -153,9 +139,8 @@ upsertPB (Photobooth pb) = insert photoboothsTable
                                          , Tuple "defaultprofile" pb.defaultprofile
                                          ]) true ""
 
-newEvent :: forall eff. Input Event -> Aff (db :: DB | eff) Event
-newEvent ({body: ev}) =
-  withConnection connectionInfo \conn -> do
+newEvent :: forall eff. Connection -> Input Event -> Aff (db :: DB | eff) Event
+newEvent conn {body: ev} = do
     execute_ (insertEvent ev) conn
     res <- queryOne_ (selectLastInserted eventsTable) conn
     case res of
@@ -182,27 +167,26 @@ upsertPartialEvent (PartialEvent e) = insert eventsTable
                                    , Tuple "profile" $ e.profile
                                    ]) true ""
 
-updatePB :: forall eff. Input Photobooth -> Aff (db :: DB | eff) Photobooth
-updatePB ({body: (Photobooth    {id: Nothing})}) =
+updatePB :: forall eff. Connection -> Input Photobooth -> Aff (db :: DB | eff) Photobooth
+updatePB _    ({body: (Photobooth    {id: Nothing})}) =
   throwError $ error $ "updatePhotobooth impossible without id!"
-updatePB ({body: (Photobooth pb@{id: Just i})}) =
+updatePB conn ({body: (Photobooth pb@{id: Just i})}) =
   let query = update photoboothsTable i (fromArray [Tuple "alias" pb.alias, Tuple "defaultprofile" pb.defaultprofile]) ""
-   in withConnection connectionInfo \conn -> do
-      execute_ query conn
-      res <- queryOne_ (selectStarId photoboothsTable i) conn
-      maybe (throwError $ error $ "Failed to update Photobooth") return res
+   in do execute_ query conn
+         res <- queryOne_ (selectStarId photoboothsTable i) conn
+         maybe (throwError $ error $ "Failed to update Photobooth") return res
 
-updateEvent :: forall eff. Input Event -> Aff (db :: DB | eff) Event
-updateEvent ({body: (Event    {id: Nothing})}) =
+updateEvent :: forall eff. Connection -> Input Event -> Aff (db :: DB | eff) Event
+updateEvent _    ({body: (Event    {id: Nothing})}) =
   throwError $ error $ "updateEvent impossible without id"
-updateEvent ({body: (Event e@{id: Just i}), params: p, url: u}) =
+updateEvent conn ({body: (Event e@{id: Just i}), url: u}) =
   let query = update eventsTable i (fromArray [ Tuple "computername" e.computername
                                               , Tuple "name" e.name
                                               , Tuple "datefrom" $ iso8601 e.datefrom
                                               , Tuple "dateuntil" $ iso8601 e.dateuntil
                                               , Tuple "profile" e.profile
                                               ]) ""
-   in withConnection connectionInfo \conn -> do
+   in do
       execute_ query conn
       res <- queryOne_ (selectStarId eventsTable i) conn
       case res of
@@ -217,19 +201,13 @@ upsertSavedFile (SavedFile sf) = insert savedFileTable
                                          , Tuple "eventId" $ show sf.eventId
                                          ]) true ""
 
-saveFileToDb :: forall eff. Input Buffer -> Aff (db :: DB | eff) SavedFile
-saveFileToDb ({body: buff, params: params}) = do
-  case lookup "eventid" params of
-       Nothing -> throwError $ error "SaveFileToDb: No eventid provided"
-       Just str -> case safeParseInt str of
-                        Nothing -> throwError $ error $ "SaveFileToDb: Failed to parse: " <> str
-                        Just eventId -> case lookup "name" params of
-                                             Nothing -> throwError $ error "SaveFileToDb: No name provided"
-                                             Just name -> withConnection connectionInfo \conn -> do
-                                               let query = Query $ "INSERT INTO " <> savedFileTable.name <> " (name, eventid, File) VALUES (?, ?, ?)"
-                                               execute query [toSql name, toSql eventId, toSql buff] conn
-                                               res <- queryOne_ (selectLastInserted savedFileTable) conn
-                                               maybe (throwError $ error $ "Failed to save File") return res
+saveFileToDb :: forall eff. Connection -> Int -> String -> Input Buffer 
+                            -> Aff (db :: DB | eff) SavedFile
+saveFileToDb conn eventId name {body: buff} = do
+  let query = Query $ "INSERT INTO " <> savedFileTable.name <> " (name, eventid, File) VALUES (?, ?, ?)"
+  execute query [toSql name, toSql eventId, toSql buff] conn
+  res <- queryOne_ (selectLastInserted savedFileTable) conn
+  maybe (throwError $ error $ "Failed to save File") return res
 
 selectFilesForEvent :: forall eff. Int -> Connection -> Aff (db :: DB | eff) (Array SavedFile)
 selectFilesForEvent i conn = query (selectStar savedFileTable "WHERE eventid = ?") [toSql i] conn
@@ -256,12 +234,6 @@ upsertMonthlyStatistic (MonthlyStatistic e) = insert monthlyStatisticsTable
                                               , Tuple "prints" $ show e.prints
                                               ]) true ""
 
-allStatistics :: forall eff. Input Unit -> Aff (db :: DB | eff) AllStatistics
-allStatistics {params: params} =
-  case lookup "cname" params of
-       Nothing -> throwError $ error "GetStatistics: No computername provided"
-       Just cname -> withConnection connectionInfo \conn -> queryAllStatistics conn cname
-       
 queryAllStatistics :: forall eff. Connection -> String -> Aff (db :: DB | eff) AllStatistics
 queryAllStatistics conn cname = do
   eventStatistics <- query (Query "select * from eventstatistics where computername = ?") [toSql cname] conn
@@ -313,13 +285,10 @@ instance foreignBufferForHttp :: IsForeign BufferForHttp where
 unpack :: BufferForHttp -> Buffer
 unpack (BufferForHttp b) = b
   
-getFileById :: forall eff. Input Unit -> Aff (db :: DB | eff) Buffer
-getFileById {params} = do
+getFileById :: forall eff. Connection -> Int -> Aff (db :: DB | eff) Buffer
+getFileById conn id =
   let q = (Query "select file from files where id = ?" :: Query BufferForHttp)
-  case lookup "id" params of
-         Nothing -> throwError $ error $ "getFileById: No id provided!"
-         Just id -> withConnection connectionInfo (\c -> 
-           queryOne q [toSql id] c >>= \mf -> maybe (throwError $ error $ "No file found") (unpack >>> return) mf)
+   in queryOne q [toSql id] conn >>= \mf -> maybe (throwError $ error $ "No file found") (unpack >>> return) mf
 
 updateWorkerState :: forall eff. Connection -> WorkerState -> Aff (db :: DB | eff) Unit 
 updateWorkerState c (WorkerState ws) = 
