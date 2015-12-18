@@ -1830,9 +1830,6 @@ var PS = { };
       };
       throw new Error("Failed pattern match at Data.Date line 58, column 1 - line 59, column 1: " + [ _44.constructor.name ]);
   };
-  var fromString = function (_64) {
-      return fromJSDate($foreign.jsDateConstructor(_64));
-  };
   var fromEpochMilliseconds = function (_65) {
       return fromJSDate($foreign.jsDateConstructor(_65));
   };
@@ -1855,7 +1852,6 @@ var PS = { };
       } ]);
   });
   exports["now"] = now;
-  exports["fromString"] = fromString;
   exports["toEpochMilliseconds"] = toEpochMilliseconds;
   exports["fromEpochMilliseconds"] = fromEpochMilliseconds;
   exports["fromJSDate"] = fromJSDate;
@@ -3227,11 +3223,22 @@ var PS = { };
 (function(exports) {
   "use strict";
 
-  //module App.Model.Date
-  /*eslint-env node*/
-
-  exports.iso8601 = function iso8601(d){
-    return d.toISOString();
+  exports.toLocalDatetime = function toLocalDatetime(d){
+    return d.toISOString().substring(0, 11) + d.toString().substring(16, 21);
+  };
+  exports.fromLocalDatetimeImpl = function fromLocalDatetimeImpl(nothing){
+    return function(just){
+      return function(str){//YYYY-mm-DDTHH:MM
+        var newD = new Date(); 
+        var offset = newD.toString().substring(28, 33); //+0100
+        var d = new Date(str + offset);
+        if (d && d.toString() !== "Invalid Date"){
+          return just(d);
+        } else {
+          return nothing;
+        }
+      };
+    };
   };
  
 })(PS["App.Model.Date"] = PS["App.Model.Date"] || {});
@@ -3240,7 +3247,10 @@ var PS = { };
   "use strict";
   var $foreign = PS["App.Model.Date"];
   var Data_Date = PS["Data.Date"];
-  exports["iso8601"] = $foreign.iso8601;;
+  var Data_Maybe = PS["Data.Maybe"];     
+  var fromLocalDatetime = $foreign.fromLocalDatetimeImpl(Data_Maybe.Nothing.value)(Data_Maybe.Just.create);
+  exports["fromLocalDatetime"] = fromLocalDatetime;
+  exports["toLocalDatetime"] = $foreign.toLocalDatetime;;
  
 })(PS["App.Model.Date"] = PS["App.Model.Date"] || {});
 (function(exports) {
@@ -7419,17 +7429,16 @@ var PS = { };
   "use strict";
   var Prelude = PS["Prelude"];
   var DOM = PS["DOM"];
-  var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var OpticUI = PS["OpticUI"];
   var OpticUI_Markup = PS["OpticUI.Markup"];
   var OpticUI_Markup_HTML = PS["OpticUI.Markup.HTML"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_String = PS["Data.String"];
   var Data_Date = PS["Data.Date"];
-  var Data_Foreign_Class = PS["Data.Foreign.Class"];
-  var App_GUI_Types = PS["App.GUI.Types"];
   var App_Model_Date = PS["App.Model.Date"];
-  var OpticUI_Core = PS["OpticUI.Core"];     
+  var OpticUI_Core = PS["OpticUI.Core"];
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
+  var Data_Foreign_Class = PS["Data.Foreign.Class"];     
   var dateTimeField = function (ps) {
       return OpticUI_Core["with"](function (s) {
           return function (h) {
@@ -7440,10 +7449,10 @@ var PS = { };
                           return OpticUI_Core.runHandler(h)(d)();
                       })(function (d) {
                           return OpticUI_Core.runHandler(h)(d);
-                      })(Data_Date.fromString(Data_Maybe.maybe("")(Prelude.id(Prelude.categoryFn))(v)));
+                      })(App_Model_Date.fromLocalDatetime(Data_Maybe.maybe("")(Prelude.id(Prelude.categoryFn))(v)));
                   };
               };
-              var props = [ OpticUI_Markup_HTML.typeA("datetime-local"), OpticUI_Markup_HTML.onInput(Data_Foreign_Class.stringIsForeign)(handler), OpticUI_Markup_HTML.valueA(Data_String.take(16)(App_Model_Date.iso8601(s))) ];
+              var props = [ OpticUI_Markup_HTML.typeA("datetime-local"), OpticUI_Markup_HTML.onInput(Data_Foreign_Class.stringIsForeign)(handler), OpticUI_Markup_HTML.valueA(Data_String.take(16)(App_Model_Date.toLocalDatetime(s))) ];
               return OpticUI_Core.ui(OpticUI_Markup_HTML.input_(Prelude["++"](Prelude.semigroupArray)(ps)(props)));
           };
       });
@@ -7632,7 +7641,7 @@ var PS = { };
                                       return _35;
                                   })());
                               };
-                              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Data_Maybe.maybe("")(Prelude.show(Prelude.showInt))(_6.model.value0.id)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_6.model.value0.computername))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_6.model.value0.name))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.iso8601(_6.model.value0.datefrom)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.iso8601(_6.model.value0.dateuntil)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_6.model.value0.profile))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(App_GUI_Components_CrudButtons.editButton(function (_54) {
+                              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Data_Maybe.maybe("")(Prelude.show(Prelude.showInt))(_6.model.value0.id)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_6.model.value0.computername))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_6.model.value0.name))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.toLocalDatetime(_6.model.value0.datefrom)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.toLocalDatetime(_6.model.value0.dateuntil)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(_6.model.value0.profile))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(App_GUI_Components_CrudButtons.editButton(function (_54) {
                                   return handle(Crud.create(_54));
                               })(i)(editing)), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_State._file(OpticUI_Core.uiStrong)(App_GUI_Components_FileInput.fileInput([ App_GUI_Components_FileInput.onFileInput(fileSelected) ]))), listFiles, App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_State._savingFile(OpticUI_Core.uiStrong)(App_Model_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
                                   return function (_0) {

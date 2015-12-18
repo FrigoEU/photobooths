@@ -103,8 +103,8 @@ showEvents handle profiles = with c
        in mconcat [ ui $ H.td [] $ H.text $ maybe "" show ev.id
                   , ui $ H.td [] $ H.text $ ev.computername
                   , ui $ H.td [] $ H.text $ ev.name
-                  , ui $ H.td [] $ H.text $ iso8601 ev.datefrom
-                  , ui $ H.td [] $ H.text $ iso8601 ev.dateuntil
+                  , ui $ H.td [] $ H.text $ toLocalDatetime ev.datefrom
+                  , ui $ H.td [] $ H.text $ toLocalDatetime ev.dateuntil
                   , ui $ H.td [] $ H.text $ ev.profile
                   , withView (H.td []) $ editButton (handle <<< Crud) i editing
                   , withView (H.td []) $ mconcat [ (_state <<< _file) $ fileInput [onFileInput fileSelected]
