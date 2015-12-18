@@ -3809,7 +3809,7 @@ var PS = { };
               return Prelude["return"](Control_Monad_Aff.applicativeAff)([  ]);
           };
           var qs = Data_String.joinWith(", ")(Data_Array.replicate(Data_Array.length(_21))("?"));
-          return Database_AnyDB.query(App_Model_SavedFile.savedFileIsForeign)(SQL.selectStar(App_Model_SavedFile.savedFileTable)("WHERE eventid = (" + (qs + ")")))(Prelude.map(Prelude.functorArray)(Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt))(_21))(conn);
+          return Database_AnyDB.query(App_Model_SavedFile.savedFileIsForeign)(SQL.selectStar(App_Model_SavedFile.savedFileTable)("WHERE eventid in (" + (qs + ")")))(Prelude.map(Prelude.functorArray)(Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt))(_21))(conn);
       };
   };
   var selectFilesForEvent = function (i) {

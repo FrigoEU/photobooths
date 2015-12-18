@@ -57,6 +57,10 @@ h1.page-title em{
   outline: 1px solid #CCC;
   background-color: white;
 }
-.indexed-tr tr th:first-child{
+tr.indexed-tr th:first-child{
   width: 28px;
+}
+input[type="datetime-local"]{
+  padding-left: 2px;
+  padding-right: 2px;
 }
