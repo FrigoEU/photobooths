@@ -27,9 +27,9 @@ import Server.Core
 import App.Endpoint
 import App.DB
 
-
 port :: Int
 port = 8080
+
 
 connectionInfo :: ConnectionInfo
 connectionInfo = Sqlite3
