@@ -16,6 +16,7 @@
   "scripts": {
     "build": "pulp build",
     "test": "pulp test",
+    "tags": "psc-docs --format ctags `find bower_components src test -name *.purs -not -name externs.purs` `find bower_components src test -name externs.purs`  > tags",
     "compile:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main | java -jar compiler.jar --js_output_file server.js",
     "compile:netw": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking | java -jar compiler.jar --js_output_file netw.js",
     "compile:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - | java -jar compiler.jar --js_output_file static/client.js",

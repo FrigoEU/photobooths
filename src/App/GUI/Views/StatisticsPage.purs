@@ -1,9 +1,9 @@
 module App.GUI.Views.StatisticsPage where
 
-import Prelude
+import Prelude (show, (<>), (<<<), (<$>), ($), (==), map)
 
-import OpticUI.Markup.HTML as H
-import OpticUI.Markup as H
+import OpticUI.Markup.HTML (td, tr, classA, div, em) as H
+import OpticUI.Markup (text) as H
 import OpticUI (with, ui, Markup(), runHandler)
 import OpticUI.Components.Async (onResult)
 
@@ -15,12 +15,13 @@ import Data.Foldable (mconcat, find)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Monoid (mempty)
 
-import App.Model.Event
-import App.Model.Statistic
-import App.Model.Async
-import App.GUI.Types
-import App.GUI.State
-import App.GUI.Components.Markup
+import App.Model.Event (Event(Event))
+import App.Model.Statistic (AllStatistics(AllStatistics), EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), getMonthText)
+import App.Model.Async (AsyncModel(Errored, Done), _Errored, _Busy)
+import App.Model.Date (toLocalDatetime)
+import App.GUI.Types (AppUI)
+import App.GUI.State (EventWithState, _events, _statistics)
+import App.GUI.Components.Markup (pageTitle, tableHeader, crudTable)
 
 statisticsPage :: forall eff. 
                   String ->
@@ -51,7 +52,7 @@ eventStatisticsLine events (EventStatistic es) = H.tr [] $
   case find (\{model: Event ev} -> maybe false (\i -> i == es.eventId) ev.id) events of
        Nothing -> H.td [] $ H.text "No event found for statistic"
        Just {model: Event ev} -> mconcat $ (H.td [] <<< H.text) <$> [
-           (ev.computername <> " " <> ev.name <> ": Van " <> show ev.datefrom <> " tot " <> show ev.dateuntil),
+           (ev.computername <> " " <> ev.name <> ": Van " <> toLocalDatetime ev.datefrom <> " tot " <> toLocalDatetime ev.dateuntil),
            show es.pictures,
            show es.prints
          ]

@@ -3,24 +3,26 @@ module Server.Core (
   hostStatic
 ) where
 
-import Prelude
+import Prelude (Unit, unit, (>>=), ($), (<>), bind, return, show)
 
 import Control.Monad.Eff (Eff())
 import Control.Monad.Eff.Console (log, CONSOLE())
 import Control.Monad.Aff (runAff, Aff())
-import Control.Monad.Eff.Exception (message, error)
-import Control.Monad.Error.Class (throwError)
+import Control.Monad.Eff.Exception (message, error, Error)
+import Control.Monad.Error.Class (throwError, class MonadError)
 
-import Data.StrMap (StrMap())
-import Data.Either (either)
+import Data.StrMap (StrMap)
+import Data.Either (Either(Left), either)
 import Data.Foreign.Generic (readJSONGeneric, toJSONGeneric, defaultOptions)
-import Data.Generic (Generic)
+import Data.Generic (class Generic)
+import Data.Serializable (class Serializable, deserialize)
+import Data.Maybe (Maybe(Nothing, Just), maybe)
 
 import Network.HTTP.Method (Method(..))
 
 import Node.Buffer (Buffer())
 
-import App.Endpoint
+import App.Endpoint (Endpoint(Endpoint), FileUploadEndpoint(FileUploadEndpoint))
 
 foreign import data App :: *
 foreign import data EXPRESS :: !
@@ -41,7 +43,7 @@ foreign import bufferParser :: Middleware
 foreign import noParser :: Middleware
 foreign import rawParser :: Middleware
 
-type Handler eff a b = Input a -> Aff eff b
+type Handler eff a b c = a -> Input b -> Aff eff c
 
 type Input a = { url :: String
                , body :: a
@@ -51,47 +53,68 @@ type Input a = { url :: String
                , headers :: StrMap String
                }
 
-hostEndpoint :: forall a b c eff. (Generic b, Generic c) =>
-                  App -> Endpoint a b c -> Handler (express :: EXPRESS, console :: CONSOLE | eff) b c
+hostEndpoint :: forall a b c eff. (Serializable a, Generic b, Generic c) =>
+                  App -> Endpoint a b c -> Handler (express :: EXPRESS, console :: CONSOLE | eff) a b c
                   -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
-hostEndpoint app (Endpoint {method: GET, serverUrl: url}) f = get app url noParser handler
+hostEndpoint app (Endpoint {method: GET, url}) h = get app url noParser handler
   where 
     handler req res = runAff (\err -> do
                                  log $ "Failed hostEndpoint GET on " <> url <> message err
                                  sendStr res $ message err)
                              (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                             (parseBodyOrThrow (convert req) >>= f)
-hostEndpoint app (Endpoint {method: POST, serverUrl: url}) f = post app url rawParser handler
+                             (do let i = convert req
+                                 qp <- parseQueryParams i
+                                 body <- parseBody i
+                                 h qp body)
+hostEndpoint app (Endpoint {method: POST, url}) h = post app url rawParser handler
   where 
     handler req res = runAff (\err -> do
                                  log $ "Failed hostEndpoint POST on " <> url <> message err
                                  sendStr res $ message err)
                              (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                             (parseBodyOrThrow (convert req) >>= f)
-hostEndpoint app (Endpoint {method: PUT, serverUrl: url}) f = put app url rawParser handler
+                             (do let i = convert req
+                                 qp <- parseQueryParams i
+                                 body <- parseBody i
+                                 h qp body)
+hostEndpoint app (Endpoint {method: PUT, url}) h = put app url rawParser handler
   where 
     handler req res = runAff (\err -> do
                                  log $ "Failed hostEndpoint PUT on " <> url <> message err
                                  sendStr res $ message err)
                              (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                             (parseBodyOrThrow (convert req) >>= f)
+                             (do let i = convert req
+                                 qp <- parseQueryParams i
+                                 body <- parseBody i
+                                 h qp body)
 
-hostFileUploadEndpoint :: forall eff a b. (Generic b) =>
+hostFileUploadEndpoint :: forall eff a b. (Serializable a, Generic b) =>
                       App -> FileUploadEndpoint a b 
-                      -> Handler (express :: EXPRESS, console :: CONSOLE | eff) Buffer b  
+                      -> Handler (express :: EXPRESS, console :: CONSOLE | eff) a Buffer b
                       -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
-hostFileUploadEndpoint app (FileUploadEndpoint {serverUrl: url}) f = post app url bufferParser handler
+hostFileUploadEndpoint app (FileUploadEndpoint {url}) h = post app url bufferParser handler
   where handler req res = runAff (\err -> do
                                      log $ "Failed hostFileUploadEndpoint on " <> url <> message err
                                      sendStr res $ message err)
                                  (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                                 (f $ convertBuffer req)
+                                 (let i = convertBuffer req
+                                   in parseQueryParams i >>= \qp -> h qp i)
 
 
-parseBodyOrThrow :: forall a eff. (Generic a) => Input String -> Aff eff (Input a)
-parseBodyOrThrow a = either (\err -> throwError $ error $ show err)
+parseBody :: forall a m. (Generic a, MonadError Error m) => Input String -> m (Input a)
+parseBody a = either (\err -> throwError $ error $ show err)
                             (\p -> return $ a { body = p})
                             (readJSONGeneric defaultOptions a.body)
+
+foreign import getParamsImpl :: forall a. (a -> Maybe a) -> Maybe a -> String -> Maybe String
+getParams :: String -> Maybe String
+getParams = getParamsImpl Just Nothing
+
+parseQueryParams :: forall a b m. (Serializable b, MonadError Error m) => Input a -> m b
+parseQueryParams {url} = either throwError
+                                return
+                                (maybe (Left $ error $ "No params found") 
+                                       (\s -> deserialize s)
+                                       (getParams url))
 
 hostFile :: forall eff. 
               App -> String -> (Input Unit -> Aff (express :: EXPRESS, console :: CONSOLE | eff) Buffer) 
@@ -102,7 +125,7 @@ hostFile app url f = get app url noParser handler
                                log $ "Failed hostFile " <> message err
                                sendStr res $ message err)
                              (\a -> sendBuffer res a)
-                             (parseBodyOrThrow (convert req) >>= f)
+                             (parseBody (convert req) >>= f)
 
 convert :: Request -> Input String
 convert = mkConvert {url: _, body: _, params: _, path: _, query: _, headers: _}

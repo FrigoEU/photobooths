@@ -200,9 +200,9 @@ upsertSavedFile (SavedFile sf) = insert savedFileTable
                                          , Tuple "eventId" $ show sf.eventId
                                          ]) true ""
 
-saveFileToDb :: forall eff. Connection -> Int -> String -> Buffer 
+saveFileToDb :: forall eff. Connection -> Tuple Int String -> Buffer 
                             -> Aff (db :: DB | eff) SavedFile
-saveFileToDb conn eventId name buff = do
+saveFileToDb conn (Tuple eventId name) buff = do
   let query = Query $ "INSERT INTO " <> savedFileTable.name <> " (name, eventid, File) VALUES (?, ?, ?)"
   execute query [toSql name, toSql eventId, toSql buff] conn
   res <- queryOne_ (selectLastInserted savedFileTable) conn
@@ -245,8 +245,8 @@ foreign import pInt :: forall a. Maybe a -> (a -> Maybe a) -> String -> Maybe In
 safeParseInt :: String -> Maybe Int
 safeParseInt str = pInt Nothing Just str
 
-queryNewEvents :: forall eff. Connection -> String -> Date -> Aff (db :: DB | eff) (Array PartialEvent)
-queryNewEvents conn cname d = query q [toSql cname, toSql d] conn
+queryNewEvents :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array PartialEvent)
+queryNewEvents conn (Tuple cname d) = query q [toSql cname, toSql d] conn
   where
     q = Query $
         "Select * from EVENTS " <>
@@ -260,8 +260,8 @@ queryPhotobooth conn cname = queryOne q [toSql cname] conn
         "Select * from PHOTOBOOTHS " <>
         "where computername = ?"
 
-queryNewFiles :: forall eff. Connection -> String -> Date -> Aff (db :: DB | eff) (Array SavedFile)
-queryNewFiles conn cname d = query q [toSql cname, toSql d] conn
+queryNewFiles :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array SavedFile)
+queryNewFiles conn (Tuple cname d) = query q [toSql cname, toSql d] conn
   where
     q = Query $
         "Select f.* from FILES f " <>

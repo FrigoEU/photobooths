@@ -1,6 +1,6 @@
 module App.Endpoint (module Endpoint.Client, module App.Endpoint) where
 
-import Prelude
+import Prelude (Unit)
 
 import Network.HTTP.Method (Method(..))
 
@@ -12,71 +12,56 @@ import App.Model.Photobooth as PB
 import App.Model.Event as E
 import App.Model.SavedFile as SI
 import App.Model.Statistic as S
-import App.Model.Date
+import App.Model.Date (fromLocalDatetime, fromLocalDatetimeImpl, iso8601, toLocalDatetime)
 
-import Endpoint.Client
+import Endpoint.Client (Endpoint(Endpoint), FileUploadEndpoint(FileUploadEndpoint), execEndpoint, execEndpoint_, execFileUploadEndpoint, fileToBlob, parseOrThrow)
 
 ------- Photobooths --------------------
 
+getPhotobooth :: Endpoint String Unit (Maybe PB.Photobooth)
+getPhotobooth = Endpoint { method: GET, url: "/api/photobooths/cname"}
+
 getPhotobooths :: Endpoint Unit Unit (Array PB.Photobooth)
-getPhotobooths = Endpoint { method: GET, serverUrl: "/api/photobooths"
-                          , mkClientUrl: const "/api/photobooths"} 
+getPhotobooths = Endpoint { method: GET, url: "/api/photobooths/all"} 
 
 postPhotobooths :: Endpoint Unit PB.Photobooth PB.Photobooth
-postPhotobooths = Endpoint { method: POST, serverUrl: "/api/photobooths"
-                           , mkClientUrl: const "/api/photobooths"}
+postPhotobooths = Endpoint { method: POST, url: "/api/photobooths"}
 
 putPhotobooths :: Endpoint Unit PB.Photobooth PB.Photobooth
-putPhotobooths = Endpoint { method: PUT, serverUrl: "/api/photobooths"
-                          , mkClientUrl: const "/api/photobooths"}
-
-getPhotobooth :: Endpoint String Unit (Maybe PB.Photobooth)
-getPhotobooth = Endpoint { method: GET, serverUrl: "/api/photobooths/:cname"
-                         , mkClientUrl: \s -> "/api/photobooths/" <> s}
+putPhotobooths = Endpoint { method: PUT, url: "/api/photobooths" }
 
 ------- Events -------------------------
 
 getEvents :: Endpoint String Unit (Array E.Event)
-getEvents = Endpoint { method: GET, serverUrl: "/api/events/:cname"
-                     , mkClientUrl: \s -> "/api/events/" <> s} 
+getEvents = Endpoint { method: GET, url: "/api/events/cname"} 
 
 postEvents :: Endpoint Unit E.Event E.Event
-postEvents = Endpoint { method: POST, serverUrl: "/api/events"
-                      , mkClientUrl: const "/api/events"}
+postEvents = Endpoint { method: POST, url: "/api/events"}
 
 putEvents :: Endpoint Unit E.Event E.Event
-putEvents = Endpoint { method: PUT, serverUrl: "/api/events"
-                     , mkClientUrl: const "/api/events"}
+putEvents = Endpoint { method: PUT, url: "/api/events"}
 
 attachFile :: FileUploadEndpoint (Tuple Int String) SI.SavedFile
-attachFile = FileUploadEndpoint { serverUrl: "/api/attachfiletoevent/:eventid/:name"
-                           , mkClientUrl: \(Tuple i name) -> "/api/attachfiletoevent/" <> show i <> "/" <> name}
+attachFile = FileUploadEndpoint { url: "/api/attachfiletoevent"}
 
 getNewEvents :: Endpoint (Tuple String Date) Unit (Array E.PartialEvent)
-getNewEvents = Endpoint { method: GET, serverUrl: "/api/newevents/:cname/:date"
-                        , mkClientUrl: \(Tuple s d) -> "/api/newevents/" <> s <> "/" <> iso8601 d}
+getNewEvents = Endpoint { method: GET, url: "/api/newevents"}
 
 getNewFiles :: Endpoint (Tuple String Date) Unit (Array SI.SavedFile)
-getNewFiles = Endpoint { method: GET, serverUrl: "/api/newfiles/:cname/:date"
-                        , mkClientUrl: \(Tuple s d) -> "/api/newfiles/" <> s <> "/" <> iso8601 d}
+getNewFiles = Endpoint { method: GET, url: "/api/newfiles"}
 
 ------- Statistics ----------------------
 
 getStatistics :: Endpoint String Unit S.AllStatistics
-getStatistics = Endpoint { method: GET, serverUrl: "/api/statistics/:cname"
-                         , mkClientUrl: \s -> "/api/statistics/" <> s}
+getStatistics = Endpoint { method: GET, url: "/api/statistics/cname"}
 
 postStatistics :: Endpoint Unit S.AllStatistics Unit
-postStatistics = Endpoint { method: POST, serverUrl: "/api/statistics"
-                          , mkClientUrl: const "/api/statistics"}
+postStatistics = Endpoint { method: POST, url: "/api/statistics"}
                           
 ------- Profiles ----------------------
 
 getProfiles :: Endpoint Unit Unit (Array (Tuple String (Array String)))
-getProfiles = Endpoint { method: GET, serverUrl: "/api/profiles"
-                       , mkClientUrl: const "/api/profiles"}
+getProfiles = Endpoint { method: GET, url: "/api/profiles/all"}
 
 getProfileFiles :: Endpoint (Tuple String String) Unit (Array String)
-getProfileFiles = Endpoint {method: GET, serverUrl: "/api/profiles/:cname/:pname"
-                           , mkClientUrl: \(Tuple cname pname) -> 
-                                             "/api/profiles/" <> cname <> "/" <> pname}
+getProfileFiles = Endpoint {method: GET, url: "/api/profiles/files" }

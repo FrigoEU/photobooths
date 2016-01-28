@@ -104,3 +104,12 @@ exports.sendBuffer = function sendBuffer(res){
     };
   };
 };
+exports.getParamsImpl = function getParamsImpl(just){
+  return function(nothing){
+    var regex = /\?params=(.*)$/;
+    return function(url){
+      var matches = url.match(regex);
+      return matches[1] ? just(matches[1]) : nothing;
+    };
+  };
+};
