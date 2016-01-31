@@ -1,19 +1,18 @@
 module App.GUI where
 
-import Prelude
+import Prelude (Unit, ($), bind, (<$>))
 import Control.Monad.Eff (Eff())
 
 import OpticUI(animate, with)
 
-import Data.Lens (view)
-import Data.Tuple (Tuple(..))
+import Data.Lens (view, set)
 
-import App.GUI.Views.PhotoboothsPage
-import App.GUI.Views.EventsPage
-import App.GUI.Views.StatisticsPage
-import App.GUI.Router
-import App.GUI.Types
-import App.GUI.State
+import App.GUI.Views.PhotoboothsPage (photoboothsPage)
+import App.GUI.Views.EventsPage (eventsPage)
+import App.GUI.Views.StatisticsPage (statisticsPage)
+import App.GUI.Router (match, resolve, hashChanged, nav, getHash)
+import App.GUI.Types (ANDRT)
+import App.GUI.State (Route(StatisticsPage, EventsPage, PhotoboothsPage), _statisticsPage, _eventsPage, _pbPage, _route, initialState)
 
 ------ MAIN -----------
 
@@ -22,11 +21,12 @@ main = do
   let initRoute = PhotoboothsPage
   ini <- initialState initRoute
   matchedRoute <- match <$> getHash
-  (Tuple _ newS) <- nav_ ini matchedRoute
-  driver <- animate newS $ with \s h ->
+  newS <- resolve ini matchedRoute
+  let newSWithRoute = set _route matchedRoute newS
+  driver <- animate newSWithRoute $ with \s h ->
     let nav' = nav s h
      in case view _route s of
             PhotoboothsPage -> _pbPage (photoboothsPage nav')
             (EventsPage cname) -> _eventsPage $ eventsPage cname
             (StatisticsPage cname) -> _statisticsPage $ statisticsPage cname
-  hashChanged (\str -> driver (\s -> nav_ s (match str) >>= \(Tuple _ newS) -> return newS))
+  hashChanged (\str -> driver (\s -> resolve s (match str)))

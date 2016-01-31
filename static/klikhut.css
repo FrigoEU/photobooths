@@ -64,3 +64,12 @@ input[type="datetime-local"]{
   padding-left: 2px;
   padding-right: 2px;
 }
+
+.file-input-label{
+  cursor: pointer;
+  background: #CE9B43;
+  color: white;
+}
+input[type="file"]{
+  display: none;
+}

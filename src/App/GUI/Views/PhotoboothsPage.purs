@@ -41,7 +41,6 @@ data PhotoboothsCommand = Crud (CrudCommand Photobooth)
 
 photoboothsPage :: forall eff. Nav (AjaxRefDomTimer eff) ->
                                AppUI (AjaxRefDomTimer eff) { collection :: AsyncModel (AjaxRefDomTimer eff) (Array Photobooth)
-                                                           , route :: Route
                                                            , profiles :: AsyncModel (AjaxRefDomTimer eff) Profiles
                                                            , new :: { model :: {id :: Maybe Int, computername :: String, alias :: String, defaultprofile :: String}
                                                                     , state :: AsyncModel (AjaxRefDomTimer eff) Photobooth}

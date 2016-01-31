@@ -12,6 +12,7 @@ import Network.HTTP.Affjax (AJAX())
 import Data.Lens (lens, Lens(), LensP())
 import Data.Maybe(Maybe(..))
 import Data.Date (Date(), now, Now())
+import Data.Generic (class Generic)
 
 import App.Model.Async
 import App.Model.Photobooth as PB
@@ -69,6 +70,8 @@ data Route = PhotoboothsPage
            | EventsPage String
            | StatisticsPage String
 
+derive instance genericRoute :: Generic Route
+
 ------ LENSES --------------------------
 
 _collection :: forall a b o. Lens {collection :: a | o} {collection :: b | o} a b
@@ -101,31 +104,31 @@ _saving = lens _.saving (_ {saving = _})
 _route :: forall a b o. Lens {route :: a | o} {route :: b | o} a b
 _route = lens _.route (_ {route = _})
 
-_pbPage :: forall a b c d e o. LensP {photobooths :: a, profiles :: e, photoboothsPage :: {new :: b, editing :: c}, route :: d | o}
-                                {collection :: a, profiles :: e, new :: b, editing :: c, route :: d}
+_pbPage :: forall a b c e o. LensP {photobooths :: a, profiles :: e, photoboothsPage :: {new :: b, editing :: c} | o}
+                                {collection :: a, profiles :: e, new :: b, editing :: c}
 _pbPage = lens (\obj -> {collection: obj.photobooths
                        , profiles: obj.profiles
                        , new: obj.photoboothsPage.new
-                       , editing: obj.photoboothsPage.editing
-                       , route: obj.route})
+                       , editing: obj.photoboothsPage.editing 
+                       })
                (\old obj ->
                    old {photobooths = obj.collection
                        , profiles = obj.profiles
                        , photoboothsPage = {new: obj.new, editing: obj.editing}
-                       , route = obj.route})
+                       })
 
-_eventsPage :: forall a b c d e o. LensP {events :: a, profiles :: e, eventsPage :: {new :: b, editing :: c}, route :: d | o}
-                                {collection :: a, profiles :: e, new :: b, editing :: c, route :: d}
+_eventsPage :: forall a b c e o. LensP {events :: a, profiles :: e, eventsPage :: {new :: b, editing :: c} | o}
+                                {collection :: a, profiles :: e, new :: b, editing :: c}
 _eventsPage = lens (\obj -> {collection: obj.events
                             , profiles: obj.profiles
                             , new: obj.eventsPage.new
                             , editing: obj.eventsPage.editing
-                            , route: obj.route})
+                            })
                (\old obj ->
                    old {events = obj.collection
                        , profiles = obj.profiles
                        , eventsPage = {new: obj.new, editing: obj.editing}
-                       , route = obj.route})
+                       })
 
 _statisticsPage :: forall a b o. LensP {events :: a, statistics :: b | o}
                                        {events :: a, statistics :: b}

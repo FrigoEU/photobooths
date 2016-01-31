@@ -49,7 +49,6 @@ eventsPage :: forall eff. String ->
                           AppUI (ANDRT eff) 
                           { collection :: AsyncModel (ANDRT eff) (Array (EventWithState (ANDRT eff)))
                           , profiles :: AsyncModel (ANDRT eff) Profiles
-                          , route :: Route
                           , new :: { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                                    , state :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
                           , editing :: Maybe {index :: Int, previous :: (EventWithState (ANDRT eff)), saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}}
@@ -100,14 +99,17 @@ showEvents handle profiles = with c
           fileSaved si = runHandler h { model: over (_Event <<< _files) (cons si) s.model
                                       , state: st {savingFile = Initial, file = Nothing}}
           fileSaveErrored err = runHandler h (s {state = (st {savingFile = Errored err})})
-       in mconcat [ ui $ H.td [] $ H.text $ maybe "" show ev.id
-                  , ui $ H.td [] $ H.text $ ev.computername
-                  , ui $ H.td [] $ H.text $ ev.name
+          fileIdStr = maybe "" show ev.id
+          fileInputId = "event-fileinput-" <> fileIdStr
+       in mconcat [ ui $ H.td [] $ H.text fileIdStr
+                  , ui $ H.td [] $ H.text ev.computername
+                  , ui $ H.td [] $ H.text ev.name
                   , ui $ H.td [] $ H.text $ toLocalDatetime ev.datefrom
                   , ui $ H.td [] $ H.text $ toLocalDatetime ev.dateuntil
-                  , ui $ H.td [] $ H.text $ ev.profile
+                  , ui $ H.td [] $ H.text ev.profile
                   , withView (H.td []) $ editButton (handle <<< Crud) i editing
-                  , withView (H.td []) $ mconcat [ (_state <<< _file) $ fileInput [onFileInput fileSelected]
+                  , withView (H.td []) $ mconcat [ (_state <<< _file) (mconcat [ ui $ H.label [H.attr "for" fileInputId, H.classA "btn-action btn"] $ H.text "Upload"
+                                                                               , fileInput [onFileInput fileSelected, H.attr "id" fileInputId]])
                                                  , listFiles
                                                  , (_state <<< _savingFile <<< _Errored) $ with (\err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text $ message err)
                                                  ] 

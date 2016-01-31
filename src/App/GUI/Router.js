@@ -21,3 +21,13 @@ exports.hashChanged = function hashChanged(handler) {
     });
   };
 };
+
+// exports.getBasePathImpl = function getBasePathImpl(just){
+//   return function(nothing){
+//     var regex = /#\/([^\/\?]*).*/;
+//     return function(string){
+//       var matches = string.match(regex);
+//       return matches ? just(matches[1]) : nothing;
+//     }
+//   }
+// }

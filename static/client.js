@@ -5104,7 +5104,8 @@ var PS = { };
   var option = OpticUI_Markup.element(Data_Maybe.Nothing.value)("option");
   var onClick = function (h) {
       return OpticUI_Markup.handle("click")(h);
-  };                                                                
+  };                                                                      
+  var label = OpticUI_Markup.element(Data_Maybe.Nothing.value)("label");
   var input_ = function (ps) {
       return OpticUI_Markup.element(Data_Maybe.Nothing.value)("input")(ps)(Data_Monoid.mempty(OpticUI_Markup.markupMonoid));
   };                                                                     
@@ -5143,6 +5144,7 @@ var PS = { };
   exports["table"] = table;
   exports["select"] = select;
   exports["option"] = option;
+  exports["label"] = label;
   exports["input_"] = input_;
   exports["h1"] = h1;
   exports["em"] = em;
@@ -5953,6 +5955,16 @@ var PS = { };
       });
     };
   };
+
+  // exports.getBasePathImpl = function getBasePathImpl(just){
+  //   return function(nothing){
+  //     var regex = /#\/([^\/\?]*).*/;
+  //     return function(string){
+  //       var matches = string.match(regex);
+  //       return matches ? just(matches[1]) : nothing;
+  //     }
+  //   }
+  // }
  
 })(PS["App.GUI.Router"] = PS["App.GUI.Router"] || {});
 (function(exports) {
@@ -5967,6 +5979,7 @@ var PS = { };
   var Data_Lens = PS["Data.Lens"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Date = PS["Data.Date"];
+  var Data_Generic = PS["Data.Generic"];
   var App_Model_Async = PS["App.Model.Async"];
   var App_Model_Photobooth = PS["App.Model.Photobooth"];
   var App_Model_Event = PS["App.Model.Event"];
@@ -6038,6 +6051,48 @@ var PS = { };
           })();
       };
   };
+  var genericRoute = new Data_Generic.Generic(function ($dollarx) {
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.PhotoboothsPage" && $dollarx.value1.length === 0)) {
+          return new Data_Maybe.Just(PhotoboothsPage.value);
+      };
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.EventsPage" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(EventsPage.create))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[0](Prelude.unit)));
+      };
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.StatisticsPage" && $dollarx.value1.length === 1)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(StatisticsPage.create))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[0](Prelude.unit)));
+      };
+      return Data_Maybe.Nothing.value;
+  }, function ($dollarq) {
+      return new Data_Generic.SigProd("App.GUI.State.Route", [ {
+          sigConstructor: "App.GUI.State.PhotoboothsPage", 
+          sigValues: [  ]
+      }, {
+          sigConstructor: "App.GUI.State.EventsPage", 
+          sigValues: [ function ($dollarq1) {
+              return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+          } ]
+      }, {
+          sigConstructor: "App.GUI.State.StatisticsPage", 
+          sigValues: [ function ($dollarq1) {
+              return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+          } ]
+      } ]);
+  }, function ($dollarx) {
+      if ($dollarx instanceof PhotoboothsPage) {
+          return new Data_Generic.SProd("App.GUI.State.PhotoboothsPage", [  ]);
+      };
+      if ($dollarx instanceof EventsPage) {
+          return new Data_Generic.SProd("App.GUI.State.EventsPage", [ function ($dollarq) {
+              return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0);
+          } ]);
+      };
+      if ($dollarx instanceof StatisticsPage) {
+          return new Data_Generic.SProd("App.GUI.State.StatisticsPage", [ function ($dollarq) {
+              return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0);
+          } ]);
+      };
+      throw new Error("Failed pattern match at App.GUI.State line 73, column 1 - line 77, column 1: " + [ $dollarx.constructor.name ]);
+  });
   var _statisticsPage = function (dictStrong) {
       return Data_Lens_Lens.lens(function (obj) {
           return {
@@ -6046,15 +6101,15 @@ var PS = { };
           };
       })(function (old) {
           return function (obj) {
-              var $127 = {};
-              for (var $128 in old) {
-                  if (old.hasOwnProperty($128)) {
-                      $127[$128] = old[$128];
+              var $143 = {};
+              for (var $144 in old) {
+                  if (old.hasOwnProperty($144)) {
+                      $143[$144] = old[$144];
                   };
               };
-              $127.events = obj.events;
-              $127.statistics = obj.statistics;
-              return $127;
+              $143.events = obj.events;
+              $143.statistics = obj.statistics;
+              return $143;
           };
       })(dictStrong);
   };
@@ -6063,14 +6118,14 @@ var PS = { };
           return v.statistics;
       })(function (v) {
           return function (v1) {
-              var $129 = {};
-              for (var $130 in v) {
-                  if (v.hasOwnProperty($130)) {
-                      $129[$130] = v[$130];
+              var $145 = {};
+              for (var $146 in v) {
+                  if (v.hasOwnProperty($146)) {
+                      $145[$146] = v[$146];
                   };
               };
-              $129.statistics = v1;
-              return $129;
+              $145.statistics = v1;
+              return $145;
           };
       })(dictStrong);
   };
@@ -6079,14 +6134,14 @@ var PS = { };
           return v.state;
       })(function (v) {
           return function (v1) {
-              var $131 = {};
-              for (var $132 in v) {
-                  if (v.hasOwnProperty($132)) {
-                      $131[$132] = v[$132];
+              var $147 = {};
+              for (var $148 in v) {
+                  if (v.hasOwnProperty($148)) {
+                      $147[$148] = v[$148];
                   };
               };
-              $131.state = v1;
-              return $131;
+              $147.state = v1;
+              return $147;
           };
       })(dictStrong);
   };
@@ -6095,14 +6150,14 @@ var PS = { };
           return v.savingFile;
       })(function (v) {
           return function (v1) {
-              var $133 = {};
-              for (var $134 in v) {
-                  if (v.hasOwnProperty($134)) {
-                      $133[$134] = v[$134];
+              var $149 = {};
+              for (var $150 in v) {
+                  if (v.hasOwnProperty($150)) {
+                      $149[$150] = v[$150];
                   };
               };
-              $133.savingFile = v1;
-              return $133;
+              $149.savingFile = v1;
+              return $149;
           };
       })(dictStrong);
   };
@@ -6111,14 +6166,14 @@ var PS = { };
           return v.saving;
       })(function (v) {
           return function (v1) {
-              var $135 = {};
-              for (var $136 in v) {
-                  if (v.hasOwnProperty($136)) {
-                      $135[$136] = v[$136];
+              var $151 = {};
+              for (var $152 in v) {
+                  if (v.hasOwnProperty($152)) {
+                      $151[$152] = v[$152];
                   };
               };
-              $135.saving = v1;
-              return $135;
+              $151.saving = v1;
+              return $151;
           };
       })(dictStrong);
   };
@@ -6127,14 +6182,14 @@ var PS = { };
           return v.route;
       })(function (v) {
           return function (v1) {
-              var $137 = {};
-              for (var $138 in v) {
-                  if (v.hasOwnProperty($138)) {
-                      $137[$138] = v[$138];
+              var $153 = {};
+              for (var $154 in v) {
+                  if (v.hasOwnProperty($154)) {
+                      $153[$154] = v[$154];
                   };
               };
-              $137.route = v1;
-              return $137;
+              $153.route = v1;
+              return $153;
           };
       })(dictStrong);
   };
@@ -6143,14 +6198,14 @@ var PS = { };
           return v.profiles;
       })(function (v) {
           return function (v1) {
-              var $139 = {};
-              for (var $140 in v) {
-                  if (v.hasOwnProperty($140)) {
-                      $139[$140] = v[$140];
+              var $155 = {};
+              for (var $156 in v) {
+                  if (v.hasOwnProperty($156)) {
+                      $155[$156] = v[$156];
                   };
               };
-              $139.profiles = v1;
-              return $139;
+              $155.profiles = v1;
+              return $155;
           };
       })(dictStrong);
   };
@@ -6159,14 +6214,14 @@ var PS = { };
           return v.profile;
       })(function (v) {
           return function (v1) {
-              var $141 = {};
-              for (var $142 in v) {
-                  if (v.hasOwnProperty($142)) {
-                      $141[$142] = v[$142];
+              var $157 = {};
+              for (var $158 in v) {
+                  if (v.hasOwnProperty($158)) {
+                      $157[$158] = v[$158];
                   };
               };
-              $141.profile = v1;
-              return $141;
+              $157.profile = v1;
+              return $157;
           };
       })(dictStrong);
   };
@@ -6176,25 +6231,23 @@ var PS = { };
               collection: obj.photobooths, 
               profiles: obj.profiles, 
               "new": obj.photoboothsPage["new"], 
-              editing: obj.photoboothsPage.editing, 
-              route: obj.route
+              editing: obj.photoboothsPage.editing
           };
       })(function (old) {
           return function (obj) {
-              var $151 = {};
-              for (var $152 in old) {
-                  if (old.hasOwnProperty($152)) {
-                      $151[$152] = old[$152];
+              var $167 = {};
+              for (var $168 in old) {
+                  if (old.hasOwnProperty($168)) {
+                      $167[$168] = old[$168];
                   };
               };
-              $151.photobooths = obj.collection;
-              $151.profiles = obj.profiles;
-              $151.photoboothsPage = {
+              $167.photobooths = obj.collection;
+              $167.profiles = obj.profiles;
+              $167.photoboothsPage = {
                   "new": obj["new"], 
                   editing: obj.editing
               };
-              $151.route = obj.route;
-              return $151;
+              return $167;
           };
       })(dictStrong);
   };
@@ -6203,14 +6256,14 @@ var PS = { };
           return v["new"];
       })(function (v) {
           return function (v1) {
-              var $153 = {};
-              for (var $154 in v) {
-                  if (v.hasOwnProperty($154)) {
-                      $153[$154] = v[$154];
+              var $169 = {};
+              for (var $170 in v) {
+                  if (v.hasOwnProperty($170)) {
+                      $169[$170] = v[$170];
                   };
               };
-              $153.new = v1;
-              return $153;
+              $169.new = v1;
+              return $169;
           };
       })(dictStrong);
   };
@@ -6219,14 +6272,14 @@ var PS = { };
           return v.name;
       })(function (v) {
           return function (v1) {
-              var $155 = {};
-              for (var $156 in v) {
-                  if (v.hasOwnProperty($156)) {
-                      $155[$156] = v[$156];
+              var $171 = {};
+              for (var $172 in v) {
+                  if (v.hasOwnProperty($172)) {
+                      $171[$172] = v[$172];
                   };
               };
-              $155.name = v1;
-              return $155;
+              $171.name = v1;
+              return $171;
           };
       })(dictStrong);
   };
@@ -6235,14 +6288,14 @@ var PS = { };
           return v.model;
       })(function (v) {
           return function (v1) {
-              var $161 = {};
-              for (var $162 in v) {
-                  if (v.hasOwnProperty($162)) {
-                      $161[$162] = v[$162];
+              var $177 = {};
+              for (var $178 in v) {
+                  if (v.hasOwnProperty($178)) {
+                      $177[$178] = v[$178];
                   };
               };
-              $161.model = v1;
-              return $161;
+              $177.model = v1;
+              return $177;
           };
       })(dictStrong);
   };
@@ -6251,14 +6304,14 @@ var PS = { };
           return v.files;
       })(function (v) {
           return function (v1) {
-              var $167 = {};
-              for (var $168 in v) {
-                  if (v.hasOwnProperty($168)) {
-                      $167[$168] = v[$168];
+              var $183 = {};
+              for (var $184 in v) {
+                  if (v.hasOwnProperty($184)) {
+                      $183[$184] = v[$184];
                   };
               };
-              $167.files = v1;
-              return $167;
+              $183.files = v1;
+              return $183;
           };
       })(dictStrong);
   };
@@ -6267,14 +6320,14 @@ var PS = { };
           return v.file;
       })(function (v) {
           return function (v1) {
-              var $169 = {};
-              for (var $170 in v) {
-                  if (v.hasOwnProperty($170)) {
-                      $169[$170] = v[$170];
+              var $185 = {};
+              for (var $186 in v) {
+                  if (v.hasOwnProperty($186)) {
+                      $185[$186] = v[$186];
                   };
               };
-              $169.file = v1;
-              return $169;
+              $185.file = v1;
+              return $185;
           };
       })(dictStrong);
   };
@@ -6284,25 +6337,23 @@ var PS = { };
               collection: obj.events, 
               profiles: obj.profiles, 
               "new": obj.eventsPage["new"], 
-              editing: obj.eventsPage.editing, 
-              route: obj.route
+              editing: obj.eventsPage.editing
           };
       })(function (old) {
           return function (obj) {
-              var $171 = {};
-              for (var $172 in old) {
-                  if (old.hasOwnProperty($172)) {
-                      $171[$172] = old[$172];
+              var $187 = {};
+              for (var $188 in old) {
+                  if (old.hasOwnProperty($188)) {
+                      $187[$188] = old[$188];
                   };
               };
-              $171.events = obj.collection;
-              $171.profiles = obj.profiles;
-              $171.eventsPage = {
+              $187.events = obj.collection;
+              $187.profiles = obj.profiles;
+              $187.eventsPage = {
                   "new": obj["new"], 
                   editing: obj.editing
               };
-              $171.route = obj.route;
-              return $171;
+              return $187;
           };
       })(dictStrong);
   };
@@ -6311,14 +6362,14 @@ var PS = { };
           return v.events;
       })(function (v) {
           return function (v1) {
-              var $173 = {};
-              for (var $174 in v) {
-                  if (v.hasOwnProperty($174)) {
-                      $173[$174] = v[$174];
+              var $189 = {};
+              for (var $190 in v) {
+                  if (v.hasOwnProperty($190)) {
+                      $189[$190] = v[$190];
                   };
               };
-              $173.events = v1;
-              return $173;
+              $189.events = v1;
+              return $189;
           };
       })(dictStrong);
   };
@@ -6327,14 +6378,14 @@ var PS = { };
           return v.editing;
       })(function (v) {
           return function (v1) {
-              var $179 = {};
-              for (var $180 in v) {
-                  if (v.hasOwnProperty($180)) {
-                      $179[$180] = v[$180];
+              var $195 = {};
+              for (var $196 in v) {
+                  if (v.hasOwnProperty($196)) {
+                      $195[$196] = v[$196];
                   };
               };
-              $179.editing = v1;
-              return $179;
+              $195.editing = v1;
+              return $195;
           };
       })(dictStrong);
   };
@@ -6343,14 +6394,14 @@ var PS = { };
           return v.defaultprofile;
       })(function (v) {
           return function (v1) {
-              var $181 = {};
-              for (var $182 in v) {
-                  if (v.hasOwnProperty($182)) {
-                      $181[$182] = v[$182];
+              var $197 = {};
+              for (var $198 in v) {
+                  if (v.hasOwnProperty($198)) {
+                      $197[$198] = v[$198];
                   };
               };
-              $181.defaultprofile = v1;
-              return $181;
+              $197.defaultprofile = v1;
+              return $197;
           };
       })(dictStrong);
   };
@@ -6359,14 +6410,14 @@ var PS = { };
           return v.dateuntil;
       })(function (v) {
           return function (v1) {
-              var $183 = {};
-              for (var $184 in v) {
-                  if (v.hasOwnProperty($184)) {
-                      $183[$184] = v[$184];
+              var $199 = {};
+              for (var $200 in v) {
+                  if (v.hasOwnProperty($200)) {
+                      $199[$200] = v[$200];
                   };
               };
-              $183.dateuntil = v1;
-              return $183;
+              $199.dateuntil = v1;
+              return $199;
           };
       })(dictStrong);
   };
@@ -6375,14 +6426,14 @@ var PS = { };
           return v.datefrom;
       })(function (v) {
           return function (v1) {
-              var $185 = {};
-              for (var $186 in v) {
-                  if (v.hasOwnProperty($186)) {
-                      $185[$186] = v[$186];
+              var $201 = {};
+              for (var $202 in v) {
+                  if (v.hasOwnProperty($202)) {
+                      $201[$202] = v[$202];
                   };
               };
-              $185.datefrom = v1;
-              return $185;
+              $201.datefrom = v1;
+              return $201;
           };
       })(dictStrong);
   };
@@ -6391,14 +6442,14 @@ var PS = { };
           return v.computername;
       })(function (v) {
           return function (v1) {
-              var $187 = {};
-              for (var $188 in v) {
-                  if (v.hasOwnProperty($188)) {
-                      $187[$188] = v[$188];
+              var $203 = {};
+              for (var $204 in v) {
+                  if (v.hasOwnProperty($204)) {
+                      $203[$204] = v[$204];
                   };
               };
-              $187.computername = v1;
-              return $187;
+              $203.computername = v1;
+              return $203;
           };
       })(dictStrong);
   };
@@ -6409,15 +6460,15 @@ var PS = { };
       };
   })(function (old) {
       return function (v) {
-          var $193 = {};
-          for (var $194 in old) {
-              if (old.hasOwnProperty($194)) {
-                  $193[$194] = old[$194];
+          var $209 = {};
+          for (var $210 in old) {
+              if (old.hasOwnProperty($210)) {
+                  $209[$210] = old[$210];
               };
           };
-          $193.collection = v.collection;
-          $193.editing = v.editing;
-          return $193;
+          $209.collection = v.collection;
+          $209.editing = v.editing;
+          return $209;
       };
   });
   var _collection = function (dictStrong) {
@@ -6425,14 +6476,14 @@ var PS = { };
           return v.collection;
       })(function (v) {
           return function (v1) {
-              var $197 = {};
-              for (var $198 in v) {
-                  if (v.hasOwnProperty($198)) {
-                      $197[$198] = v[$198];
+              var $213 = {};
+              for (var $214 in v) {
+                  if (v.hasOwnProperty($214)) {
+                      $213[$214] = v[$214];
                   };
               };
-              $197.collection = v1;
-              return $197;
+              $213.collection = v1;
+              return $213;
           };
       })(dictStrong);
   };
@@ -6441,14 +6492,14 @@ var PS = { };
           return v.alias;
       })(function (v) {
           return function (v1) {
-              var $199 = {};
-              for (var $200 in v) {
-                  if (v.hasOwnProperty($200)) {
-                      $199[$200] = v[$200];
+              var $215 = {};
+              for (var $216 in v) {
+                  if (v.hasOwnProperty($216)) {
+                      $215[$216] = v[$216];
                   };
               };
-              $199.alias = v1;
-              return $199;
+              $215.alias = v1;
+              return $215;
           };
       })(dictStrong);
   };
@@ -6479,7 +6530,8 @@ var PS = { };
   exports["_new"] = _new;
   exports["_collectionEditing"] = _collectionEditing;
   exports["_collection"] = _collection;
-  exports["initialState"] = initialState;;
+  exports["initialState"] = initialState;
+  exports["genericRoute"] = genericRoute;;
  
 })(PS["App.GUI.State"] = PS["App.GUI.State"] || {});
 (function(exports) {
@@ -6546,12 +6598,14 @@ var PS = { };
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var Network_HTTP_Affjax = PS["Network.HTTP.Affjax"];
   var Control_Monad_Eff_Ref = PS["Control.Monad.Eff.Ref"];
+  var Control_Apply = PS["Control.Apply"];
   var OpticUI = PS["OpticUI"];
   var OpticUI_Components_Async = PS["OpticUI.Components.Async"];
   var Data_Lens = PS["Data.Lens"];
   var Data_String = PS["Data.String"];
-  var Data_Tuple = PS["Data.Tuple"];
   var Data_Either = PS["Data.Either"];
+  var Data_Foreign = PS["Data.Foreign"];
+  var Data_Foreign_Generic = PS["Data.Foreign.Generic"];
   var App_Model_Async = PS["App.Model.Async"];
   var App_GUI_State = PS["App.GUI.State"];
   var App_GUI_Load = PS["App.GUI.Load"];
@@ -6559,21 +6613,22 @@ var PS = { };
   var Data_Lens_Setter = PS["Data.Lens.Setter"];
   var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
   var OpticUI_Core = PS["OpticUI.Core"];     
-  var nav_ = function (s) {
+  var toUrl = Data_Foreign_Generic.toJSONGeneric(App_GUI_State.genericRoute)(Data_Foreign_Generic.defaultOptions);
+  var resolve = function (s) {
       return function (v) {
           if (v instanceof App_GUI_State.PhotoboothsPage) {
-              return Prelude["return"](Control_Monad_Eff.applicativeEff)(new Data_Tuple.Tuple("/photobooths", Data_Lens_Setter.set(App_GUI_State._route(Data_Profunctor_Strong.strongFn))(v)(s)));
+              return Prelude["return"](Control_Monad_Eff.applicativeEff)(s);
           };
           if (v instanceof App_GUI_State.EventsPage) {
               return function __do() {
                   var v1 = OpticUI_Components_Async.async(App_GUI_Load.loadEvents(v.value0))();
                   return (function () {
-                      var modifications = function ($18) {
-                          return Data_Lens_Setter.set(App_GUI_State._route(Data_Profunctor_Strong.strongFn))(v)(Data_Lens_Setter.set(function ($19) {
-                              return App_GUI_State._eventsPage(Data_Profunctor_Strong.strongFn)(App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._model(Data_Profunctor_Strong.strongFn)(App_GUI_State._computername(Data_Profunctor_Strong.strongFn)($19))));
-                          })(v.value0)(Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))($18)));
+                      var modifications = function ($11) {
+                          return Data_Lens_Setter.set(function ($12) {
+                              return App_GUI_State._eventsPage(Data_Profunctor_Strong.strongFn)(App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._model(Data_Profunctor_Strong.strongFn)(App_GUI_State._computername(Data_Profunctor_Strong.strongFn)($12))));
+                          })(v.value0)(Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))($11));
                       };
-                      return Prelude["return"](Control_Monad_Eff.applicativeEff)(new Data_Tuple.Tuple("/events/" + v.value0, modifications(s)));
+                      return Prelude["return"](Control_Monad_Eff.applicativeEff)(modifications(s));
                   })()();
               };
           };
@@ -6582,65 +6637,31 @@ var PS = { };
                   var v1 = OpticUI_Components_Async.async(App_GUI_Load.loadEvents(v.value0))();
                   var v2 = OpticUI_Components_Async.async(App_GUI_Load.loadStatistics(v.value0))();
                   return (function () {
-                      var modifications = function ($20) {
-                          return Data_Lens_Setter.set(App_GUI_State._route(Data_Profunctor_Strong.strongFn))(v)(Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))(Data_Lens_Setter.set(App_GUI_State._statistics(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v2))($20)));
+                      var modifications = function ($13) {
+                          return Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))(Data_Lens_Setter.set(App_GUI_State._statistics(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v2))($13));
                       };
-                      return Prelude["return"](Control_Monad_Eff.applicativeEff)(new Data_Tuple.Tuple("/statistics/" + v.value0, modifications(s)));
+                      return Prelude["return"](Control_Monad_Eff.applicativeEff)(modifications(s));
                   })()();
               };
           };
-          throw new Error("Failed pattern match at App.GUI.Router line 37, column 1 - line 39, column 1: " + [ s.constructor.name, v.constructor.name ]);
+          throw new Error("Failed pattern match at App.GUI.Router line 41, column 1 - line 43, column 1: " + [ s.constructor.name, v.constructor.name ]);
       };
   };
   var nav = function (s) {
       return function (h) {
           return function (r) {
-              return function __do() {
-                  var v = nav_(s)(r)();
-                  $foreign.setHash(v.value0)();
-                  return OpticUI_Core.runHandler(h)(v.value1)();
-              };
+              return Prelude[">>="](Control_Monad_Eff.bindEff)(Control_Apply["*>"](Control_Monad_Eff.applyEff)($foreign.setHash(toUrl(r)))(resolve(s)(r)))(Prelude[">>>"](Prelude.semigroupoidFn)(Data_Lens_Setter.set(App_GUI_State._route(Data_Profunctor_Strong.strongFn))(r))(OpticUI_Core.runHandler(h)));
           };
       };
   };
-  var match$prime = function (str) {
-      var t = Data_String.drop(2)(str);
-      return Prelude.bind(Data_Either.bindEither)((function () {
-          var $15 = Prelude["=="](Prelude.eqString)(t)("photobooths");
-          if ($15) {
-              return new Data_Either.Left(App_GUI_State.PhotoboothsPage.value);
-          };
-          if (!$15) {
-              return new Data_Either.Right(Prelude.unit);
-          };
-          throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ $15.constructor.name ]);
-      })())(function () {
-          return Prelude.bind(Data_Either.bindEither)((function () {
-              var $16 = Prelude["=="](Prelude.eqString)(Data_String.take(6)(t))("events");
-              if ($16) {
-                  return new Data_Either.Left(new App_GUI_State.EventsPage(Data_String.drop(7)(t)));
-              };
-              if (!$16) {
-                  return new Data_Either.Right(Prelude.unit);
-              };
-              throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ $16.constructor.name ]);
-          })())(function () {
-              var $17 = Prelude["=="](Prelude.eqString)(Data_String.take(10)(t))("statistics");
-              if ($17) {
-                  return new Data_Either.Left(new App_GUI_State.StatisticsPage(Data_String.drop(11)(t)));
-              };
-              if (!$17) {
-                  return new Data_Either.Right(Prelude.unit);
-              };
-              throw new Error("Failed pattern match at App.GUI.Router line 57, column 1 - line 58, column 1: " + [ $17.constructor.name ]);
-          });
-      });
-  };
+  var fromUrl = Data_Foreign_Generic.readJSONGeneric(App_GUI_State.genericRoute)(Data_Foreign_Generic.defaultOptions);
   var match = function (str) {
-      return Data_Either.either(Prelude.id(Prelude.categoryFn))(Prelude["const"](App_GUI_State.PhotoboothsPage.value))(match$prime(str));
+      return Data_Either.either(Prelude["const"](App_GUI_State.PhotoboothsPage.value))(Prelude.id(Prelude.categoryFn))(fromUrl(Data_String.drop(1)(str)));
   };
+  exports["fromUrl"] = fromUrl;
+  exports["toUrl"] = toUrl;
   exports["match"] = match;
-  exports["nav_"] = nav_;
+  exports["resolve"] = resolve;
   exports["nav"] = nav;
   exports["hashChanged"] = $foreign.hashChanged;
   exports["getHash"] = $foreign.getHash;;
@@ -7374,7 +7395,7 @@ var PS = { };
                           if (v1 instanceof App_Model_Async.Errored) {
                               return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(v1.value0)))));
                           };
-                          throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 70, column 7 - line 72, column 7: " + [ v.constructor.name, v1.constructor.name, h.constructor.name ]);
+                          throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 69, column 7 - line 71, column 7: " + [ v.constructor.name, v1.constructor.name, h.constructor.name ]);
                       };
                   };
               };
@@ -7415,7 +7436,7 @@ var PS = { };
                   if (v instanceof ToStatistics) {
                       return $$goto(new App_GUI_State.StatisticsPage(v.value0));
                   };
-                  throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 42, column 1 - line 49, column 1: " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 42, column 1 - line 48, column 1: " + [ v.constructor.name ]);
               };
               return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(App_GUI_Components_Markup.pageTitle(OpticUI_Markup.text("Photobooths"))))(OpticUI_Core.withView(App_GUI_Components_Markup.crudTable)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.tableHeader(Prelude.functorArray)(Data_Foldable.foldableArray)([  ])([ "Name", "Alias", "Default Profile", "Actions", "Link" ])), App_GUI_State._collectionEditing(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s))(function (ed) {
                   return Prelude["return"](Data_Maybe.applicativeMaybe)(ed.index);
@@ -7699,7 +7720,7 @@ var PS = { };
                                               })())();
                                           };
                                       };
-                                      throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 102, column 11 - line 103, column 8: " + [ v2.constructor.name, v3.constructor.name ]);
+                                      throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 103, column 11 - line 104, column 8: " + [ v2.constructor.name, v3.constructor.name ]);
                                   };
                               };
                               var fileSaved = function (si) {
@@ -7741,9 +7762,11 @@ var PS = { };
                                       return $36;
                                   })());
                               };
-                              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(Data_Maybe.maybe("")(Prelude.show(Prelude.showInt))(v1.model.value0.id)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(v1.model.value0.computername))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(v1.model.value0.name))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.toLocalDatetime(v1.model.value0.datefrom)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.toLocalDatetime(v1.model.value0.dateuntil)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(v1.model.value0.profile))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(App_GUI_Components_CrudButtons.editButton(function ($55) {
+                              var fileIdStr = Data_Maybe.maybe("")(Prelude.show(Prelude.showInt))(v1.model.value0.id);
+                              var fileInputId = "event-fileinput-" + fileIdStr;
+                              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(fileIdStr))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(v1.model.value0.computername))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(v1.model.value0.name))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.toLocalDatetime(v1.model.value0.datefrom)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(App_Model_Date.toLocalDatetime(v1.model.value0.dateuntil)))), OpticUI_Core.ui(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text(v1.model.value0.profile))), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(App_GUI_Components_CrudButtons.editButton(function ($55) {
                                   return handle(Crud.create($55));
-                              })(i)(editing)), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_State._file(OpticUI_Core.uiStrong)(App_GUI_Components_FileInput.fileInput([ App_GUI_Components_FileInput.onFileInput(fileSelected) ]))), listFiles, App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_State._savingFile(OpticUI_Core.uiStrong)(App_Model_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
+                              })(i)(editing)), OpticUI_Core.withView(OpticUI_Markup_HTML.td([  ]))(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_State._file(OpticUI_Core.uiStrong)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(OpticUI_Markup_HTML.label([ OpticUI_Markup.attr("for")(fileInputId), OpticUI_Markup_HTML.classA("btn-action btn") ])(OpticUI_Markup.text("Upload"))), App_GUI_Components_FileInput.fileInput([ App_GUI_Components_FileInput.onFileInput(fileSelected), OpticUI_Markup.attr("id")(fileInputId) ]) ]))), listFiles, App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_State._savingFile(OpticUI_Core.uiStrong)(App_Model_Async._Errored(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core["with"](function (err) {
                                   return function (v2) {
                                       return OpticUI_Core.ui(OpticUI_Markup_HTML.div([ OpticUI_Markup_HTML.classA("alert alert-danger") ])(OpticUI_Markup.text(Control_Monad_Eff_Exception.message(err))));
                                   };
@@ -7773,7 +7796,7 @@ var PS = { };
                           return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(OpticUI_Core["with"](line(selI)(editing)(i)));
                       })));
                   };
-                  throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 71, column 1 - line 76, column 1: " + [ v.constructor.name, h.constructor.name ]);
+                  throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 70, column 1 - line 75, column 1: " + [ v.constructor.name, h.constructor.name ]);
               };
           };
           return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core["with"](c))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(App_GUI_State._collection(OpticUI_Core.uiStrong)(App_Model_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_Components_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(App_GUI_Views_Crud.LoadAll.value))))))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(App_GUI_State._collection(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($56) {
@@ -8319,13 +8342,14 @@ var PS = { };
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var OpticUI = PS["OpticUI"];
   var Data_Lens = PS["Data.Lens"];
-  var Data_Tuple = PS["Data.Tuple"];
   var App_GUI_Views_PhotoboothsPage = PS["App.GUI.Views.PhotoboothsPage"];
   var App_GUI_Views_EventsPage = PS["App.GUI.Views.EventsPage"];
   var App_GUI_Views_StatisticsPage = PS["App.GUI.Views.StatisticsPage"];
   var App_GUI_Router = PS["App.GUI.Router"];
   var App_GUI_Types = PS["App.GUI.Types"];
   var App_GUI_State = PS["App.GUI.State"];
+  var Data_Lens_Setter = PS["Data.Lens.Setter"];
+  var Data_Profunctor_Strong = PS["Data.Profunctor.Strong"];
   var OpticUI_Run = PS["OpticUI.Run"];
   var OpticUI_Core = PS["OpticUI.Core"];
   var Data_Lens_Getter = PS["Data.Lens.Getter"];
@@ -8333,31 +8357,33 @@ var PS = { };
   var main = function __do() {
       var v = App_GUI_State.initialState(App_GUI_State.PhotoboothsPage.value)();
       var v1 = Prelude["<$>"](Control_Monad_Eff.functorEff)(App_GUI_Router.match)(App_GUI_Router.getHash)();
-      var v2 = App_GUI_Router.nav_(v)(v1)();
-      var v3 = OpticUI_Run.animate(v2.value1)(OpticUI_Core["with"](function (s) {
-          return function (h) {
-              var nav$prime = App_GUI_Router.nav(s)(h);
-              var $8 = Data_Lens_Getter.view(App_GUI_State._route(Data_Lens_Internal_Forget.strongForget))(s);
-              if ($8 instanceof App_GUI_State.PhotoboothsPage) {
-                  return App_GUI_State._pbPage(OpticUI_Core.uiStrong)(App_GUI_Views_PhotoboothsPage.photoboothsPage(nav$prime));
-              };
-              if ($8 instanceof App_GUI_State.EventsPage) {
-                  return App_GUI_State._eventsPage(OpticUI_Core.uiStrong)(App_GUI_Views_EventsPage.eventsPage($8.value0));
-              };
-              if ($8 instanceof App_GUI_State.StatisticsPage) {
-                  return App_GUI_State._statisticsPage(OpticUI_Core.uiStrong)(App_GUI_Views_StatisticsPage.statisticsPage($8.value0));
-              };
-              throw new Error("Failed pattern match at App.GUI line 20, column 1 - line 21, column 1: " + [ $8.constructor.name ]);
+      var v2 = App_GUI_Router.resolve(v)(v1)();
+      return (function () {
+          var newSWithRoute = Data_Lens_Setter.set(App_GUI_State._route(Data_Profunctor_Strong.strongFn))(v1)(v2);
+          return function __do() {
+              var v3 = OpticUI_Run.animate(newSWithRoute)(OpticUI_Core["with"](function (s) {
+                  return function (h) {
+                      var nav$prime = App_GUI_Router.nav(s)(h);
+                      var $7 = Data_Lens_Getter.view(App_GUI_State._route(Data_Lens_Internal_Forget.strongForget))(s);
+                      if ($7 instanceof App_GUI_State.PhotoboothsPage) {
+                          return App_GUI_State._pbPage(OpticUI_Core.uiStrong)(App_GUI_Views_PhotoboothsPage.photoboothsPage(nav$prime));
+                      };
+                      if ($7 instanceof App_GUI_State.EventsPage) {
+                          return App_GUI_State._eventsPage(OpticUI_Core.uiStrong)(App_GUI_Views_EventsPage.eventsPage($7.value0));
+                      };
+                      if ($7 instanceof App_GUI_State.StatisticsPage) {
+                          return App_GUI_State._statisticsPage(OpticUI_Core.uiStrong)(App_GUI_Views_StatisticsPage.statisticsPage($7.value0));
+                      };
+                      throw new Error("Failed pattern match at App.GUI line 19, column 1 - line 20, column 1: " + [ $7.constructor.name ]);
+                  };
+              }))();
+              return App_GUI_Router.hashChanged(function (str) {
+                  return v3(function (s) {
+                      return App_GUI_Router.resolve(s)(App_GUI_Router.match(str));
+                  });
+              })();
           };
-      }))();
-      return App_GUI_Router.hashChanged(function (str) {
-          return v3(function (s) {
-              return function __do() {
-                  var v4 = App_GUI_Router.nav_(s)(App_GUI_Router.match(str))();
-                  return Prelude["return"](Control_Monad_Eff.applicativeEff)(v4.value1)();
-              };
-          });
-      })();
+      })()();
   };
   exports["main"] = main;;
  
