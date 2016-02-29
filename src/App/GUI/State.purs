@@ -36,13 +36,15 @@ initialState initRoute = do
       { model: 
         { id: Nothing, computername: "", name: "", datefrom: dateNow, dateuntil: dateNow, profile: "", files: []}
       , state: Initial}
-    , editing: Nothing}
+    , editing: Nothing
+    , deleting: Nothing}
   , photoboothsPage: 
     { new: 
       { model: 
         { id: Nothing, computername: "", alias: "", defaultprofile: ""}
           , state: Initial}
-    , editing: Nothing }}
+    , editing: Nothing 
+    , deleting: Nothing}}
 
 type State eff = { route :: Route
                  , photobooths :: AsyncModel eff (Array PB.Photobooth)
@@ -53,13 +55,15 @@ type State eff = { route :: Route
                    { new :: 
                      { model :: { id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                      , state :: AsyncModel eff (EventWithState eff)}
-                   , editing :: Maybe {index:: Int, previous:: EventWithState eff, saving:: AsyncModel eff (EventWithState eff)}}
+                   , editing :: Maybe {index:: Int, previous:: EventWithState eff, saving:: AsyncModel eff (EventWithState eff)}
+                   , deleting :: Maybe {index :: Int, saving :: AsyncModel eff Unit}}
                  , photoboothsPage :: 
                    { new :: 
                      { model :: 
                        { id:: Maybe Int, computername :: String, alias :: String, defaultprofile :: String}
                        , state :: AsyncModel eff PB.Photobooth}
-                   , editing :: Maybe {index:: Int, previous:: PB.Photobooth, saving:: AsyncModel eff PB.Photobooth}}
+                   , editing :: Maybe {index:: Int, previous:: PB.Photobooth, saving:: AsyncModel eff PB.Photobooth}
+                   , deleting :: Maybe {index :: Int, saving :: AsyncModel eff Unit}}
                  }
 
 type EventWithState eff = {model :: E.Event, state :: {savingFile :: AsyncModel eff SavedFile, file :: Maybe File}}
@@ -67,8 +71,8 @@ type EventWithState eff = {model :: E.Event, state :: {savingFile :: AsyncModel 
 ------ ROUTES --------------------------
 
 data Route = PhotoboothsPage
-           | EventsPage String
-           | StatisticsPage String
+           | EventsPage String String
+           | StatisticsPage String String
 
 derive instance genericRoute :: Generic Route
 
@@ -79,6 +83,9 @@ _collection = lens _.collection (_ {collection = _})
 
 _collectionEditing = lens (\{collection: a, editing: b} -> {collection: a, editing: b})
                            (\old {collection: a, editing: b} -> old {collection = a, editing = b})
+
+_collectionEditingD = lens (\{collection: a, editing: b, deleting: c} -> {collection: a, editing: b, deleting: c})
+                            (\old {collection: a, editing: b, deleting: c} -> old {collection = a, editing = b, deleting = c})
 
 _new :: forall a b o. Lens {new :: a | o} {new :: b | o} a b
 _new = lens _.new (_ {new = _})
@@ -92,6 +99,9 @@ _state = lens _.state (_ {state = _})
 _editing :: forall a b o. Lens {editing :: a | o} {editing :: b | o} a b
 _editing = lens _.editing (_ {editing = _})
 
+_deleting :: forall a b o. Lens {deleting :: a | o} {deleting :: b | o} a b
+_deleting = lens _.deleting (_ {deleting = _})
+
 _index :: forall a b o. Lens {index :: a | o} {index :: b | o} a b
 _index = lens _.index (_ {index = _})
 
@@ -104,30 +114,32 @@ _saving = lens _.saving (_ {saving = _})
 _route :: forall a b o. Lens {route :: a | o} {route :: b | o} a b
 _route = lens _.route (_ {route = _})
 
-_pbPage :: forall a b c e o. LensP {photobooths :: a, profiles :: e, photoboothsPage :: {new :: b, editing :: c} | o}
-                                {collection :: a, profiles :: e, new :: b, editing :: c}
+_pbPage :: forall a b c d e o. LensP {photobooths :: a, profiles :: e, photoboothsPage :: {new :: b, editing :: c, deleting :: d} | o}
+                                {collection :: a, profiles :: e, new :: b, editing :: c, deleting :: d}
 _pbPage = lens (\obj -> {collection: obj.photobooths
                        , profiles: obj.profiles
                        , new: obj.photoboothsPage.new
                        , editing: obj.photoboothsPage.editing 
+                       , deleting: obj.photoboothsPage.deleting
                        })
                (\old obj ->
                    old {photobooths = obj.collection
                        , profiles = obj.profiles
-                       , photoboothsPage = {new: obj.new, editing: obj.editing}
+                       , photoboothsPage = {new: obj.new, editing: obj.editing, deleting: obj.deleting}
                        })
 
-_eventsPage :: forall a b c e o. LensP {events :: a, profiles :: e, eventsPage :: {new :: b, editing :: c} | o}
-                                {collection :: a, profiles :: e, new :: b, editing :: c}
+_eventsPage :: forall a b c d e o. LensP {events :: a, profiles :: e, eventsPage :: {new :: b, editing :: c, deleting :: d} | o}
+                                {collection :: a, profiles :: e, new :: b, editing :: c, deleting :: d}
 _eventsPage = lens (\obj -> {collection: obj.events
                             , profiles: obj.profiles
                             , new: obj.eventsPage.new
                             , editing: obj.eventsPage.editing
+                            , deleting: obj.eventsPage.deleting
                             })
                (\old obj ->
                    old {events = obj.collection
                        , profiles = obj.profiles
-                       , eventsPage = {new: obj.new, editing: obj.editing}
+                       , eventsPage = {new: obj.new, editing: obj.editing, deleting: obj.deleting}
                        })
 
 _statisticsPage :: forall a b o. LensP {events :: a, statistics :: b | o}

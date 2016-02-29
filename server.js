@@ -2918,6 +2918,7 @@ var PS = { };
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Lens = PS["Data.Lens"];
   var Data_Tuple = PS["Data.Tuple"];
+  var Data_Array = PS["Data.Array"];
   var App_Model_StrMap = PS["App.Model.StrMap"];
   var Data_Either = PS["Data.Either"];
   var Data_Foreign_Index = PS["Data.Foreign.Index"];
@@ -3151,6 +3152,7 @@ var PS = { };
   var Data_Date = PS["Data.Date"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Either = PS["Data.Either"];
+  var Data_Array = PS["Data.Array"];
   var App_Model_StrMap = PS["App.Model.StrMap"];
   var App_Model_SavedFile = PS["App.Model.SavedFile"];
   var Data_Foreign_Index = PS["Data.Foreign.Index"];
@@ -3762,6 +3764,7 @@ var PS = { };
   var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
   var Control_Monad_Error_Class = PS["Control.Monad.Error.Class"];
   var Control_Monad_Aff = PS["Control.Monad.Aff"];
+  var Control_Apply = PS["Control.Apply"];
   var Data_Date = PS["Data.Date"];
   var Data_Array = PS["Data.Array"];
   var Data_String = PS["Data.String"];
@@ -3807,7 +3810,7 @@ var PS = { };
                   });
               });
           };
-          throw new Error("Failed pattern match at App.DB line 169, column 1 - line 170, column 1: " + [ v.constructor.name, v1.constructor.name ]);
+          throw new Error("Failed pattern match at App.DB line 170, column 1 - line 171, column 1: " + [ v.constructor.name, v1.constructor.name ]);
       };
   };
   var unpack = function (v) {
@@ -3847,11 +3850,11 @@ var PS = { };
                               return Prelude["return"](Control_Monad_Aff.applicativeAff)(App_Model_Event.mkEvent(v2.value0)(ims));
                           });
                       };
-                      throw new Error("Failed pattern match at App.DB line 178, column 1 - line 179, column 1: " + [ v2.constructor.name ]);
+                      throw new Error("Failed pattern match at App.DB line 186, column 1 - line 187, column 1: " + [ v2.constructor.name ]);
                   });
               });
           };
-          throw new Error("Failed pattern match at App.DB line 178, column 1 - line 179, column 1: " + [ v.constructor.name, v1.constructor.name ]);
+          throw new Error("Failed pattern match at App.DB line 186, column 1 - line 187, column 1: " + [ v.constructor.name, v1.constructor.name ]);
       };
   };
   var saveFileToDb = function (conn) {
@@ -3901,7 +3904,7 @@ var PS = { };
                   if (!$93) {
                       return Prelude["return"](Control_Monad_Aff.applicativeAff)([  ]);
                   };
-                  throw new Error("Failed pattern match at App.DB line 110, column 1 - line 111, column 1: " + [ $93.constructor.name ]);
+                  throw new Error("Failed pattern match at App.DB line 111, column 1 - line 112, column 1: " + [ $93.constructor.name ]);
               })())(function (v1) {
                   var createEvent = function (v2) {
                       return App_Model_Event.mkEvent(v2)(Data_Array.filter(function (v3) {
@@ -3955,7 +3958,7 @@ var PS = { };
                           return Prelude["return"](Control_Monad_Aff.applicativeAff)(App_Model_Event.mkEvent(v.value0)(ims));
                       });
                   };
-                  throw new Error("Failed pattern match at App.DB line 141, column 1 - line 142, column 1: " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at App.DB line 142, column 1 - line 143, column 1: " + [ v.constructor.name ]);
               });
           });
       };
@@ -3970,6 +3973,11 @@ var PS = { };
           return Prelude[">>="](Control_Monad_Aff.bindAff)(Database_AnyDB.queryOne(foreignBufferForHttp)("select file from files where id = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt)(id) ])(conn))(function (mf) {
               return Data_Maybe.maybe(Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No file found")))(Prelude[">>>"](Prelude.semigroupoidFn)(unpack)(Prelude["return"](Control_Monad_Aff.applicativeAff)))(mf);
           });
+      };
+  };
+  var deletePB = function (c) {
+      return function (cname) {
+          return Control_Apply["*>"](Control_Monad_Aff.applyAff)(Control_Apply["*>"](Control_Monad_Aff.applyAff)(Control_Apply["*>"](Control_Monad_Aff.applyAff)(Database_AnyDB.execute("DELETE FROM photobooths where computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(c))(Database_AnyDB.execute("DELETE FROM events where computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(c)))(Database_AnyDB.execute("DELETE FROM eventstatistics where computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(c)))(Database_AnyDB.execute("DELETE FROM monthlystatistics where computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(c));
       };
   };
   var allPhotobooths = function (conn) {
@@ -4003,6 +4011,7 @@ var PS = { };
   exports["selectFilesForEvent"] = selectFilesForEvent;
   exports["saveFileToDb"] = saveFileToDb;
   exports["updateEvent"] = updateEvent;
+  exports["deletePB"] = deletePB;
   exports["updatePB"] = updatePB;
   exports["insertEvent"] = insertEvent;
   exports["newEvent"] = newEvent;
@@ -4016,7 +4025,14 @@ var PS = { };
 (function(exports) {
   // Generated by psc version 0.8.0.0
   "use strict";
-  var Prelude = PS["Prelude"];
+  var Prelude = PS["Prelude"];     
+  var DELETE = (function () {
+      function DELETE() {
+
+      };
+      DELETE.value = new DELETE();
+      return DELETE;
+  })();
   var GET = (function () {
       function GET() {
 
@@ -4038,6 +4054,7 @@ var PS = { };
       PUT.value = new PUT();
       return PUT;
   })();
+  exports["DELETE"] = DELETE;
   exports["GET"] = GET;
   exports["POST"] = POST;
   exports["PUT"] = PUT;;
@@ -4618,6 +4635,10 @@ var PS = { };
       method: Network_HTTP_Method.GET.value, 
       url: "/api/events/cname"
   });
+  var deletePhotobooth = new Endpoint_Client.Endpoint({
+      method: Network_HTTP_Method.DELETE.value, 
+      url: "/api/photobooths"
+  });
   var attachFile = new Endpoint_Client.FileUploadEndpoint({
       url: "/api/attachfiletoevent"
   });
@@ -4631,6 +4652,7 @@ var PS = { };
   exports["putEvents"] = putEvents;
   exports["postEvents"] = postEvents;
   exports["getEvents"] = getEvents;
+  exports["deletePhotobooth"] = deletePhotobooth;
   exports["putPhotobooths"] = putPhotobooths;
   exports["postPhotobooths"] = postPhotobooths;
   exports["getPhotobooths"] = getPhotobooths;
@@ -4858,6 +4880,20 @@ var PS = { };
       };
     };
   };
+  exports.delete = function get(app){
+    return function (url){
+      return function(mware){
+        return function(handler){
+          return function(){
+            var cb = function(req, res){ return handler(req)(res)(); };
+            var args = mware ? [url, mware, cb] : [url, cb];
+            app.delete.apply(app, args);
+          };
+        };
+      };
+    };
+  };
+
 
   exports.post = function get(app){
     return function (url){
@@ -4966,14 +5002,14 @@ var PS = { };
                   return Control_Monad_Error_Class.throwError(dictMonadError)(Control_Monad_Eff_Exception.error(Prelude.show(Data_Foreign.showForeignError)(err)));
               })(function (p) {
                   return Prelude["return"]((dictMonadError["__superclass_Prelude.Monad_0"]())["__superclass_Prelude.Applicative_0"]())((function () {
-                      var $30 = {};
-                      for (var $31 in a) {
-                          if (a.hasOwnProperty($31)) {
-                              $30[$31] = a[$31];
+                      var $26 = {};
+                      for (var $27 in a) {
+                          if (a.hasOwnProperty($27)) {
+                              $26[$27] = a[$27];
                           };
                       };
-                      $30.body = p;
-                      return $30;
+                      $26.body = p;
+                      return $26;
                   })());
               })(Data_Foreign_Generic.readJSONGeneric(dictGeneric)(Data_Foreign_Generic.defaultOptions)(a.body));
           };
@@ -5063,73 +5099,43 @@ var PS = { };
               return function (app) {
                   return function (v) {
                       return function (h) {
-                          if (v.value0.method instanceof Network_HTTP_Method.GET) {
-                              var handler = function (req) {
-                                  return function (res) {
-                                      return Control_Monad_Aff.runAff(function (err) {
-                                          return function __do() {
-                                              Control_Monad_Eff_Console.log("Failed hostEndpoint GET on " + (v.value0.url + Control_Monad_Eff_Exception.message(err)))();
-                                              return $foreign.sendStr(res)(Control_Monad_Eff_Exception.message(err))();
-                                          };
-                                      })(function (a) {
-                                          return $foreign.sendStr(res)(Data_Foreign_Generic.toJSONGeneric(dictGeneric1)(Data_Foreign_Generic.defaultOptions)(a));
-                                      })((function () {
-                                          var i = convert(req);
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(parseQueryParams(dictSerializable)(Control_Monad_Aff.monadErrorAff)(i))(function (v1) {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(parseBody(dictGeneric)(Control_Monad_Aff.monadErrorAff)(i))(function (v2) {
-                                                  return h(v1)(v2);
-                                              });
+                          var handler = function (req) {
+                              return function (res) {
+                                  return Control_Monad_Aff.runAff(function (err) {
+                                      return function __do() {
+                                          Control_Monad_Eff_Console.log("Failed hostEndpoint on " + (v.value0.url + Control_Monad_Eff_Exception.message(err)))();
+                                          return $foreign.sendStr(res)(Control_Monad_Eff_Exception.message(err))();
+                                      };
+                                  })(function (a) {
+                                      return $foreign.sendStr(res)(Data_Foreign_Generic.toJSONGeneric(dictGeneric1)(Data_Foreign_Generic.defaultOptions)(a));
+                                  })((function () {
+                                      var i = convert(req);
+                                      return Prelude.bind(Control_Monad_Aff.bindAff)(parseQueryParams(dictSerializable)(Control_Monad_Aff.monadErrorAff)(i))(function (v1) {
+                                          return Prelude.bind(Control_Monad_Aff.bindAff)(parseBody(dictGeneric)(Control_Monad_Aff.monadErrorAff)(i))(function (v2) {
+                                              return h(v1)(v2);
                                           });
-                                      })());
-                                  };
+                                      });
+                                  })());
                               };
-                              return $foreign.get(app)(v.value0.url)($foreign.noParser)(handler);
+                          };
+                          var register = function (f) {
+                              return function (parser) {
+                                  return f(app)(v.value0.url)(parser)(handler);
+                              };
+                          };
+                          if (v.value0.method instanceof Network_HTTP_Method.GET) {
+                              return register($foreign.get)($foreign.noParser);
                           };
                           if (v.value0.method instanceof Network_HTTP_Method.POST) {
-                              var handler = function (req) {
-                                  return function (res) {
-                                      return Control_Monad_Aff.runAff(function (err) {
-                                          return function __do() {
-                                              Control_Monad_Eff_Console.log("Failed hostEndpoint POST on " + (v.value0.url + Control_Monad_Eff_Exception.message(err)))();
-                                              return $foreign.sendStr(res)(Control_Monad_Eff_Exception.message(err))();
-                                          };
-                                      })(function (a) {
-                                          return $foreign.sendStr(res)(Data_Foreign_Generic.toJSONGeneric(dictGeneric1)(Data_Foreign_Generic.defaultOptions)(a));
-                                      })((function () {
-                                          var i = convert(req);
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(parseQueryParams(dictSerializable)(Control_Monad_Aff.monadErrorAff)(i))(function (v1) {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(parseBody(dictGeneric)(Control_Monad_Aff.monadErrorAff)(i))(function (v2) {
-                                                  return h(v1)(v2);
-                                              });
-                                          });
-                                      })());
-                                  };
-                              };
-                              return $foreign.post(app)(v.value0.url)($foreign.rawParser)(handler);
+                              return register($foreign.post)($foreign.rawParser);
                           };
                           if (v.value0.method instanceof Network_HTTP_Method.PUT) {
-                              var handler = function (req) {
-                                  return function (res) {
-                                      return Control_Monad_Aff.runAff(function (err) {
-                                          return function __do() {
-                                              Control_Monad_Eff_Console.log("Failed hostEndpoint PUT on " + (v.value0.url + Control_Monad_Eff_Exception.message(err)))();
-                                              return $foreign.sendStr(res)(Control_Monad_Eff_Exception.message(err))();
-                                          };
-                                      })(function (a) {
-                                          return $foreign.sendStr(res)(Data_Foreign_Generic.toJSONGeneric(dictGeneric1)(Data_Foreign_Generic.defaultOptions)(a));
-                                      })((function () {
-                                          var i = convert(req);
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(parseQueryParams(dictSerializable)(Control_Monad_Aff.monadErrorAff)(i))(function (v1) {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(parseBody(dictGeneric)(Control_Monad_Aff.monadErrorAff)(i))(function (v2) {
-                                                  return h(v1)(v2);
-                                              });
-                                          });
-                                      })());
-                                  };
-                              };
-                              return $foreign.put(app)(v.value0.url)($foreign.rawParser)(handler);
+                              return register($foreign.put)($foreign.rawParser);
                           };
-                          throw new Error("Failed pattern match at Server.Core line 56, column 1 - line 59, column 1: " + [ app.constructor.name, v.constructor.name, h.constructor.name ]);
+                          if (v.value0.method instanceof Network_HTTP_Method.DELETE) {
+                              return register($foreign["delete"])($foreign.noParser);
+                          };
+                          throw new Error("Failed pattern match at Server.Core line 57, column 1 - line 60, column 1: " + [ v.value0.method.constructor.name ]);
                       };
                   };
               };
@@ -5193,8 +5199,8 @@ var PS = { };
   var App_Model_Statistic = PS["App.Model.Statistic"];
   var App_Model_SavedFile = PS["App.Model.SavedFile"];     
   var throwStr = function (dictMonadError) {
-      return function ($69) {
-          return Control_Monad_Error_Class.throwError(dictMonadError)(Control_Monad_Eff_Exception.error($69));
+      return function ($71) {
+          return Control_Monad_Error_Class.throwError(dictMonadError)(Control_Monad_Eff_Exception.error($71));
       };
   };
   var safeParseIntE = function (dictMonadError) {
@@ -5232,8 +5238,8 @@ var PS = { };
       var prof = Node_Path.normalize("./profiles");
       return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(prof))(function (v) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Array.filterM(Control_Monad_Aff.monadAff))(v)(function (p) {
-              return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.stat(Node_Path.concat([ prof, p ])))(function ($70) {
-                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(Node_FS_Stats.isDirectory($70));
+              return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.stat(Node_Path.concat([ prof, p ])))(function ($72) {
+                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(Node_FS_Stats.isDirectory($72));
               });
           }))(function (v1) {
               return Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v1)(function (dir) {
@@ -5270,6 +5276,13 @@ var PS = { };
           return function (v3) {
               return withServerConn(function (conn) {
                   return App_DB.updatePB(conn)(v3.body);
+              });
+          };
+      })();
+      Server_Core.hostEndpoint(Data_Serializable.serializableString)(Data_Generic.genericUnit)(Data_Generic.genericUnit)(v1)(App_Endpoint.deletePhotobooth)(function (s) {
+          return function (v2) {
+              return withServerConn(function (conn) {
+                  return App_DB.deletePB(conn)(s);
               });
           };
       })();

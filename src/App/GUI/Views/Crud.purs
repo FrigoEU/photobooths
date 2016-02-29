@@ -3,17 +3,18 @@ module App.GUI.Views.Crud where
 import Prelude
 
 import Control.Monad.Aff (Aff())
-import Control.Monad.Eff.Exception (message, Error())
+import Control.Monad.Eff.Exception (Error)
 import Control.Monad.Eff (Eff())
 import Control.Monad.Eff.Ref (REF())
 
 import OpticUI (runHandler, Handler())
-import OpticUI.Components.Async (onResult, async)
+import OpticUI.Components.Async (async)
 
 import Data.Lens (set, over, view)
-import Data.Lens.Common (_Just, _Nothing)
-import Data.Array (snoc, (!!), updateAt)
+import Data.Lens.Common (_Just)
+import Data.Array 
 import Data.Maybe (Maybe(..), maybe)
+import Data.Monoid
 
 import App.GUI.Types
 import App.GUI.State
@@ -32,17 +33,24 @@ data CrudCommand a = LoadAll
                    | SaveEdit
                    | EditSaved a
                    | EditSaveFailed Error
+                   | StartDelete Int
+                   | CancelDelete
+                   | Delete a
+                   | DeleteDone
+                   | DeleteFailed Error
 
 type CrudModel a b obj eff = { collection :: AsyncModel eff (Array a)
                              , new :: { model :: b
                                       , state :: AsyncModel eff a}
-                             , editing :: Maybe {index :: Int, previous :: a, saving :: AsyncModel eff a} | obj}
+                             , editing :: Maybe {index :: Int, previous :: a, saving :: AsyncModel eff a}
+                             , deleting :: Maybe {index :: Int, saving :: AsyncModel eff Unit} | obj}
 
 crudHandler :: forall a b obj eff. CrudModel a b obj (ref :: REF | eff)
                                    -> Handler (ref :: REF | eff) (CrudModel a b obj (ref :: REF | eff))
                                    -> { loadAll :: Aff (ref :: REF | eff) (Array a)
                                       , saveNew :: a -> Aff (ref :: REF | eff) a
                                       , saveEdit :: a -> Aff (ref :: REF | eff) a
+                                      , delete :: a -> Aff (ref :: REF | eff) Unit
                                       , initial :: Eff (ref :: REF | eff) b
                                       , constr :: b -> a}
                                    -> CrudCommand a -> Eff (ref :: REF | eff) Unit
@@ -55,14 +63,28 @@ crudHandler s h impls comm = handle comm
                                       (view _editing s)
     handle LoadAll = async impls.loadAll >>= \a -> runHandler h (set _collection (Busy a) s)
     handle SaveNew = async (impls.saveNew (impls.constr (view (_new <<< _model) s))) >>= \a -> runHandler h (set (_new <<< _state) (Busy a) s)
+    {-- handle (Delete a) = --} 
     handle (Loaded as) = runHandler h (set _collection (Done as) s)
     handle (LoadingFailed err) = runHandler h (set _collection (Errored err) s)
+    handle (Delete a) = async (impls.delete a) >>= \a -> runHandler h (set (_deleting <<< _Just <<< _saving) (Busy a) s)
+    handle (StartDelete i) = runHandler h (set _deleting (Just {index: i, saving: Initial}) s)
+    handle CancelDelete = runHandler h (set _deleting Nothing s)
+    handle DeleteDone = runHandler h $ updates s
+      where 
+        index = view _deleting s >>= \{index: ind}-> return ind
+        coll = view (_collection <<< _Done) s
+        updates = set _deleting Nothing <<<
+                  (case {i: index, c: coll} of
+                        {i: Nothing}   -> id
+                        {c: []}        -> id
+                        {i: Just i, c} -> over (_collection <<< _Done) (\arr -> maybe coll id $ deleteAt i arr))
+    handle (DeleteFailed err) = runHandler h (set (_deleting <<< _Just <<< _saving) (Errored err) s) 
     handle (NewSaveFailed err) = runHandler h (set (_new <<< _state) (Errored err) s)
     handle (NewSaved new) = do
       init <- impls.initial 
       runHandler h $ (updates init) s
         where
-          updates init = over (_collection <<< _Done) (\arr -> snoc arr new) <<< 
+          updates init = over (_collection <<< _Done) (\arr -> cons new arr) <<< 
                          set (_new <<< _model) init <<< 
                          set (_new <<< _state) (Initial) 
     handle (StartEdit i) = maybe (return unit) 

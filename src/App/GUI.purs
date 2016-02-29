@@ -1,6 +1,6 @@
 module App.GUI where
 
-import Prelude (Unit, ($), bind, (<$>))
+import Prelude (Unit, ($), bind, (<$>), return)
 import Control.Monad.Eff (Eff())
 
 import OpticUI(animate, with)
@@ -27,6 +27,8 @@ main = do
     let nav' = nav s h
      in case view _route s of
             PhotoboothsPage -> _pbPage (photoboothsPage nav')
-            (EventsPage cname) -> _eventsPage $ eventsPage cname
-            (StatisticsPage cname) -> _statisticsPage $ statisticsPage cname
-  hashChanged (\str -> driver (\s -> resolve s (match str)))
+            (EventsPage _ alias) -> _eventsPage $ eventsPage alias
+            (StatisticsPage _ alias) -> _statisticsPage $ statisticsPage alias
+  hashChanged (\str -> driver (\s -> do let newRoute = match str
+                                        newSt <- resolve s newRoute
+                                        return $ set _route newRoute newSt))

@@ -5,6 +5,7 @@ import Prelude
 import Control.Monad.Eff.Exception (error)
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Aff (Aff())
+import Control.Apply ((*>))
 
 import Data.Date (Date())
 import Data.Array (replicate, filter, length)
@@ -174,6 +175,13 @@ updatePB conn (Photobooth pb@{id: Just i}) =
    in do execute_ query conn
          res <- queryOne_ (selectStarId photoboothsTable i) conn
          maybe (throwError $ error $ "Failed to update Photobooth") return res
+
+deletePB :: forall eff. Connection -> String -> Aff (db :: DB | eff) Unit
+deletePB c cname = execute (Query "DELETE FROM photobooths where computername = ?") [toSql cname] c
+                   *> execute (Query "DELETE FROM events where computername = ?") [toSql cname] c
+                   *> execute (Query "DELETE FROM eventstatistics where computername = ?") [toSql cname] c
+                   *> execute (Query "DELETE FROM monthlystatistics where computername = ?") [toSql cname] c
+
 
 updateEvent :: forall eff. Connection -> Event -> Aff (db :: DB | eff) Event
 updateEvent _    (Event    {id: Nothing}) =

@@ -218,6 +218,10 @@ var PS = { };
   var ordString = new Ord(function () {
       return eqString;
   }, unsafeCompare);
+  var eqInt = new Eq($foreign.refEq);
+  var ordInt = new Ord(function () {
+      return eqInt;
+  }, unsafeCompare);
   var eq = function (dict) {
       return dict.eq;
   };
@@ -372,7 +376,9 @@ var PS = { };
   exports["functorArray"] = functorArray;
   exports["semigroupFn"] = semigroupFn;
   exports["semigroupArray"] = semigroupArray;
+  exports["eqInt"] = eqInt;
   exports["eqString"] = eqString;
+  exports["ordInt"] = ordInt;
   exports["ordString"] = ordString;
   exports["boundedBoolean"] = boundedBoolean;
   exports["booleanAlgebraBoolean"] = booleanAlgebraBoolean;
@@ -1258,6 +1264,19 @@ var PS = { };
     };
   };
 
+  exports._deleteAt = function (just) {
+    return function (nothing) {
+      return function (i) {
+        return function (l) {
+          if (i < 0 || i >= l.length) return nothing;
+          var l1 = l.slice();
+          l1.splice(i, 1);
+          return just(l1);
+        };
+      };
+    };
+  };
+
   exports._updateAt = function (just) {
     return function (nothing) {
       return function (i) {
@@ -1391,10 +1410,12 @@ var PS = { };
           };
       };
   };
+  var deleteAt = $foreign._deleteAt(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
   exports["foldM"] = foldM;
   exports["zipWithA"] = zipWithA;
   exports["sortBy"] = sortBy;
   exports["updateAt"] = updateAt;
+  exports["deleteAt"] = deleteAt;
   exports["index"] = index;
   exports["!!"] = $bang$bang;
   exports["zipWith"] = $foreign.zipWith;
@@ -2600,6 +2621,7 @@ var PS = { };
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Lens = PS["Data.Lens"];
   var Data_Tuple = PS["Data.Tuple"];
+  var Data_Array = PS["Data.Array"];
   var App_Model_StrMap = PS["App.Model.StrMap"];
   var Data_Either = PS["Data.Either"];
   var Data_Foreign_Index = PS["Data.Foreign.Index"];
@@ -2613,6 +2635,11 @@ var PS = { };
       };
       return Photobooth;
   })();
+  var sortPhotobooths = Data_Array.sortBy(function (v) {
+      return function (v1) {
+          return Prelude.compare(Prelude.ordInt)(Data_Maybe.maybe(999999)(Prelude.id(Prelude.categoryFn))(v1.value0.id))(Data_Maybe.maybe(999999)(Prelude.id(Prelude.categoryFn))(v.value0.id));
+      };
+  });
   var genericPhotobooth = new Data_Generic.Generic(function ($dollarx) {
       if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.Model.Photobooth.Photobooth" && $dollarx.value1.length === 1)) {
           return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(Photobooth.create))((function (r) {
@@ -2697,6 +2724,7 @@ var PS = { };
   });
   exports["Photobooth"] = Photobooth;
   exports["_Photobooth"] = _Photobooth;
+  exports["sortPhotobooths"] = sortPhotobooths;
   exports["genericPhotobooth"] = genericPhotobooth;;
  
 })(PS["App.Model.Photobooth"] = PS["App.Model.Photobooth"] || {});
@@ -2800,6 +2828,7 @@ var PS = { };
   var Data_Date = PS["Data.Date"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Either = PS["Data.Either"];
+  var Data_Array = PS["Data.Array"];
   var App_Model_StrMap = PS["App.Model.StrMap"];
   var App_Model_SavedFile = PS["App.Model.SavedFile"];
   var Data_Foreign_Index = PS["Data.Foreign.Index"];
@@ -2813,6 +2842,11 @@ var PS = { };
       };
       return Event;
   })();
+  var sortEvents = Data_Array.sortBy(function (v) {
+      return function (v1) {
+          return Prelude.compare(Prelude.ordInt)(Data_Maybe.maybe(999999)(Prelude.id(Prelude.categoryFn))(v1.value0.id))(Data_Maybe.maybe(999999)(Prelude.id(Prelude.categoryFn))(v.value0.id));
+      };
+  });
   var genericEvent = new Data_Generic.Generic(function ($dollarx) {
       if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.Model.Event.Event" && $dollarx.value1.length === 1)) {
           return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(Event.create))((function (r) {
@@ -2936,6 +2970,7 @@ var PS = { };
   });
   exports["Event"] = Event;
   exports["_Event"] = _Event;
+  exports["sortEvents"] = sortEvents;
   exports["genericEvent"] = genericEvent;;
  
 })(PS["App.Model.Event"] = PS["App.Model.Event"] || {});
@@ -4652,6 +4687,10 @@ var PS = { };
       method: Network_HTTP_Method.GET.value, 
       url: "/api/events/cname"
   });
+  var deletePhotobooth = new Endpoint_Client.Endpoint({
+      method: Network_HTTP_Method.DELETE.value, 
+      url: "/api/photobooths"
+  });
   var attachFile = new Endpoint_Client.FileUploadEndpoint({
       url: "/api/attachfiletoevent"
   });
@@ -4661,6 +4700,7 @@ var PS = { };
   exports["putEvents"] = putEvents;
   exports["postEvents"] = postEvents;
   exports["getEvents"] = getEvents;
+  exports["deletePhotobooth"] = deletePhotobooth;
   exports["putPhotobooths"] = putPhotobooths;
   exports["postPhotobooths"] = postPhotobooths;
   exports["getPhotobooths"] = getPhotobooths;;
@@ -5995,20 +6035,26 @@ var PS = { };
       return PhotoboothsPage;
   })();
   var EventsPage = (function () {
-      function EventsPage(value0) {
+      function EventsPage(value0, value1) {
           this.value0 = value0;
+          this.value1 = value1;
       };
       EventsPage.create = function (value0) {
-          return new EventsPage(value0);
+          return function (value1) {
+              return new EventsPage(value0, value1);
+          };
       };
       return EventsPage;
   })();
   var StatisticsPage = (function () {
-      function StatisticsPage(value0) {
+      function StatisticsPage(value0, value1) {
           this.value0 = value0;
+          this.value1 = value1;
       };
       StatisticsPage.create = function (value0) {
-          return new StatisticsPage(value0);
+          return function (value1) {
+              return new StatisticsPage(value0, value1);
+          };
       };
       return StatisticsPage;
   })();
@@ -6034,7 +6080,8 @@ var PS = { };
                       }, 
                       state: App_Model_Async.Initial.value
                   }, 
-                  editing: Data_Maybe.Nothing.value
+                  editing: Data_Maybe.Nothing.value, 
+                  deleting: Data_Maybe.Nothing.value
               }, 
               photoboothsPage: {
                   "new": {
@@ -6046,7 +6093,8 @@ var PS = { };
                       }, 
                       state: App_Model_Async.Initial.value
                   }, 
-                  editing: Data_Maybe.Nothing.value
+                  editing: Data_Maybe.Nothing.value, 
+                  deleting: Data_Maybe.Nothing.value
               }
           })();
       };
@@ -6055,11 +6103,11 @@ var PS = { };
       if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.PhotoboothsPage" && $dollarx.value1.length === 0)) {
           return new Data_Maybe.Just(PhotoboothsPage.value);
       };
-      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.EventsPage" && $dollarx.value1.length === 1)) {
-          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(EventsPage.create))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[0](Prelude.unit)));
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.EventsPage" && $dollarx.value1.length === 2)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(EventsPage.create))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[0](Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[1](Prelude.unit)));
       };
-      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.StatisticsPage" && $dollarx.value1.length === 1)) {
-          return Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(StatisticsPage.create))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[0](Prelude.unit)));
+      if ($dollarx instanceof Data_Generic.SProd && ($dollarx.value0 === "App.GUI.State.StatisticsPage" && $dollarx.value1.length === 2)) {
+          return Prelude.apply(Data_Maybe.applyMaybe)(Prelude.apply(Data_Maybe.applyMaybe)(new Data_Maybe.Just(StatisticsPage.create))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[0](Prelude.unit))))(Data_Generic.fromSpine(Data_Generic.genericString)($dollarx.value1[1](Prelude.unit)));
       };
       return Data_Maybe.Nothing.value;
   }, function ($dollarq) {
@@ -6070,10 +6118,14 @@ var PS = { };
           sigConstructor: "App.GUI.State.EventsPage", 
           sigValues: [ function ($dollarq1) {
               return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+          }, function ($dollarq1) {
+              return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
           } ]
       }, {
           sigConstructor: "App.GUI.State.StatisticsPage", 
           sigValues: [ function ($dollarq1) {
+              return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
+          }, function ($dollarq1) {
               return Data_Generic.toSignature(Data_Generic.genericString)(Data_Generic.anyProxy);
           } ]
       } ]);
@@ -6084,14 +6136,18 @@ var PS = { };
       if ($dollarx instanceof EventsPage) {
           return new Data_Generic.SProd("App.GUI.State.EventsPage", [ function ($dollarq) {
               return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0);
+          }, function ($dollarq) {
+              return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value1);
           } ]);
       };
       if ($dollarx instanceof StatisticsPage) {
           return new Data_Generic.SProd("App.GUI.State.StatisticsPage", [ function ($dollarq) {
               return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value0);
+          }, function ($dollarq) {
+              return Data_Generic.toSpine(Data_Generic.genericString)($dollarx.value1);
           } ]);
       };
-      throw new Error("Failed pattern match at App.GUI.State line 73, column 1 - line 77, column 1: " + [ $dollarx.constructor.name ]);
+      throw new Error("Failed pattern match at App.GUI.State line 77, column 1 - line 81, column 1: " + [ $dollarx.constructor.name ]);
   });
   var _statisticsPage = function (dictStrong) {
       return Data_Lens_Lens.lens(function (obj) {
@@ -6101,15 +6157,15 @@ var PS = { };
           };
       })(function (old) {
           return function (obj) {
-              var $143 = {};
-              for (var $144 in old) {
-                  if (old.hasOwnProperty($144)) {
-                      $143[$144] = old[$144];
+              var $157 = {};
+              for (var $158 in old) {
+                  if (old.hasOwnProperty($158)) {
+                      $157[$158] = old[$158];
                   };
               };
-              $143.events = obj.events;
-              $143.statistics = obj.statistics;
-              return $143;
+              $157.events = obj.events;
+              $157.statistics = obj.statistics;
+              return $157;
           };
       })(dictStrong);
   };
@@ -6118,14 +6174,14 @@ var PS = { };
           return v.statistics;
       })(function (v) {
           return function (v1) {
-              var $145 = {};
-              for (var $146 in v) {
-                  if (v.hasOwnProperty($146)) {
-                      $145[$146] = v[$146];
+              var $159 = {};
+              for (var $160 in v) {
+                  if (v.hasOwnProperty($160)) {
+                      $159[$160] = v[$160];
                   };
               };
-              $145.statistics = v1;
-              return $145;
+              $159.statistics = v1;
+              return $159;
           };
       })(dictStrong);
   };
@@ -6134,14 +6190,14 @@ var PS = { };
           return v.state;
       })(function (v) {
           return function (v1) {
-              var $147 = {};
-              for (var $148 in v) {
-                  if (v.hasOwnProperty($148)) {
-                      $147[$148] = v[$148];
+              var $161 = {};
+              for (var $162 in v) {
+                  if (v.hasOwnProperty($162)) {
+                      $161[$162] = v[$162];
                   };
               };
-              $147.state = v1;
-              return $147;
+              $161.state = v1;
+              return $161;
           };
       })(dictStrong);
   };
@@ -6150,14 +6206,14 @@ var PS = { };
           return v.savingFile;
       })(function (v) {
           return function (v1) {
-              var $149 = {};
-              for (var $150 in v) {
-                  if (v.hasOwnProperty($150)) {
-                      $149[$150] = v[$150];
+              var $163 = {};
+              for (var $164 in v) {
+                  if (v.hasOwnProperty($164)) {
+                      $163[$164] = v[$164];
                   };
               };
-              $149.savingFile = v1;
-              return $149;
+              $163.savingFile = v1;
+              return $163;
           };
       })(dictStrong);
   };
@@ -6166,14 +6222,14 @@ var PS = { };
           return v.saving;
       })(function (v) {
           return function (v1) {
-              var $151 = {};
-              for (var $152 in v) {
-                  if (v.hasOwnProperty($152)) {
-                      $151[$152] = v[$152];
+              var $165 = {};
+              for (var $166 in v) {
+                  if (v.hasOwnProperty($166)) {
+                      $165[$166] = v[$166];
                   };
               };
-              $151.saving = v1;
-              return $151;
+              $165.saving = v1;
+              return $165;
           };
       })(dictStrong);
   };
@@ -6182,14 +6238,14 @@ var PS = { };
           return v.route;
       })(function (v) {
           return function (v1) {
-              var $153 = {};
-              for (var $154 in v) {
-                  if (v.hasOwnProperty($154)) {
-                      $153[$154] = v[$154];
+              var $167 = {};
+              for (var $168 in v) {
+                  if (v.hasOwnProperty($168)) {
+                      $167[$168] = v[$168];
                   };
               };
-              $153.route = v1;
-              return $153;
+              $167.route = v1;
+              return $167;
           };
       })(dictStrong);
   };
@@ -6198,14 +6254,14 @@ var PS = { };
           return v.profiles;
       })(function (v) {
           return function (v1) {
-              var $155 = {};
-              for (var $156 in v) {
-                  if (v.hasOwnProperty($156)) {
-                      $155[$156] = v[$156];
+              var $169 = {};
+              for (var $170 in v) {
+                  if (v.hasOwnProperty($170)) {
+                      $169[$170] = v[$170];
                   };
               };
-              $155.profiles = v1;
-              return $155;
+              $169.profiles = v1;
+              return $169;
           };
       })(dictStrong);
   };
@@ -6214,14 +6270,14 @@ var PS = { };
           return v.profile;
       })(function (v) {
           return function (v1) {
-              var $157 = {};
-              for (var $158 in v) {
-                  if (v.hasOwnProperty($158)) {
-                      $157[$158] = v[$158];
+              var $171 = {};
+              for (var $172 in v) {
+                  if (v.hasOwnProperty($172)) {
+                      $171[$172] = v[$172];
                   };
               };
-              $157.profile = v1;
-              return $157;
+              $171.profile = v1;
+              return $171;
           };
       })(dictStrong);
   };
@@ -6231,23 +6287,25 @@ var PS = { };
               collection: obj.photobooths, 
               profiles: obj.profiles, 
               "new": obj.photoboothsPage["new"], 
-              editing: obj.photoboothsPage.editing
+              editing: obj.photoboothsPage.editing, 
+              deleting: obj.photoboothsPage.deleting
           };
       })(function (old) {
           return function (obj) {
-              var $167 = {};
-              for (var $168 in old) {
-                  if (old.hasOwnProperty($168)) {
-                      $167[$168] = old[$168];
+              var $181 = {};
+              for (var $182 in old) {
+                  if (old.hasOwnProperty($182)) {
+                      $181[$182] = old[$182];
                   };
               };
-              $167.photobooths = obj.collection;
-              $167.profiles = obj.profiles;
-              $167.photoboothsPage = {
+              $181.photobooths = obj.collection;
+              $181.profiles = obj.profiles;
+              $181.photoboothsPage = {
                   "new": obj["new"], 
-                  editing: obj.editing
+                  editing: obj.editing, 
+                  deleting: obj.deleting
               };
-              return $167;
+              return $181;
           };
       })(dictStrong);
   };
@@ -6256,14 +6314,14 @@ var PS = { };
           return v["new"];
       })(function (v) {
           return function (v1) {
-              var $169 = {};
-              for (var $170 in v) {
-                  if (v.hasOwnProperty($170)) {
-                      $169[$170] = v[$170];
+              var $183 = {};
+              for (var $184 in v) {
+                  if (v.hasOwnProperty($184)) {
+                      $183[$184] = v[$184];
                   };
               };
-              $169.new = v1;
-              return $169;
+              $183.new = v1;
+              return $183;
           };
       })(dictStrong);
   };
@@ -6272,14 +6330,14 @@ var PS = { };
           return v.name;
       })(function (v) {
           return function (v1) {
-              var $171 = {};
-              for (var $172 in v) {
-                  if (v.hasOwnProperty($172)) {
-                      $171[$172] = v[$172];
+              var $185 = {};
+              for (var $186 in v) {
+                  if (v.hasOwnProperty($186)) {
+                      $185[$186] = v[$186];
                   };
               };
-              $171.name = v1;
-              return $171;
+              $185.name = v1;
+              return $185;
           };
       })(dictStrong);
   };
@@ -6288,14 +6346,14 @@ var PS = { };
           return v.model;
       })(function (v) {
           return function (v1) {
-              var $177 = {};
-              for (var $178 in v) {
-                  if (v.hasOwnProperty($178)) {
-                      $177[$178] = v[$178];
+              var $191 = {};
+              for (var $192 in v) {
+                  if (v.hasOwnProperty($192)) {
+                      $191[$192] = v[$192];
                   };
               };
-              $177.model = v1;
-              return $177;
+              $191.model = v1;
+              return $191;
           };
       })(dictStrong);
   };
@@ -6304,14 +6362,14 @@ var PS = { };
           return v.files;
       })(function (v) {
           return function (v1) {
-              var $183 = {};
-              for (var $184 in v) {
-                  if (v.hasOwnProperty($184)) {
-                      $183[$184] = v[$184];
+              var $197 = {};
+              for (var $198 in v) {
+                  if (v.hasOwnProperty($198)) {
+                      $197[$198] = v[$198];
                   };
               };
-              $183.files = v1;
-              return $183;
+              $197.files = v1;
+              return $197;
           };
       })(dictStrong);
   };
@@ -6320,14 +6378,14 @@ var PS = { };
           return v.file;
       })(function (v) {
           return function (v1) {
-              var $185 = {};
-              for (var $186 in v) {
-                  if (v.hasOwnProperty($186)) {
-                      $185[$186] = v[$186];
+              var $199 = {};
+              for (var $200 in v) {
+                  if (v.hasOwnProperty($200)) {
+                      $199[$200] = v[$200];
                   };
               };
-              $185.file = v1;
-              return $185;
+              $199.file = v1;
+              return $199;
           };
       })(dictStrong);
   };
@@ -6337,23 +6395,25 @@ var PS = { };
               collection: obj.events, 
               profiles: obj.profiles, 
               "new": obj.eventsPage["new"], 
-              editing: obj.eventsPage.editing
+              editing: obj.eventsPage.editing, 
+              deleting: obj.eventsPage.deleting
           };
       })(function (old) {
           return function (obj) {
-              var $187 = {};
-              for (var $188 in old) {
-                  if (old.hasOwnProperty($188)) {
-                      $187[$188] = old[$188];
+              var $201 = {};
+              for (var $202 in old) {
+                  if (old.hasOwnProperty($202)) {
+                      $201[$202] = old[$202];
                   };
               };
-              $187.events = obj.collection;
-              $187.profiles = obj.profiles;
-              $187.eventsPage = {
+              $201.events = obj.collection;
+              $201.profiles = obj.profiles;
+              $201.eventsPage = {
                   "new": obj["new"], 
-                  editing: obj.editing
+                  editing: obj.editing, 
+                  deleting: obj.deleting
               };
-              return $187;
+              return $201;
           };
       })(dictStrong);
   };
@@ -6362,14 +6422,14 @@ var PS = { };
           return v.events;
       })(function (v) {
           return function (v1) {
-              var $189 = {};
-              for (var $190 in v) {
-                  if (v.hasOwnProperty($190)) {
-                      $189[$190] = v[$190];
+              var $203 = {};
+              for (var $204 in v) {
+                  if (v.hasOwnProperty($204)) {
+                      $203[$204] = v[$204];
                   };
               };
-              $189.events = v1;
-              return $189;
+              $203.events = v1;
+              return $203;
           };
       })(dictStrong);
   };
@@ -6378,14 +6438,30 @@ var PS = { };
           return v.editing;
       })(function (v) {
           return function (v1) {
-              var $195 = {};
-              for (var $196 in v) {
-                  if (v.hasOwnProperty($196)) {
-                      $195[$196] = v[$196];
+              var $209 = {};
+              for (var $210 in v) {
+                  if (v.hasOwnProperty($210)) {
+                      $209[$210] = v[$210];
                   };
               };
-              $195.editing = v1;
-              return $195;
+              $209.editing = v1;
+              return $209;
+          };
+      })(dictStrong);
+  };
+  var _deleting = function (dictStrong) {
+      return Data_Lens_Lens.lens(function (v) {
+          return v.deleting;
+      })(function (v) {
+          return function (v1) {
+              var $211 = {};
+              for (var $212 in v) {
+                  if (v.hasOwnProperty($212)) {
+                      $211[$212] = v[$212];
+                  };
+              };
+              $211.deleting = v1;
+              return $211;
           };
       })(dictStrong);
   };
@@ -6394,14 +6470,14 @@ var PS = { };
           return v.defaultprofile;
       })(function (v) {
           return function (v1) {
-              var $197 = {};
-              for (var $198 in v) {
-                  if (v.hasOwnProperty($198)) {
-                      $197[$198] = v[$198];
+              var $213 = {};
+              for (var $214 in v) {
+                  if (v.hasOwnProperty($214)) {
+                      $213[$214] = v[$214];
                   };
               };
-              $197.defaultprofile = v1;
-              return $197;
+              $213.defaultprofile = v1;
+              return $213;
           };
       })(dictStrong);
   };
@@ -6410,14 +6486,14 @@ var PS = { };
           return v.dateuntil;
       })(function (v) {
           return function (v1) {
-              var $199 = {};
-              for (var $200 in v) {
-                  if (v.hasOwnProperty($200)) {
-                      $199[$200] = v[$200];
+              var $215 = {};
+              for (var $216 in v) {
+                  if (v.hasOwnProperty($216)) {
+                      $215[$216] = v[$216];
                   };
               };
-              $199.dateuntil = v1;
-              return $199;
+              $215.dateuntil = v1;
+              return $215;
           };
       })(dictStrong);
   };
@@ -6426,14 +6502,14 @@ var PS = { };
           return v.datefrom;
       })(function (v) {
           return function (v1) {
-              var $201 = {};
-              for (var $202 in v) {
-                  if (v.hasOwnProperty($202)) {
-                      $201[$202] = v[$202];
+              var $217 = {};
+              for (var $218 in v) {
+                  if (v.hasOwnProperty($218)) {
+                      $217[$218] = v[$218];
                   };
               };
-              $201.datefrom = v1;
-              return $201;
+              $217.datefrom = v1;
+              return $217;
           };
       })(dictStrong);
   };
@@ -6442,17 +6518,37 @@ var PS = { };
           return v.computername;
       })(function (v) {
           return function (v1) {
-              var $203 = {};
-              for (var $204 in v) {
-                  if (v.hasOwnProperty($204)) {
-                      $203[$204] = v[$204];
+              var $219 = {};
+              for (var $220 in v) {
+                  if (v.hasOwnProperty($220)) {
+                      $219[$220] = v[$220];
                   };
               };
-              $203.computername = v1;
-              return $203;
+              $219.computername = v1;
+              return $219;
           };
       })(dictStrong);
   };
+  var _collectionEditingD = Data_Lens_Lens.lens(function (v) {
+      return {
+          collection: v.collection, 
+          editing: v.editing, 
+          deleting: v.deleting
+      };
+  })(function (old) {
+      return function (v) {
+          var $226 = {};
+          for (var $227 in old) {
+              if (old.hasOwnProperty($227)) {
+                  $226[$227] = old[$227];
+              };
+          };
+          $226.collection = v.collection;
+          $226.editing = v.editing;
+          $226.deleting = v.deleting;
+          return $226;
+      };
+  });
   var _collectionEditing = Data_Lens_Lens.lens(function (v) {
       return {
           collection: v.collection, 
@@ -6460,15 +6556,15 @@ var PS = { };
       };
   })(function (old) {
       return function (v) {
-          var $209 = {};
-          for (var $210 in old) {
-              if (old.hasOwnProperty($210)) {
-                  $209[$210] = old[$210];
+          var $235 = {};
+          for (var $236 in old) {
+              if (old.hasOwnProperty($236)) {
+                  $235[$236] = old[$236];
               };
           };
-          $209.collection = v.collection;
-          $209.editing = v.editing;
-          return $209;
+          $235.collection = v.collection;
+          $235.editing = v.editing;
+          return $235;
       };
   });
   var _collection = function (dictStrong) {
@@ -6476,14 +6572,14 @@ var PS = { };
           return v.collection;
       })(function (v) {
           return function (v1) {
-              var $213 = {};
-              for (var $214 in v) {
-                  if (v.hasOwnProperty($214)) {
-                      $213[$214] = v[$214];
+              var $239 = {};
+              for (var $240 in v) {
+                  if (v.hasOwnProperty($240)) {
+                      $239[$240] = v[$240];
                   };
               };
-              $213.collection = v1;
-              return $213;
+              $239.collection = v1;
+              return $239;
           };
       })(dictStrong);
   };
@@ -6492,14 +6588,14 @@ var PS = { };
           return v.alias;
       })(function (v) {
           return function (v1) {
-              var $215 = {};
-              for (var $216 in v) {
-                  if (v.hasOwnProperty($216)) {
-                      $215[$216] = v[$216];
+              var $241 = {};
+              for (var $242 in v) {
+                  if (v.hasOwnProperty($242)) {
+                      $241[$242] = v[$242];
                   };
               };
-              $215.alias = v1;
-              return $215;
+              $241.alias = v1;
+              return $241;
           };
       })(dictStrong);
   };
@@ -6524,10 +6620,12 @@ var PS = { };
   exports["_pbPage"] = _pbPage;
   exports["_route"] = _route;
   exports["_saving"] = _saving;
+  exports["_deleting"] = _deleting;
   exports["_editing"] = _editing;
   exports["_state"] = _state;
   exports["_model"] = _model;
   exports["_new"] = _new;
+  exports["_collectionEditingD"] = _collectionEditingD;
   exports["_collectionEditing"] = _collectionEditing;
   exports["_collection"] = _collection;
   exports["initialState"] = initialState;
@@ -6554,7 +6652,7 @@ var PS = { };
       return Endpoint_Client.execEndpoint(Data_Serializable.serializableString)(Data_Generic.genericUnit)(App_Model_Statistic.genericAllStatistics)(App_Endpoint.getStatistics)(s)(Prelude.unit);
   };
   var loadEvents = function (s) {
-      return Prelude[">>="](Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint(Data_Serializable.serializableString)(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Event.genericEvent))(App_Endpoint.getEvents)(s)(Prelude.unit))(function (es) {
+      return Prelude[">>="](Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint(Data_Serializable.serializableString)(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Event.genericEvent))(App_Endpoint.getEvents)(s)(Prelude.unit))(Prelude[">>>"](Prelude.semigroupoidFn)(App_Model_Event.sortEvents)(function (es) {
           return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.map(Prelude.functorArray)(function (v) {
               return {
                   model: v, 
@@ -6564,7 +6662,7 @@ var PS = { };
                   }
               };
           })(es));
-      });
+      }));
   };
   exports["loadStatistics"] = loadStatistics;
   exports["loadEvents"] = loadEvents;;
@@ -6623,10 +6721,10 @@ var PS = { };
               return function __do() {
                   var v1 = OpticUI_Components_Async.async(App_GUI_Load.loadEvents(v.value0))();
                   return (function () {
-                      var modifications = function ($11) {
-                          return Data_Lens_Setter.set(function ($12) {
-                              return App_GUI_State._eventsPage(Data_Profunctor_Strong.strongFn)(App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._model(Data_Profunctor_Strong.strongFn)(App_GUI_State._computername(Data_Profunctor_Strong.strongFn)($12))));
-                          })(v.value0)(Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))($11));
+                      var modifications = function ($13) {
+                          return Data_Lens_Setter.set(function ($14) {
+                              return App_GUI_State._eventsPage(Data_Profunctor_Strong.strongFn)(App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._model(Data_Profunctor_Strong.strongFn)(App_GUI_State._computername(Data_Profunctor_Strong.strongFn)($14))));
+                          })(v.value0)(Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))($13));
                       };
                       return Prelude["return"](Control_Monad_Eff.applicativeEff)(modifications(s));
                   })()();
@@ -6637,8 +6735,8 @@ var PS = { };
                   var v1 = OpticUI_Components_Async.async(App_GUI_Load.loadEvents(v.value0))();
                   var v2 = OpticUI_Components_Async.async(App_GUI_Load.loadStatistics(v.value0))();
                   return (function () {
-                      var modifications = function ($13) {
-                          return Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))(Data_Lens_Setter.set(App_GUI_State._statistics(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v2))($13));
+                      var modifications = function ($15) {
+                          return Data_Lens_Setter.set(App_GUI_State._events(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v1))(Data_Lens_Setter.set(App_GUI_State._statistics(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Busy(v2))($15));
                       };
                       return Prelude["return"](Control_Monad_Eff.applicativeEff)(modifications(s));
                   })()();
@@ -6865,6 +6963,7 @@ var PS = { };
   var Data_Lens_Common = PS["Data.Lens.Common"];
   var Data_Array = PS["Data.Array"];
   var Data_Maybe = PS["Data.Maybe"];
+  var Data_Monoid = PS["Data.Monoid"];
   var App_GUI_Types = PS["App.GUI.Types"];
   var App_GUI_State = PS["App.GUI.State"];
   var App_Model_Async = PS["App.Model.Async"];
@@ -6874,7 +6973,6 @@ var PS = { };
   var OpticUI_Core = PS["OpticUI.Core"];
   var Data_Lens_Getter = PS["Data.Lens.Getter"];
   var Data_Lens_Internal_Forget = PS["Data.Lens.Internal.Forget"];
-  var Data_Monoid = PS["Data.Monoid"];
   var Data_Lens_Prism_Maybe = PS["Data.Lens.Prism.Maybe"];     
   var LoadAll = (function () {
       function LoadAll() {
@@ -6967,18 +7065,59 @@ var PS = { };
       };
       return EditSaveFailed;
   })();
+  var StartDelete = (function () {
+      function StartDelete(value0) {
+          this.value0 = value0;
+      };
+      StartDelete.create = function (value0) {
+          return new StartDelete(value0);
+      };
+      return StartDelete;
+  })();
+  var CancelDelete = (function () {
+      function CancelDelete() {
+
+      };
+      CancelDelete.value = new CancelDelete();
+      return CancelDelete;
+  })();
+  var Delete = (function () {
+      function Delete(value0) {
+          this.value0 = value0;
+      };
+      Delete.create = function (value0) {
+          return new Delete(value0);
+      };
+      return Delete;
+  })();
+  var DeleteDone = (function () {
+      function DeleteDone() {
+
+      };
+      DeleteDone.value = new DeleteDone();
+      return DeleteDone;
+  })();
+  var DeleteFailed = (function () {
+      function DeleteFailed(value0) {
+          this.value0 = value0;
+      };
+      DeleteFailed.create = function (value0) {
+          return new DeleteFailed(value0);
+      };
+      return DeleteFailed;
+  })();
   var crudHandler = function (s) {
       return function (h) {
           return function (impls) {
               return function (comm) {
                   var updateEditingAndStop = function (replacement) {
                       return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (v) {
-                          var updates = function ($21) {
-                              return Data_Lens_Setter.set(App_GUI_State._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(Data_Lens_Setter.over(function ($22) {
-                                  return App_GUI_State._collection(Data_Profunctor_Strong.strongFn)(App_Model_Async._Done(Data_Profunctor_Choice.choiceFn)($22));
+                          var updates = function ($33) {
+                              return Data_Lens_Setter.set(App_GUI_State._editing(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(Data_Lens_Setter.over(function ($34) {
+                                  return App_GUI_State._collection(Data_Profunctor_Strong.strongFn)(App_Model_Async._Done(Data_Profunctor_Choice.choiceFn)($34));
                               })(function (as) {
                                   return Data_Maybe.maybe(as)(Prelude.id(Prelude.categoryFn))(Data_Array.updateAt(v.index)(replacement)(as));
-                              })($21));
+                              })($33));
                           };
                           return OpticUI_Core.runHandler(h)(updates(s));
                       })(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s));
@@ -6992,11 +7131,11 @@ var PS = { };
                       };
                       if (v instanceof SaveNew) {
                           return function __do() {
-                              var a = OpticUI_Components_Async.async(impls.saveNew(impls.constr(Data_Lens_Getter.view(function ($23) {
-                                  return App_GUI_State._new(Data_Lens_Internal_Forget.strongForget)(App_GUI_State._model(Data_Lens_Internal_Forget.strongForget)($23));
+                              var a = OpticUI_Components_Async.async(impls.saveNew(impls.constr(Data_Lens_Getter.view(function ($35) {
+                                  return App_GUI_State._new(Data_Lens_Internal_Forget.strongForget)(App_GUI_State._model(Data_Lens_Internal_Forget.strongForget)($35));
                               })(s))))();
-                              return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($24) {
-                                  return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._state(Data_Profunctor_Strong.strongFn)($24));
+                              return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($36) {
+                                  return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._state(Data_Profunctor_Strong.strongFn)($36));
                               })(new App_Model_Async.Busy(a))(s))();
                           };
                       };
@@ -7006,23 +7145,76 @@ var PS = { };
                       if (v instanceof LoadingFailed) {
                           return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(App_GUI_State._collection(Data_Profunctor_Strong.strongFn))(new App_Model_Async.Errored(v.value0))(s));
                       };
+                      if (v instanceof Delete) {
+                          return function __do() {
+                              var a1 = OpticUI_Components_Async.async(impls["delete"](v.value0))();
+                              return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($37) {
+                                  return App_GUI_State._deleting(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(App_GUI_State._saving(Data_Profunctor_Strong.strongFn)($37)));
+                              })(new App_Model_Async.Busy(a1))(s))();
+                          };
+                      };
+                      if (v instanceof StartDelete) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(App_GUI_State._deleting(Data_Profunctor_Strong.strongFn))(new Data_Maybe.Just({
+                              index: v.value0, 
+                              saving: App_Model_Async.Initial.value
+                          }))(s));
+                      };
+                      if (v instanceof CancelDelete) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(App_GUI_State._deleting(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)(s));
+                      };
+                      if (v instanceof DeleteDone) {
+                          var index = Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._deleting(Data_Lens_Internal_Forget.strongForget))(s))(function (v1) {
+                              return Prelude["return"](Data_Maybe.applicativeMaybe)(v1.index);
+                          });
+                          var coll = Data_Lens_Getter.view(function ($38) {
+                              return App_GUI_State._collection(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_Monoid.monoidArray))($38));
+                          })(s);
+                          var updates = function ($39) {
+                              return Data_Lens_Setter.set(App_GUI_State._deleting(Data_Profunctor_Strong.strongFn))(Data_Maybe.Nothing.value)((function () {
+                                  var $16 = {
+                                      i: index, 
+                                      c: coll
+                                  };
+                                  if ($16.i instanceof Data_Maybe.Nothing) {
+                                      return Prelude.id(Prelude.categoryFn);
+                                  };
+                                  if ($16.c.length === 0) {
+                                      return Prelude.id(Prelude.categoryFn);
+                                  };
+                                  if ($16.i instanceof Data_Maybe.Just) {
+                                      return Data_Lens_Setter.over(function ($40) {
+                                          return App_GUI_State._collection(Data_Profunctor_Strong.strongFn)(App_Model_Async._Done(Data_Profunctor_Choice.choiceFn)($40));
+                                      })(function (arr) {
+                                          return Data_Maybe.maybe(coll)(Prelude.id(Prelude.categoryFn))(Data_Array.deleteAt($16.i.value0)(arr));
+                                      });
+                                  };
+                                  throw new Error("Failed pattern match at App.GUI.Views.Crud line 48, column 1 - line 57, column 1: " + [ $16.constructor.name ]);
+                              })()($39));
+                          };
+                          return OpticUI_Core.runHandler(h)(updates(s));
+                      };
+                      if (v instanceof DeleteFailed) {
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($41) {
+                              return App_GUI_State._deleting(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(App_GUI_State._saving(Data_Profunctor_Strong.strongFn)($41)));
+                          })(new App_Model_Async.Errored(v.value0))(s));
+                      };
                       if (v instanceof NewSaveFailed) {
-                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($25) {
-                              return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._state(Data_Profunctor_Strong.strongFn)($25));
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($42) {
+                              return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._state(Data_Profunctor_Strong.strongFn)($42));
                           })(new App_Model_Async.Errored(v.value0))(s));
                       };
                       if (v instanceof NewSaved) {
                           var updates = function (init) {
-                              return function ($26) {
-                                  return Data_Lens_Setter.over(function ($27) {
-                                      return App_GUI_State._collection(Data_Profunctor_Strong.strongFn)(App_Model_Async._Done(Data_Profunctor_Choice.choiceFn)($27));
+                              return function ($43) {
+                                  return Data_Lens_Setter.over(function ($44) {
+                                      return App_GUI_State._collection(Data_Profunctor_Strong.strongFn)(App_Model_Async._Done(Data_Profunctor_Choice.choiceFn)($44));
                                   })(function (arr) {
-                                      return Data_Array.snoc(arr)(v.value0);
-                                  })(Data_Lens_Setter.set(function ($28) {
-                                      return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._model(Data_Profunctor_Strong.strongFn)($28));
-                                  })(init)(Data_Lens_Setter.set(function ($29) {
-                                      return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._state(Data_Profunctor_Strong.strongFn)($29));
-                                  })(App_Model_Async.Initial.value)($26)));
+                                      return Data_Array.cons(v.value0)(arr);
+                                  })(Data_Lens_Setter.set(function ($45) {
+                                      return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._model(Data_Profunctor_Strong.strongFn)($45));
+                                  })(init)(Data_Lens_Setter.set(function ($46) {
+                                      return App_GUI_State._new(Data_Profunctor_Strong.strongFn)(App_GUI_State._state(Data_Profunctor_Strong.strongFn)($46));
+                                  })(App_Model_Async.Initial.value)($43)));
                               };
                           };
                           return function __do() {
@@ -7037,8 +7229,8 @@ var PS = { };
                                   previous: a, 
                                   saving: App_Model_Async.Initial.value
                               }))(s));
-                          })(Data_Array["!!"](Data_Lens_Getter.view(function ($30) {
-                              return App_GUI_State._collection(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_Monoid.monoidArray))($30));
+                          })(Data_Array["!!"](Data_Lens_Getter.view(function ($47) {
+                              return App_GUI_State._collection(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_Monoid.monoidArray))($47));
                           })(s))(v.value0));
                       };
                       if (v instanceof CancelEdit) {
@@ -7050,13 +7242,13 @@ var PS = { };
                           return Data_Maybe.maybe(Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit))(function (a) {
                               return function __do() {
                                   var b = OpticUI_Components_Async.async(impls.saveEdit(a))();
-                                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($31) {
-                                      return App_GUI_State._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(App_GUI_State._saving(Data_Profunctor_Strong.strongFn)($31)));
+                                  return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($48) {
+                                      return App_GUI_State._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(App_GUI_State._saving(Data_Profunctor_Strong.strongFn)($48)));
                                   })(new App_Model_Async.Busy(b))(s))();
                               };
                           })(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s))(function (v1) {
-                              return Data_Array["!!"](Data_Lens_Getter.view(function ($32) {
-                                  return App_GUI_State._collection(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_Monoid.monoidArray))($32));
+                              return Data_Array["!!"](Data_Lens_Getter.view(function ($49) {
+                                  return App_GUI_State._collection(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_Monoid.monoidArray))($49));
                               })(s))(v1.index);
                           }));
                       };
@@ -7064,11 +7256,11 @@ var PS = { };
                           return updateEditingAndStop(v.value0);
                       };
                       if (v instanceof EditSaveFailed) {
-                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($33) {
-                              return App_GUI_State._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(App_GUI_State._saving(Data_Profunctor_Strong.strongFn)($33)));
+                          return OpticUI_Core.runHandler(h)(Data_Lens_Setter.set(function ($50) {
+                              return App_GUI_State._editing(Data_Profunctor_Strong.strongFn)(Data_Lens_Prism_Maybe._Just(Data_Profunctor_Choice.choiceFn)(App_GUI_State._saving(Data_Profunctor_Strong.strongFn)($50)));
                           })(new App_Model_Async.Errored(v.value0))(s));
                       };
-                      throw new Error("Failed pattern match at App.GUI.Views.Crud line 41, column 1 - line 49, column 1: " + [ v.constructor.name ]);
+                      throw new Error("Failed pattern match at App.GUI.Views.Crud line 48, column 1 - line 57, column 1: " + [ v.constructor.name ]);
                   };
                   return handle(comm);
               };
@@ -7086,6 +7278,11 @@ var PS = { };
   exports["SaveEdit"] = SaveEdit;
   exports["EditSaved"] = EditSaved;
   exports["EditSaveFailed"] = EditSaveFailed;
+  exports["StartDelete"] = StartDelete;
+  exports["CancelDelete"] = CancelDelete;
+  exports["Delete"] = Delete;
+  exports["DeleteDone"] = DeleteDone;
+  exports["DeleteFailed"] = DeleteFailed;
   exports["crudHandler"] = crudHandler;;
  
 })(PS["App.GUI.Views.Crud"] = PS["App.GUI.Views.Crud"] || {});
@@ -7304,20 +7501,26 @@ var PS = { };
       return Crud;
   })();
   var ToEvents = (function () {
-      function ToEvents(value0) {
+      function ToEvents(value0, value1) {
           this.value0 = value0;
+          this.value1 = value1;
       };
       ToEvents.create = function (value0) {
-          return new ToEvents(value0);
+          return function (value1) {
+              return new ToEvents(value0, value1);
+          };
       };
       return ToEvents;
   })();
   var ToStatistics = (function () {
-      function ToStatistics(value0) {
+      function ToStatistics(value0, value1) {
           this.value0 = value0;
+          this.value1 = value1;
       };
       ToStatistics.create = function (value0) {
-          return new ToStatistics(value0);
+          return function (value1) {
+              return new ToStatistics(value0, value1);
+          };
       };
       return ToStatistics;
   })();
@@ -7330,44 +7533,65 @@ var PS = { };
   var makeNewPb = function (handle) {
       var c = function (model) {
           return function (h) {
-              return App_GUI_Components_Markup.rowUI([ App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), OpticUI_Core.ui(App_GUI_Components_Markup.emptyTd), App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_Components_CrudButtons.newButton(function ($35) {
-                  return handle(Crud.create($35));
+              return App_GUI_Components_Markup.rowUI([ App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._computername(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_State._model(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), OpticUI_Core.ui(App_GUI_Components_Markup.emptyTd), App_GUI_State._state(OpticUI_Core.uiStrong)(App_GUI_Components_CrudButtons.newButton(function ($51) {
+                  return handle(Crud.create($51));
               })), OpticUI_Core.ui(App_GUI_Components_Markup.emptyTd) ]);
           };
       };
       return OpticUI_Core["with"](c);
   };
-  var loadPbs = Endpoint_Client.execEndpoint(Data_Serializable.serializableUnit)(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Photobooth.genericPhotobooth))(App_Endpoint.getPhotobooths)(Prelude.unit)(Prelude.unit);
+  var loadPbs = Prelude[">>="](Control_Monad_Aff.bindAff)(Endpoint_Client.execEndpoint(Data_Serializable.serializableUnit)(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Photobooth.genericPhotobooth))(App_Endpoint.getPhotobooths)(Prelude.unit)(Prelude.unit))(Prelude[">>>"](Prelude.semigroupoidFn)(App_Model_Photobooth.sortPhotobooths)(Prelude["return"](Control_Monad_Aff.applicativeAff)));
   var linkButtons = function (handle) {
       return function (cn) {
-          return Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (v) {
-              return handle(new ToEvents(cn));
-          }) ])(OpticUI_Markup.text("Zie events")))(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (v) {
-              return handle(new ToStatistics(cn));
-          }) ])(OpticUI_Markup.text("Zie statistieken")));
+          return function (alias) {
+              return Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (v) {
+                  return handle(new ToEvents(cn, alias));
+              }) ])(OpticUI_Markup.text("Zie events")))(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (v) {
+                  return handle(new ToStatistics(cn, alias));
+              }) ])(OpticUI_Markup.text("Zie statistieken")));
+          };
       };
   };
   var showPB = function (handle) {
       return function (v) {
           return function (v1) {
-              return function (editing) {
-                  return function (i) {
-                      if (v instanceof Data_Maybe.Just && i === v.value0) {
-                          return OpticUI_Core["with"](function (v2) {
+              return function (v2) {
+                  return function (editing) {
+                      return function (i) {
+                          if (v instanceof Data_Maybe.Just && i === v.value0) {
+                              return OpticUI_Core["with"](function (v3) {
+                                  return function (h) {
+                                      return App_GUI_Components_Markup.rowUI([ OpticUI_Core.ui(OpticUI_Markup.text(v3.value0.computername)), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._defaultprofile(OpticUI_Core.uiStrong)(App_GUI_Components_Select.select(Data_Maybe.fromMaybe([  ])(Data_StrMap.lookup(v3.value0.computername)(v2)))(Prelude.id(Prelude.categoryFn))([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_Components_CrudButtons.editButton(function ($52) {
+                                          return handle(Crud.create($52));
+                                      })(i)(editing), OpticUI_Core.ui(linkButtons(handle)(v3.value0.computername)(v3.value0.alias)) ]);
+                                  };
+                              });
+                          };
+                          return OpticUI_Core["with"](function (v3) {
                               return function (h) {
-                                  return App_GUI_Components_Markup.rowUI([ OpticUI_Core.ui(OpticUI_Markup.text(v2.value0.computername)), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._alias(OpticUI_Core.uiStrong)(OpticUI_Components.textField([ OpticUI_Markup_HTML.classA("form-control") ]))), App_Model_Photobooth._Photobooth(OpticUI_Core.uiStrong)(App_GUI_State._defaultprofile(OpticUI_Core.uiStrong)(App_GUI_Components_Select.select(Data_Maybe.fromMaybe([  ])(Data_StrMap.lookup(v2.value0.computername)(v1)))(Prelude.id(Prelude.categoryFn))([ OpticUI_Markup_HTML.classA("form-control") ]))), App_GUI_Components_CrudButtons.editButton(function ($36) {
-                                      return handle(Crud.create($36));
-                                  })(i)(editing), OpticUI_Core.ui(linkButtons(handle)(v2.value0.computername)) ]);
+                                  return App_GUI_Components_Markup.rowUI(Prelude["<$>"](Prelude.functorArray)(OpticUI_Core.ui)([ OpticUI_Markup.text(v3.value0.computername), OpticUI_Markup.text(v3.value0.alias), OpticUI_Markup.text(v3.value0.defaultprofile), Data_Maybe.maybe(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-action"), OpticUI_Markup_HTML.onClick(function (v4) {
+                                      return handle(Crud.create(new App_GUI_Views_Crud.StartEdit(i)));
+                                  }) ])(OpticUI_Markup.text("Edit")))(Prelude["const"](OpticUI_Markup.text("")))(v), linkButtons(handle)(v3.value0.computername)(v3.value0.alias), (function () {
+                                      if (v1 instanceof Data_Maybe.Just && i === v1.value0) {
+                                          return Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger"), OpticUI_Markup_HTML.onClick(function (v4) {
+                                              return handle(Crud.create(new App_GUI_Views_Crud.Delete(v3)));
+                                          }) ])(OpticUI_Markup.text("Sure?")))(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-primary"), OpticUI_Markup_HTML.onClick(function (v4) {
+                                              return handle(Crud.create(App_GUI_Views_Crud.CancelDelete.value));
+                                          }) ])(OpticUI_Markup.text("Cancel!")));
+                                      };
+                                      if (v1 instanceof Data_Maybe.Just) {
+                                          return OpticUI_Markup.text("");
+                                      };
+                                      if (v1 instanceof Data_Maybe.Nothing) {
+                                          return OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-danger"), OpticUI_Markup_HTML.onClick(function (v4) {
+                                              return handle(Crud.create(new App_GUI_Views_Crud.StartDelete(i)));
+                                          }) ])(OpticUI_Markup.text("Delete"));
+                                      };
+                                      throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 83, column 1 - line 90, column 1: " + [ v1.constructor.name ]);
+                                  })() ]));
                               };
                           });
                       };
-                      return OpticUI_Core["with"](function (v2) {
-                          return function (h) {
-                              return App_GUI_Components_Markup.rowUI(Prelude["<$>"](Prelude.functorArray)(OpticUI_Core.ui)([ OpticUI_Markup.text(v2.value0.computername), OpticUI_Markup.text(v2.value0.alias), OpticUI_Markup.text(v2.value0.defaultprofile), Data_Maybe.maybe(OpticUI_Markup_HTML.button([ OpticUI_Markup_HTML.classA("btn btn-action"), OpticUI_Markup_HTML.onClick(function (v3) {
-                                  return handle(Crud.create(new App_GUI_Views_Crud.StartEdit(i)));
-                              }) ])(OpticUI_Markup.text("Edit")))(Prelude["const"](OpticUI_Markup.text("")))(v), linkButtons(handle)(v2.value0.computername) ]));
-                          };
-                      });
                   };
               };
           };
@@ -7375,47 +7599,57 @@ var PS = { };
   };
   var listPhotobooths = function (handle) {
       return function (selInd) {
-          return function (profiles) {
-              var showColl = function (v) {
-                  return function (v1) {
-                      return function (h) {
-                          if (v1 instanceof App_Model_Async.Initial) {
-                              return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Nothing loaded yet")))))(App_Model_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_Components_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(App_GUI_Views_Crud.LoadAll.value)))));
+          return function (delInd) {
+              return function (profiles) {
+                  var showColl = function (v) {
+                      return function (v1) {
+                          return function (h) {
+                              if (v1 instanceof App_Model_Async.Initial) {
+                                  return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Nothing loaded yet")))))(App_Model_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_Components_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(App_GUI_Views_Crud.LoadAll.value)))));
+                              };
+                              if (v1 instanceof App_Model_Async.Busy) {
+                                  return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))))(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($53) {
+                                      return handle(Crud.create(App_GUI_Views_Crud.Loaded.create($53)));
+                                  })(function ($54) {
+                                      return handle(Crud.create(App_GUI_Views_Crud.LoadingFailed.create($54)));
+                                  })));
+                              };
+                              if (v1 instanceof App_Model_Async.Done) {
+                                  return App_Model_Async._Done(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.foreach(OpticUI_Markup.markupMonoid)(Data_Traversable.traversableArray)(showPB(handle)(selInd)(delInd)(profiles)(v)));
+                              };
+                              if (v1 instanceof App_Model_Async.Errored) {
+                                  return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(v1.value0)))));
+                              };
+                              throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 76, column 7 - line 78, column 7: " + [ v.constructor.name, v1.constructor.name, h.constructor.name ]);
                           };
-                          if (v1 instanceof App_Model_Async.Busy) {
-                              return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Loading photobooths")))))(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($37) {
-                                  return handle(Crud.create(App_GUI_Views_Crud.Loaded.create($37)));
-                              })(function ($38) {
-                                  return handle(Crud.create(App_GUI_Views_Crud.LoadingFailed.create($38)));
-                              })));
-                          };
-                          if (v1 instanceof App_Model_Async.Done) {
-                              return App_Model_Async._Done(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Core.foreach(OpticUI_Markup.markupMonoid)(Data_Traversable.traversableArray)(showPB(handle)(selInd)(profiles)(v)));
-                          };
-                          if (v1 instanceof App_Model_Async.Errored) {
-                              return OpticUI_Core.ui(OpticUI_Markup_HTML.tr([  ])(OpticUI_Markup_HTML.td([  ])(OpticUI_Markup.text("Photobooths failed to load: " + Control_Monad_Eff_Exception.message(v1.value0)))));
-                          };
-                          throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 69, column 7 - line 71, column 7: " + [ v.constructor.name, v1.constructor.name, h.constructor.name ]);
                       };
                   };
+                  return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core["with"](function (s) {
+                      return function (v) {
+                          return App_GUI_State._collection(OpticUI_Core.uiStrong)(OpticUI_Core["with"](showColl(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s))));
+                      };
+                  }), App_GUI_State._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_State._saving(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($55) {
+                      return handle(Crud.create(App_GUI_Views_Crud.EditSaved.create($55)));
+                  })(function ($56) {
+                      return handle(Crud.create(App_GUI_Views_Crud.EditSaveFailed.create($56)));
+                  }))))), App_GUI_State._deleting(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_State._saving(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($57) {
+                      return handle(Prelude["const"](new Crud(App_GUI_Views_Crud.DeleteDone.value))($57));
+                  })(function ($58) {
+                      return handle(Crud.create(App_GUI_Views_Crud.DeleteFailed.create($58)));
+                  }))))) ]);
               };
-              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core["with"](function (s) {
-                  return function (v) {
-                      return App_GUI_State._collection(OpticUI_Core.uiStrong)(OpticUI_Core["with"](showColl(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s))));
-                  };
-              }), App_GUI_State._editing(OpticUI_Core.uiStrong)(Data_Lens_Prism_Maybe._Just(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_State._saving(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($39) {
-                  return handle(Crud.create(App_GUI_Views_Crud.EditSaved.create($39)));
-              })(function ($40) {
-                  return handle(Crud.create(App_GUI_Views_Crud.EditSaveFailed.create($40)));
-              }))))) ]);
           };
       };
+  };
+  var deletePB = function (v) {
+      return Endpoint_Client.execEndpoint(Data_Serializable.serializableString)(Data_Generic.genericUnit)(Data_Generic.genericUnit)(App_Endpoint.deletePhotobooth)(v.value0.computername)(Prelude.unit);
   };
   var photoboothsPage = function ($$goto) {
       return OpticUI_Core["with"](function (s) {
           return function (h) {
               var impls = {
                   loadAll: loadPbs, 
+                  "delete": deletePB, 
                   saveNew: saveNewPb, 
                   saveEdit: updatePB, 
                   initial: Prelude["return"](Control_Monad_Eff.applicativeEff)({
@@ -7431,18 +7665,20 @@ var PS = { };
                       return App_GUI_Views_Crud.crudHandler(s)(h)(impls)(v.value0);
                   };
                   if (v instanceof ToEvents) {
-                      return $$goto(new App_GUI_State.EventsPage(v.value0));
+                      return $$goto(new App_GUI_State.EventsPage(v.value0, v.value1));
                   };
                   if (v instanceof ToStatistics) {
-                      return $$goto(new App_GUI_State.StatisticsPage(v.value0));
+                      return $$goto(new App_GUI_State.StatisticsPage(v.value0, v.value1));
                   };
-                  throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 42, column 1 - line 48, column 1: " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at App.GUI.Views.PhotoboothsPage line 42, column 1 - line 49, column 1: " + [ v.constructor.name ]);
               };
-              return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(App_GUI_Components_Markup.pageTitle(OpticUI_Markup.text("Photobooths"))))(OpticUI_Core.withView(App_GUI_Components_Markup.crudTable)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.tableHeader(Prelude.functorArray)(Data_Foldable.foldableArray)([  ])([ "Name", "Alias", "Default Profile", "Actions", "Link" ])), App_GUI_State._collectionEditing(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s))(function (ed) {
+              return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core.ui(App_GUI_Components_Markup.pageTitle(OpticUI_Markup.text("Photobooths"))))(OpticUI_Core.withView(App_GUI_Components_Markup.crudTable)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.tableHeader(Prelude.functorArray)(Data_Foldable.foldableArray)([  ])([ "Name", "Alias", "Default Profile", "Actions", "Link", "Delete" ])), App_GUI_State._new(OpticUI_Core.uiStrong)(makeNewPb(handle)), App_GUI_State._collectionEditingD(OpticUI_Core.uiStrong)(listPhotobooths(handle)(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._editing(Data_Lens_Internal_Forget.strongForget))(s))(function (ed) {
                   return Prelude["return"](Data_Maybe.applicativeMaybe)(ed.index);
-              }))(Data_Lens_Getter.view(function ($41) {
-                  return App_GUI_State._profiles(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_StrMap.monoidStrMap(Prelude.semigroupArray)))($41));
-              })(s))), App_GUI_State._new(OpticUI_Core.uiStrong)(makeNewPb(handle)), App_GUI_State._profiles(OpticUI_Core.uiStrong)(App_GUI_Views_Profiles.loadProfiles) ])));
+              }))(Prelude[">>="](Data_Maybe.bindMaybe)(Data_Lens_Getter.view(App_GUI_State._deleting(Data_Lens_Internal_Forget.strongForget))(s))(function (d) {
+                  return Prelude["return"](Data_Maybe.applicativeMaybe)(d.index);
+              }))(Data_Lens_Getter.view(function ($59) {
+                  return App_GUI_State._profiles(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_StrMap.monoidStrMap(Prelude.semigroupArray)))($59));
+              })(s))), App_GUI_State._profiles(OpticUI_Core.uiStrong)(App_GUI_Views_Profiles.loadProfiles) ])));
           };
       });
   };
@@ -7720,7 +7956,7 @@ var PS = { };
                                               })())();
                                           };
                                       };
-                                      throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 103, column 11 - line 104, column 8: " + [ v2.constructor.name, v3.constructor.name ]);
+                                      throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 104, column 11 - line 105, column 8: " + [ v2.constructor.name, v3.constructor.name ]);
                                   };
                               };
                               var fileSaved = function (si) {
@@ -7796,7 +8032,7 @@ var PS = { };
                           return OpticUI_Core.withView(OpticUI_Markup_HTML.tr([  ]))(OpticUI_Core["with"](line(selI)(editing)(i)));
                       })));
                   };
-                  throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 70, column 1 - line 75, column 1: " + [ v.constructor.name, h.constructor.name ]);
+                  throw new Error("Failed pattern match at App.GUI.Views.EventsPage line 71, column 1 - line 76, column 1: " + [ v.constructor.name, h.constructor.name ]);
               };
           };
           return Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(OpticUI_Core["with"](c))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(App_GUI_State._collection(OpticUI_Core.uiStrong)(App_Model_Async._Initial(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(App_GUI_Components_Exec.exec(OpticUI_Markup.markupMonoid)(handle(new Crud(App_GUI_Views_Crud.LoadAll.value))))))(Prelude["<>"](OpticUI_Core.uiSemigroup(OpticUI_Markup.markupSemigroup))(App_GUI_State._collection(OpticUI_Core.uiStrong)(App_Model_Async._Busy(OpticUI_Core.uiChoice(OpticUI_Markup.markupMonoid))(OpticUI_Components_Async.onResult(OpticUI_Markup.markupMonoid)(function ($56) {
@@ -7826,6 +8062,7 @@ var PS = { };
                   loadAll: App_GUI_Load.loadEvents(cn), 
                   saveNew: saveNewEvent, 
                   saveEdit: saveUpdatedEvent, 
+                  "delete": Prelude["const"](Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit)), 
                   initial: function __do() {
                       var d = Data_Date.now();
                       return Prelude["return"](Control_Monad_Eff.applicativeEff)({
@@ -7851,9 +8088,9 @@ var PS = { };
               var handle = function (v) {
                   return App_GUI_Views_Crud.crudHandler(s)(h)(impls)(v.value0);
               };
-              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.pageTitle(Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup.text("Events for: "))(OpticUI_Markup_HTML.em([  ])(OpticUI_Markup.text(cn))))), OpticUI_Core.withView(App_GUI_Components_Markup.crudTable)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.tableHeader(Prelude.functorArray)(Data_Foldable.foldableArray)([ OpticUI_Markup_HTML.classA("indexed-tr") ])([ "", "Computer", "Name", "Start", "End", "Profile", "Actions", "Files" ])), App_GUI_State._collectionEditing(OpticUI_Core.uiStrong)(showEvents(handle)(Data_Lens_Getter.view(function ($61) {
+              return Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.pageTitle(Prelude["<>"](OpticUI_Markup.markupSemigroup)(OpticUI_Markup.text("Events for: "))(OpticUI_Markup_HTML.em([  ])(OpticUI_Markup.text(cn))))), OpticUI_Core.withView(App_GUI_Components_Markup.crudTable)(Data_Foldable.mconcat(Data_Foldable.foldableArray)(OpticUI_Core.uiMonoid(OpticUI_Markup.markupMonoid))([ OpticUI_Core.ui(App_GUI_Components_Markup.tableHeader(Prelude.functorArray)(Data_Foldable.foldableArray)([ OpticUI_Markup_HTML.classA("indexed-tr") ])([ "", "Computer", "Name", "Start", "End", "Profile", "Actions", "Files" ])), App_GUI_State._new(OpticUI_Core.uiStrong)(makeNewEvent(handle)), App_GUI_State._collectionEditing(OpticUI_Core.uiStrong)(showEvents(handle)(Data_Lens_Getter.view(function ($61) {
                   return App_GUI_State._profiles(Data_Lens_Internal_Forget.strongForget)(App_Model_Async._Done(Data_Lens_Internal_Forget.choiceForget(Data_StrMap.monoidStrMap(Prelude.semigroupArray)))($61));
-              })(s))), App_GUI_State._new(OpticUI_Core.uiStrong)(makeNewEvent(handle)) ])), App_GUI_State._profiles(OpticUI_Core.uiStrong)(App_GUI_Views_Profiles.loadProfiles) ]);
+              })(s))) ])), App_GUI_State._profiles(OpticUI_Core.uiStrong)(App_GUI_Views_Profiles.loadProfiles) ]);
           };
       };
       return OpticUI_Core["with"](c);
@@ -8364,22 +8601,26 @@ var PS = { };
               var v3 = OpticUI_Run.animate(newSWithRoute)(OpticUI_Core["with"](function (s) {
                   return function (h) {
                       var nav$prime = App_GUI_Router.nav(s)(h);
-                      var $7 = Data_Lens_Getter.view(App_GUI_State._route(Data_Lens_Internal_Forget.strongForget))(s);
-                      if ($7 instanceof App_GUI_State.PhotoboothsPage) {
+                      var $8 = Data_Lens_Getter.view(App_GUI_State._route(Data_Lens_Internal_Forget.strongForget))(s);
+                      if ($8 instanceof App_GUI_State.PhotoboothsPage) {
                           return App_GUI_State._pbPage(OpticUI_Core.uiStrong)(App_GUI_Views_PhotoboothsPage.photoboothsPage(nav$prime));
                       };
-                      if ($7 instanceof App_GUI_State.EventsPage) {
-                          return App_GUI_State._eventsPage(OpticUI_Core.uiStrong)(App_GUI_Views_EventsPage.eventsPage($7.value0));
+                      if ($8 instanceof App_GUI_State.EventsPage) {
+                          return App_GUI_State._eventsPage(OpticUI_Core.uiStrong)(App_GUI_Views_EventsPage.eventsPage($8.value1));
                       };
-                      if ($7 instanceof App_GUI_State.StatisticsPage) {
-                          return App_GUI_State._statisticsPage(OpticUI_Core.uiStrong)(App_GUI_Views_StatisticsPage.statisticsPage($7.value0));
+                      if ($8 instanceof App_GUI_State.StatisticsPage) {
+                          return App_GUI_State._statisticsPage(OpticUI_Core.uiStrong)(App_GUI_Views_StatisticsPage.statisticsPage($8.value1));
                       };
-                      throw new Error("Failed pattern match at App.GUI line 19, column 1 - line 20, column 1: " + [ $7.constructor.name ]);
+                      throw new Error("Failed pattern match at App.GUI line 19, column 1 - line 20, column 1: " + [ $8.constructor.name ]);
                   };
               }))();
               return App_GUI_Router.hashChanged(function (str) {
                   return v3(function (s) {
-                      return App_GUI_Router.resolve(s)(App_GUI_Router.match(str));
+                      var newRoute = App_GUI_Router.match(str);
+                      return function __do() {
+                          var v4 = App_GUI_Router.resolve(s)(newRoute)();
+                          return Prelude["return"](Control_Monad_Eff.applicativeEff)(Data_Lens_Setter.set(App_GUI_State._route(Data_Profunctor_Strong.strongFn))(newRoute)(v4))();
+                      };
                   });
               })();
           };

@@ -41,12 +41,12 @@ nav s h r = setHash (toUrl r) *> resolve s r >>= set _route r >>> runHandler h
 resolve :: forall eff. State (ajax :: AJAX, ref :: REF | eff) -> Route -> 
                     Eff (ajax :: AJAX, ref :: REF | eff) (State (ajax :: AJAX, ref :: REF | eff))
 resolve s PhotoboothsPage = return s
-resolve s (r@(EventsPage cname)) = do
+resolve s (r@(EventsPage cname _)) = do
   eventsAsync <- async $ loadEvents cname
   let modifications = (set (_eventsPage <<< _new <<< _model <<< _computername) cname) <<<
                       (set _events (Busy eventsAsync))
   return (modifications s)
-resolve s (r@(StatisticsPage cname)) = do
+resolve s (r@(StatisticsPage cname _)) = do
   eventsAsync <- async $ loadEvents cname
   statisticsAsync <- async $ loadStatistics cname
   let modifications = (set _events (Busy eventsAsync)) <<< 

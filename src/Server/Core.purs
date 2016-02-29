@@ -33,6 +33,7 @@ foreign import data Middleware :: *
 foreign import makeApp :: forall eff. Eff (express :: EXPRESS | eff) App
 foreign import listen :: forall eff. App -> Int -> Eff (express :: EXPRESS | eff) Unit
 foreign import get :: forall eff. App -> String -> Middleware -> (Request -> Response -> (Eff (express :: EXPRESS | eff) Unit)) -> Eff (express :: EXPRESS | eff) Unit
+foreign import delete :: forall eff. App -> String -> Middleware -> (Request -> Response -> (Eff (express :: EXPRESS | eff) Unit)) -> Eff (express :: EXPRESS | eff) Unit
 foreign import post :: forall eff. App -> String -> Middleware -> (Request -> Response -> (Eff (express :: EXPRESS | eff) Unit)) -> Eff (express :: EXPRESS | eff) Unit
 foreign import put :: forall eff. App -> String -> Middleware -> (Request -> Response -> (Eff (express :: EXPRESS | eff) Unit)) -> Eff (express :: EXPRESS | eff) Unit
 foreign import sendStr  :: forall eff. Response -> String -> Eff (express :: EXPRESS | eff) Unit
@@ -56,30 +57,16 @@ type Input a = { url :: String
 hostEndpoint :: forall a b c eff. (Serializable a, Generic b, Generic c) =>
                   App -> Endpoint a b c -> Handler (express :: EXPRESS, console :: CONSOLE | eff) a b c
                   -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
-hostEndpoint app (Endpoint {method: GET, url}) h = get app url noParser handler
-  where 
+hostEndpoint app (Endpoint {method, url}) h = 
+  case method of
+       GET -> register get noParser
+       POST -> register post rawParser
+       PUT -> register put rawParser
+       DELETE -> register delete noParser
+  where
+    register f parser = f app url parser handler 
     handler req res = runAff (\err -> do
-                                 log $ "Failed hostEndpoint GET on " <> url <> message err
-                                 sendStr res $ message err)
-                             (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                             (do let i = convert req
-                                 qp <- parseQueryParams i
-                                 body <- parseBody i
-                                 h qp body)
-hostEndpoint app (Endpoint {method: POST, url}) h = post app url rawParser handler
-  where 
-    handler req res = runAff (\err -> do
-                                 log $ "Failed hostEndpoint POST on " <> url <> message err
-                                 sendStr res $ message err)
-                             (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                             (do let i = convert req
-                                 qp <- parseQueryParams i
-                                 body <- parseBody i
-                                 h qp body)
-hostEndpoint app (Endpoint {method: PUT, url}) h = put app url rawParser handler
-  where 
-    handler req res = runAff (\err -> do
-                                 log $ "Failed hostEndpoint PUT on " <> url <> message err
+                                 log $ "Failed hostEndpoint on " <> url <> message err
                                  sendStr res $ message err)
                              (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
                              (do let i = convert req

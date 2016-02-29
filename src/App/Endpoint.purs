@@ -30,6 +30,9 @@ postPhotobooths = Endpoint { method: POST, url: "/api/photobooths"}
 putPhotobooths :: Endpoint Unit PB.Photobooth PB.Photobooth
 putPhotobooths = Endpoint { method: PUT, url: "/api/photobooths" }
 
+deletePhotobooth :: Endpoint String Unit Unit
+deletePhotobooth = Endpoint { method: DELETE, url: "/api/photobooths" }
+
 ------- Events -------------------------
 
 getEvents :: Endpoint String Unit (Array E.Event)

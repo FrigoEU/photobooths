@@ -4,14 +4,15 @@ import Prelude
 
 import SQL as S
 
-import Data.Foreign
-import Data.Foreign.Class
-import Data.Generic
+import Data.Foreign (ForeignError(TypeMismatch))
+import Data.Foreign.Class (class IsForeign, readProp)
+import Data.Generic (class Generic, gShow, gEq)
 import Data.Lens (lens)
 import Data.Tuple (Tuple(..))
-import Data.Date
-import Data.Maybe
-import Data.Either
+import Data.Date (Date, fromStringStrict)
+import Data.Maybe (Maybe(Just), maybe)
+import Data.Either (Either(Right, Left))
+import Data.Array (sortBy)
 
 import App.Model.StrMap (fromArray)
 import App.Model.SavedFile
@@ -44,6 +45,10 @@ mkEvent (PartialEvent pe) im = Event { id: pe.id
 
 derive instance genericEvent :: Generic Event
 derive instance genericPartialEvent :: Generic PartialEvent
+
+sortEvents :: Array Event -> Array Event
+sortEvents = sortBy (\(Event {id: mi1}) (Event {id: mi2}) 
+                       -> compare (maybe 999999 id mi2) (maybe 999999 id mi1))
 
 instance eqEvent         :: Eq Event where eq = gEq 
 instance showEvent       :: Show Event where show = gShow

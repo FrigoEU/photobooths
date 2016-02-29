@@ -13,7 +13,7 @@ import Data.Array (filterM)
 import Data.StrMap (lookup)
 import Data.Tuple (Tuple(..))
 import Data.Maybe (maybe)
-import Data.Traversable (traverse)
+import Data.Traversable (traverse) 
 
 import Database.AnyDB (DB(), withConnection, Connection(), ConnectionInfo(..))
 import Node.Path (normalize, concat)
@@ -49,6 +49,7 @@ main = do
   hostEndpoint app getPhotobooths  \ _ _      -> withServerConn allPhotobooths
   hostEndpoint app postPhotobooths \ _ {body} -> withServerConn \conn -> newPB conn body
   hostEndpoint app putPhotobooths  \ _ {body} -> withServerConn \conn -> updatePB conn body
+  hostEndpoint app deletePhotobooth \s _      -> withServerConn \conn -> deletePB conn s
   hostEndpoint app getEvents       \ s _      -> withServerConn \conn -> queryEvents conn s
   hostEndpoint app postEvents      \ _ {body} -> withServerConn \conn -> newEvent conn body
   hostEndpoint app putEvents       \ _ {body} -> withServerConn \conn -> updateEvent conn body

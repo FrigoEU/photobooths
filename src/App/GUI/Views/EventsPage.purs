@@ -51,17 +51,18 @@ eventsPage :: forall eff. String ->
                           , profiles :: AsyncModel (ANDRT eff) Profiles
                           , new :: { model :: {id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                                    , state :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
-                          , editing :: Maybe {index :: Int, previous :: (EventWithState (ANDRT eff)), saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}}
+                          , editing :: Maybe {index :: Int, previous :: (EventWithState (ANDRT eff)), saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
+                          , deleting :: Maybe {index :: Int, saving :: AsyncModel (ANDRT eff) Unit}}
 eventsPage cn = with c
   where c s h =
-          let impls = { loadAll: loadEvents cn, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent 
+          let impls = { loadAll: loadEvents cn, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent, delete: const (return unit)
                       , initial: (now >>= \d -> return {id: Nothing, computername: cn, name: "", datefrom: d, dateuntil: d, profile: "", files: []})
                       , constr: (\a ->{model: Event a, state: {savingFile: Initial, file: Nothing}})}
               handle (Crud command) = crudHandler s h impls command
            in mconcat [ ui $ pageTitle (H.text "Events for: " <> H.em [] (H.text cn))
                       , withView crudTable $ mconcat [ ui $ tableHeader [H.classA "indexed-tr"] ["" , "Computer" , "Name" , "Start" , "End" , "Profile" , "Actions" , "Files"]
-                                                     , _collectionEditing $ showEvents handle (view (_profiles <<< _Done) s) 
                                                      , _new $ makeNewEvent handle
+                                                     , _collectionEditing $ showEvents handle (view (_profiles <<< _Done) s) 
                                                      ]
                       , _profiles loadProfiles
                       ]

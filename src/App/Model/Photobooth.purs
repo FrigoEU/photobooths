@@ -4,11 +4,12 @@ import Prelude
 
 import SQL
 
-import Data.Foreign.Class
-import Data.Generic
-import Data.Maybe (Maybe(..))
-import Data.Lens (Lens(), lens)
+import Data.Foreign.Class (class IsForeign, readProp)
+import Data.Generic (class Generic, gShow, gEq)
+import Data.Maybe (Maybe(Just), maybe)
+import Data.Lens (lens)
 import Data.Tuple (Tuple(..))
+import Data.Array (sortBy)
 
 import App.Model.StrMap
 
@@ -21,6 +22,11 @@ derive instance genericPhotobooth :: Generic Photobooth
 
 instance eqPhotobooth         :: Eq Photobooth where eq = gEq 
 instance showPhotobooth       :: Show Photobooth where show = gShow
+
+sortPhotobooths :: Array Photobooth -> Array Photobooth
+sortPhotobooths = sortBy (\(Photobooth {id: mi1}) (Photobooth {id: mi2}) 
+                       -> compare (maybe 999999 id mi2) (maybe 999999 id mi1))
+
 
 instance photoboothIsForeign :: IsForeign Photobooth where
   read obj = do

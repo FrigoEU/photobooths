@@ -33,6 +33,20 @@ exports.get = function get(app){
     };
   };
 };
+exports.delete = function get(app){
+  return function (url){
+    return function(mware){
+      return function(handler){
+        return function(){
+          var cb = function(req, res){ return handler(req)(res)(); };
+          var args = mware ? [url, mware, cb] : [url, cb];
+          app.delete.apply(app, args);
+        };
+      };
+    };
+  };
+};
+
 
 exports.post = function get(app){
   return function (url){
