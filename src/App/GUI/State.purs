@@ -28,16 +28,17 @@ initialState initRoute = do
   dateNow <- now
   return { route: initRoute
   , photobooths: Initial
-  , events: Initial
   , profiles: Initial
-  , statistics: Initial
+  , statisticsPage: { events: Initial
+                    , statistics: Initial }
   , eventsPage: 
     { new: 
       { model: 
         { id: Nothing, computername: "", name: "", datefrom: dateNow, dateuntil: dateNow, profile: "", files: []}
       , state: Initial}
     , editing: Nothing
-    , deleting: Nothing}
+    , deleting: Nothing
+    , events: Initial }
   , photoboothsPage: 
     { new: 
       { model: 
@@ -48,13 +49,14 @@ initialState initRoute = do
 
 type State eff = { route :: Route
                  , photobooths :: AsyncModel eff (Array PB.Photobooth)
-                 , events :: AsyncModel eff (Array (EventWithState eff))
                  , profiles :: AsyncModel eff Profiles
-                 , statistics :: AsyncModel eff AllStatistics
+                 , statisticsPage :: { events :: AsyncModel eff (Array E.Event)
+                                     , statistics :: AsyncModel eff AllStatistics }
                  , eventsPage :: 
                    { new :: 
                      { model :: { id :: Maybe Int, computername :: String, name :: String, datefrom :: Date, dateuntil :: Date, profile :: String, files :: Array SavedFile}
                      , state :: AsyncModel eff (EventWithState eff)}
+                   , events :: AsyncModel eff (Array (EventWithState eff))
                    , editing :: Maybe {index:: Int, previous:: EventWithState eff, saving:: AsyncModel eff (EventWithState eff)}
                    , deleting :: Maybe {index :: Int, saving :: AsyncModel eff Unit}}
                  , photoboothsPage :: 
@@ -71,7 +73,7 @@ type EventWithState eff = {model :: E.Event, state :: {savingFile :: AsyncModel 
 ------ ROUTES --------------------------
 
 data Route = PhotoboothsPage
-           | EventsPage String String
+           | EventsPage String String Int
            | StatisticsPage String String
 
 derive instance genericRoute :: Generic Route
@@ -128,28 +130,29 @@ _pbPage = lens (\obj -> {collection: obj.photobooths
                        , photoboothsPage = {new: obj.new, editing: obj.editing, deleting: obj.deleting}
                        })
 
-_eventsPage :: forall a b c d e o. LensP {events :: a, profiles :: e, eventsPage :: {new :: b, editing :: c, deleting :: d} | o}
+_eventsPage :: forall a b c d e o. LensP {profiles :: e, eventsPage :: {events :: a, new :: b, editing :: c, deleting :: d} | o}
                                 {collection :: a, profiles :: e, new :: b, editing :: c, deleting :: d}
-_eventsPage = lens (\obj -> {collection: obj.events
+_eventsPage = lens (\obj -> {collection: obj.eventsPage.events
                             , profiles: obj.profiles
                             , new: obj.eventsPage.new
                             , editing: obj.eventsPage.editing
                             , deleting: obj.eventsPage.deleting
                             })
                (\old obj ->
-                   old {events = obj.collection
-                       , profiles = obj.profiles
-                       , eventsPage = {new: obj.new, editing: obj.editing, deleting: obj.deleting}
+                   old { profiles = obj.profiles
+                       , eventsPage = {new: obj.new, editing: obj.editing, deleting: obj.deleting, events: obj.collection}
                        })
 
-_statisticsPage :: forall a b o. LensP {events :: a, statistics :: b | o}
-                                       {events :: a, statistics :: b}
-_statisticsPage = lens (\obj -> { events: obj.events
-                                , statistics: obj.statistics })
-                       (\old obj ->
-                           old {events = obj.events
-                               , statistics = obj.statistics })
+{-- _statisticsPage :: forall a b o. LensP {events :: a, statistics :: b | o} --}
+{--                                        {events :: a, statistics :: b} --}
+{-- _statisticsPage = lens (\obj -> { events: obj.events --}
+{--                                 , statistics: obj.statistics }) --}
+{--                        (\old obj -> --}
+{--                            old {events = obj.events --}
+{--                                , statistics = obj.statistics }) --}
 
+_statisticsPage :: forall a b o. Lens {statisticsPage :: a | o} {statisticsPage :: b | o} a b
+_statisticsPage = lens _.statisticsPage (_ {statisticsPage = _})
 
 _id :: forall a b o. Lens {id :: a | o} {id :: b | o} a b
 _id = lens _.id (_ {id = _})

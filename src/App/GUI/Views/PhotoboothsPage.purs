@@ -49,9 +49,9 @@ photoboothsPage :: forall eff. Nav (AjaxRefDomTimer eff) ->
 photoboothsPage goto = with $ \s h ->
   let impls = {loadAll: loadPbs, delete: deletePB, saveNew: saveNewPb, saveEdit: updatePB, initial: return {id: Nothing, computername: "", alias: "", defaultprofile: ""}, constr: Photobooth } 
       handle (Crud a) = crudHandler s h impls a
-      handle (ToEvents name alias) = goto (EventsPage name alias)
+      handle (ToEvents name alias) = goto (EventsPage name alias 0)
       handle (ToStatistics name alias) = goto (StatisticsPage name alias)
-   in ui (pageTitle $ H.text "Photobooths")
+   in ui (pageTitle $ H.button [H.classA "btn-nav is-home"] (H.text "^") <> H.text " Photobooths")
    <> (withView crudTable $ mconcat [ ui $ tableHeader [] ["Name", "Alias", "Default Profile", "Actions", "Link", "Delete"]
                                     , _new (makeNewPb handle)
                                     , _collectionEditingD (listPhotobooths handle (view _editing s >>= \ed -> return ed.index) (view _deleting s >>= \d -> return d.index) (view (_profiles <<< _Done) s))

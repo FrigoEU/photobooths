@@ -1471,6 +1471,12 @@ var PS = { };
     return s.length;
   };
 
+  exports.split = function (sep) {
+    return function (s) {
+      return s.split(sep);
+    };
+  };
+
   exports.joinWith = function (s) {
     return function (xs) {
       return xs.join(s);
@@ -1489,7 +1495,8 @@ var PS = { };
   var Data_String_Unsafe = PS["Data.String.Unsafe"];
   var toChar = $foreign._toChar(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
   exports["toChar"] = toChar;
-  exports["joinWith"] = $foreign.joinWith;;
+  exports["joinWith"] = $foreign.joinWith;
+  exports["split"] = $foreign.split;;
  
 })(PS["Data.String"] = PS["Data.String"] || {});
 (function(exports) {
@@ -3810,7 +3817,7 @@ var PS = { };
                   });
               });
           };
-          throw new Error("Failed pattern match at App.DB line 170, column 1 - line 171, column 1: " + [ v.constructor.name, v1.constructor.name ]);
+          throw new Error("Failed pattern match at App.DB line 186, column 1 - line 187, column 1: " + [ v.constructor.name, v1.constructor.name ]);
       };
   };
   var unpack = function (v) {
@@ -3850,11 +3857,11 @@ var PS = { };
                               return Prelude["return"](Control_Monad_Aff.applicativeAff)(App_Model_Event.mkEvent(v2.value0)(ims));
                           });
                       };
-                      throw new Error("Failed pattern match at App.DB line 186, column 1 - line 187, column 1: " + [ v2.constructor.name ]);
+                      throw new Error("Failed pattern match at App.DB line 202, column 1 - line 203, column 1: " + [ v2.constructor.name ]);
                   });
               });
           };
-          throw new Error("Failed pattern match at App.DB line 186, column 1 - line 187, column 1: " + [ v.constructor.name, v1.constructor.name ]);
+          throw new Error("Failed pattern match at App.DB line 202, column 1 - line 203, column 1: " + [ v.constructor.name, v1.constructor.name ]);
       };
   };
   var saveFileToDb = function (conn) {
@@ -3888,32 +3895,6 @@ var PS = { };
       return function (v) {
           var q = Database_AnyDB.Query("Select * from EVENTS " + ("where computername = ? " + "and updatedon > ?"));
           return Database_AnyDB.query(App_Model_Event.partialEventIsForeign)(q)([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(v.value0), Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueDate)(v.value1) ])(conn);
-      };
-  };
-  var queryEvents = function (conn) {
-      return function (cname) {
-          return Prelude.bind(Control_Monad_Aff.bindAff)(Database_AnyDB.query(App_Model_Event.partialEventIsForeign)("Select * from EVENTS WHERE computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(conn))(function (v) {
-              var ids = Prelude["<$>"](Prelude.functorArray)(function (v1) {
-                  return Data_Maybe.fromMaybe(-1)(v1.value0.id);
-              })(v);
-              return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
-                  var $93 = Data_Array.length(ids) > -1;
-                  if ($93) {
-                      return selectFilesForEvents(ids)(conn);
-                  };
-                  if (!$93) {
-                      return Prelude["return"](Control_Monad_Aff.applicativeAff)([  ]);
-                  };
-                  throw new Error("Failed pattern match at App.DB line 111, column 1 - line 112, column 1: " + [ $93.constructor.name ]);
-              })())(function (v1) {
-                  var createEvent = function (v2) {
-                      return App_Model_Event.mkEvent(v2)(Data_Array.filter(function (v3) {
-                          return v3.value0.eventId === Data_Maybe.fromMaybe(0)(v2.value0.id);
-                      })(v1));
-                  };
-                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude["<$>"](Prelude.functorArray)(createEvent)(v));
-              });
-          });
       };
   };
   var queryAllStatistics = function (conn) {
@@ -3958,7 +3939,7 @@ var PS = { };
                           return Prelude["return"](Control_Monad_Aff.applicativeAff)(App_Model_Event.mkEvent(v.value0)(ims));
                       });
                   };
-                  throw new Error("Failed pattern match at App.DB line 142, column 1 - line 143, column 1: " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at App.DB line 158, column 1 - line 159, column 1: " + [ v.constructor.name ]);
               });
           });
       };
@@ -3996,6 +3977,50 @@ var PS = { };
           });
       };
   };
+  var addFilesToEvents = function (conn) {
+      return function (partialEvs) {
+          var ids = Prelude["<$>"](Prelude.functorArray)(function (v) {
+              return Data_Maybe.fromMaybe(-1)(v.value0.id);
+          })(partialEvs);
+          return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
+              var $117 = Data_Array.length(ids) > -1;
+              if ($117) {
+                  return selectFilesForEvents(ids)(conn);
+              };
+              if (!$117) {
+                  return Prelude["return"](Control_Monad_Aff.applicativeAff)([  ]);
+              };
+              throw new Error("Failed pattern match at App.DB line 129, column 1 - line 130, column 1: " + [ $117.constructor.name ]);
+          })())(function (v) {
+              var createEvent = function (v1) {
+                  return App_Model_Event.mkEvent(v1)(Data_Array.filter(function (v2) {
+                      return v2.value0.eventId === Data_Maybe.fromMaybe(0)(v1.value0.id);
+                  })(v));
+              };
+              return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude["<$>"](Prelude.functorArray)(createEvent)(partialEvs));
+          });
+      };
+  };
+  var queryEvents = function (conn) {
+      return function (cname) {
+          return Prelude[">>="](Control_Monad_Aff.bindAff)(Database_AnyDB.query(App_Model_Event.partialEventIsForeign)("Select * from EVENTS WHERE computername = ?")([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname) ])(conn))(addFilesToEvents(conn));
+      };
+  };
+  var queryEventsByIds = function (conn) {
+      return function (ids) {
+          var is = Data_String.joinWith(",")(Prelude["<$>"](Prelude.functorArray)(Prelude.show(Prelude.showInt))(ids));
+          var q = "Select * from EVENTS WHERE id in (" + (is + ")");
+          return Prelude[">>="](Control_Monad_Aff.bindAff)(Database_AnyDB.query_(App_Model_Event.partialEventIsForeign)(q)(conn))(addFilesToEvents(conn));
+      };
+  };
+  var queryEventsPaged = function (conn) {
+      return function (i) {
+          return function (cname) {
+              var params = [ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(cname), Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt)(5), Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueInt)(5 * i | 0) ];
+              return Prelude[">>="](Control_Monad_Aff.bindAff)(Database_AnyDB.query(App_Model_Event.partialEventIsForeign)("Select * from EVENTS WHERE computername = ? order by id desc limit ? offset ?")(params)(conn))(addFilesToEvents(conn));
+          };
+      };
+  };
   exports["BufferForHttp"] = BufferForHttp;
   exports["getFileById"] = getFileById;
   exports["unpack"] = unpack;
@@ -4017,6 +4042,9 @@ var PS = { };
   exports["newEvent"] = newEvent;
   exports["insertPB"] = insertPB;
   exports["newPB"] = newPB;
+  exports["addFilesToEvents"] = addFilesToEvents;
+  exports["queryEventsByIds"] = queryEventsByIds;
+  exports["queryEventsPaged"] = queryEventsPaged;
   exports["queryEvents"] = queryEvents;
   exports["allPhotobooths"] = allPhotobooths;
   exports["foreignBufferForHttp"] = foreignBufferForHttp;;
@@ -4451,9 +4479,11 @@ var PS = { };
   var Control_Monad_Eff_Exception = PS["Control.Monad.Eff.Exception"];
   var Data_Maybe = PS["Data.Maybe"];
   var Data_Either = PS["Data.Either"];
-  var App_Model_Date = PS["App.Model.Date"];
   var Data_Date = PS["Data.Date"];
-  var Data_Tuple = PS["Data.Tuple"];     
+  var Data_Tuple = PS["Data.Tuple"];
+  var Data_String = PS["Data.String"];
+  var Data_Traversable = PS["Data.Traversable"];
+  var App_Model_Date = PS["App.Model.Date"];     
   var Serializable = function (deserialize, serialize) {
       this.deserialize = deserialize;
       this.serialize = serialize;
@@ -4462,19 +4492,19 @@ var PS = { };
       return dict.serialize;
   };
   var serializableUnit = new Serializable(function (s) {
-      var $6 = Prelude["=="](Prelude.eqString)(s)("unit");
-      if ($6) {
+      var $7 = Prelude["=="](Prelude.eqString)(s)("unit");
+      if ($7) {
           return new Data_Either.Right(Prelude.unit);
       };
-      if (!$6) {
+      if (!$7) {
           return Data_Either.Left.create(Control_Monad_Eff_Exception.error("Unable to deserialize " + (s + " to Unit")));
       };
-      throw new Error("Failed pattern match at Data.Serializable line 69, column 1 - line 72, column 87: " + [ $6.constructor.name ]);
+      throw new Error("Failed pattern match at Data.Serializable line 74, column 1 - line 79, column 1: " + [ $7.constructor.name ]);
   }, function (s) {
       return "unit";
   });
-  var serializableString = new Serializable(function ($15) {
-      return Data_Either.Right.create(Prelude.id(Prelude.categoryFn)($15));
+  var serializableString = new Serializable(function ($16) {
+      return Data_Either.Right.create(Prelude.id(Prelude.categoryFn)($16));
   }, Prelude.id(Prelude.categoryFn));
   var serializableDate = new Serializable(function (a) {
       return Data_Maybe.maybe(Data_Either.Left.create(Control_Monad_Eff_Exception.error("Unable to deserialize " + (a + " to Date"))))(Data_Either.Right.create)(Data_Date.fromStringStrict(a));
@@ -4485,6 +4515,13 @@ var PS = { };
   }, $foreign.toString);
   var deserialize = function (dict) {
       return dict.deserialize;
+  };
+  var serializableArray = function (dictSerializable) {
+      return new Serializable(function (s) {
+          return Data_Traversable.traverse(Data_Traversable.traversableArray)(Data_Either.applicativeEither)(deserialize(dictSerializable))(Data_String.split(";")(s));
+      }, function (arr) {
+          return Data_String.joinWith(";")(Prelude["<$>"](Prelude.functorArray)(serialize(dictSerializable))(arr));
+      });
   };
   var serializableTuple = function (dictSerializable) {
       return function (dictSerializable1) {
@@ -4508,7 +4545,8 @@ var PS = { };
   exports["serializableString"] = serializableString;
   exports["serializableDate"] = serializableDate;
   exports["serializableTuple"] = serializableTuple;
-  exports["serializableUnit"] = serializableUnit;;
+  exports["serializableUnit"] = serializableUnit;
+  exports["serializableArray"] = serializableArray;;
  
 })(PS["Data.Serializable"] = PS["Data.Serializable"] || {});
 (function(exports) {
@@ -4631,6 +4669,14 @@ var PS = { };
       method: Network_HTTP_Method.GET.value, 
       url: "/api/newevents"
   });
+  var getEventsPaged = new Endpoint_Client.Endpoint({
+      method: Network_HTTP_Method.GET.value, 
+      url: "/api/events/paged"
+  });
+  var getEventsByIds = new Endpoint_Client.Endpoint({
+      method: Network_HTTP_Method.GET.value, 
+      url: "/api/events/byids"
+  });
   var getEvents = new Endpoint_Client.Endpoint({
       method: Network_HTTP_Method.GET.value, 
       url: "/api/events/cname"
@@ -4649,6 +4695,8 @@ var PS = { };
   exports["getNewFiles"] = getNewFiles;
   exports["getNewEvents"] = getNewEvents;
   exports["attachFile"] = attachFile;
+  exports["getEventsByIds"] = getEventsByIds;
+  exports["getEventsPaged"] = getEventsPaged;
   exports["putEvents"] = putEvents;
   exports["postEvents"] = postEvents;
   exports["getEvents"] = getEvents;
@@ -5199,8 +5247,8 @@ var PS = { };
   var App_Model_Statistic = PS["App.Model.Statistic"];
   var App_Model_SavedFile = PS["App.Model.SavedFile"];     
   var throwStr = function (dictMonadError) {
-      return function ($71) {
-          return Control_Monad_Error_Class.throwError(dictMonadError)(Control_Monad_Eff_Exception.error($71));
+      return function ($79) {
+          return Control_Monad_Error_Class.throwError(dictMonadError)(Control_Monad_Eff_Exception.error($79));
       };
   };
   var safeParseIntE = function (dictMonadError) {
@@ -5238,8 +5286,8 @@ var PS = { };
       var prof = Node_Path.normalize("./profiles");
       return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(prof))(function (v) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Array.filterM(Control_Monad_Aff.monadAff))(v)(function (p) {
-              return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.stat(Node_Path.concat([ prof, p ])))(function ($72) {
-                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(Node_FS_Stats.isDirectory($72));
+              return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.stat(Node_Path.concat([ prof, p ])))(function ($80) {
+                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(Node_FS_Stats.isDirectory($80));
               });
           }))(function (v1) {
               return Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v1)(function (dir) {
@@ -5304,6 +5352,20 @@ var PS = { };
           return function (v3) {
               return withServerConn(function (conn) {
                   return App_DB.updateEvent(conn)(v3.body);
+              });
+          };
+      })();
+      Server_Core.hostEndpoint(Data_Serializable.serializableTuple(Data_Serializable.serializableString)(Data_Serializable.serializableInt))(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Event.genericEvent))(v1)(App_Endpoint.getEventsPaged)(function (v2) {
+          return function (v3) {
+              return withServerConn(function (conn) {
+                  return App_DB.queryEventsPaged(conn)(v2.value1)(v2.value0);
+              });
+          };
+      })();
+      Server_Core.hostEndpoint(Data_Serializable.serializableArray(Data_Serializable.serializableInt))(Data_Generic.genericUnit)(Data_Generic.genericArray(App_Model_Event.genericEvent))(v1)(App_Endpoint.getEventsByIds)(function (ids) {
+          return function (v2) {
+              return withServerConn(function (conn) {
+                  return App_DB.queryEventsByIds(conn)(ids);
               });
           };
       })();

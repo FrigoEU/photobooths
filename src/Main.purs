@@ -12,7 +12,7 @@ import Data.Date (Now, now)
 import Data.Array (filterM)
 import Data.StrMap (lookup)
 import Data.Tuple (Tuple(..))
-import Data.Maybe (maybe)
+import Data.Maybe 
 import Data.Traversable (traverse) 
 
 import Database.AnyDB (DB(), withConnection, Connection(), ConnectionInfo(..))
@@ -45,14 +45,17 @@ main = do
       --makeDB conn
       --loadWithDummy conn dateNow
   app <- makeApp
-  hostEndpoint app getPhotobooth   \ s _      -> withServerConn \conn -> queryPhotobooth conn s
-  hostEndpoint app getPhotobooths  \ _ _      -> withServerConn allPhotobooths
-  hostEndpoint app postPhotobooths \ _ {body} -> withServerConn \conn -> newPB conn body
-  hostEndpoint app putPhotobooths  \ _ {body} -> withServerConn \conn -> updatePB conn body
-  hostEndpoint app deletePhotobooth \s _      -> withServerConn \conn -> deletePB conn s
-  hostEndpoint app getEvents       \ s _      -> withServerConn \conn -> queryEvents conn s
-  hostEndpoint app postEvents      \ _ {body} -> withServerConn \conn -> newEvent conn body
-  hostEndpoint app putEvents       \ _ {body} -> withServerConn \conn -> updateEvent conn body
+  hostEndpoint app getPhotobooth   \ s _        -> withServerConn \conn -> queryPhotobooth conn s
+  hostEndpoint app getPhotobooths  \ _ _        -> withServerConn allPhotobooths
+  hostEndpoint app postPhotobooths \ _ {body}   -> withServerConn \conn -> newPB conn body
+  hostEndpoint app putPhotobooths  \ _ {body}   -> withServerConn \conn -> updatePB conn body
+  hostEndpoint app deletePhotobooth \s _        -> withServerConn \conn -> deletePB conn s
+  hostEndpoint app getEvents       \ s _        -> withServerConn \conn -> queryEvents conn s
+  hostEndpoint app postEvents      \ _ {body}   -> withServerConn \conn -> newEvent conn body
+  hostEndpoint app putEvents       \ _ {body}   -> withServerConn \conn -> updateEvent conn body
+  hostEndpoint app getEventsPaged  \(Tuple s i)_-> withServerConn \conn-> queryEventsPaged conn i s
+  hostEndpoint app getEventsByIds \ ids _       -> withServerConn \conn-> queryEventsByIds conn ids
+
   hostEndpoint app getNewEvents    \ qp _     -> withServerConn \conn -> queryNewEvents conn qp
   hostEndpoint app getProfiles     \ _ _      -> allProfiles
   hostEndpoint app getStatistics   \ s _      -> withServerConn \conn -> queryAllStatistics conn s

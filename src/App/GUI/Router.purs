@@ -19,7 +19,7 @@ import Data.Foreign.Generic (defaultOptions, readJSONGeneric, toJSONGeneric)
 
 import App.Model.Async (AsyncModel(Busy))
 import App.GUI.State
-import App.GUI.Load (loadStatistics, loadEvents)
+import App.GUI.Load 
 import App.GUI.Types (AjaxRefDom)
 
 type Nav eff = Route -> Eff eff Unit
@@ -41,87 +41,23 @@ nav s h r = setHash (toUrl r) *> resolve s r >>= set _route r >>> runHandler h
 resolve :: forall eff. State (ajax :: AJAX, ref :: REF | eff) -> Route -> 
                     Eff (ajax :: AJAX, ref :: REF | eff) (State (ajax :: AJAX, ref :: REF | eff))
 resolve s PhotoboothsPage = return s
-resolve s (r@(EventsPage cname _)) = do
-  eventsAsync <- async $ loadEvents cname
+resolve s (r@(EventsPage cname _ page)) = do
+  eventsAsync <- async $ loadEventsWithState cname page
   let modifications = (set (_eventsPage <<< _new <<< _model <<< _computername) cname) <<<
-                      (set _events (Busy eventsAsync))
+                      (set (_eventsPage <<< _collection) (Busy eventsAsync))
   return (modifications s)
 resolve s (r@(StatisticsPage cname _)) = do
   eventsAsync <- async $ loadEvents cname
   statisticsAsync <- async $ loadStatistics cname
-  let modifications = (set _events (Busy eventsAsync)) <<< 
-                      (set _statistics (Busy statisticsAsync))
+  let modifications = (set (_statisticsPage <<< _events) (Busy eventsAsync)) <<< 
+                      (set (_statisticsPage <<< _statistics) (Busy statisticsAsync))
   return (modifications s)
 
 match :: String -> Route
 match str = either (const PhotoboothsPage) id $ fromUrl (drop 1 str)
-
-{-- fromUrl :: String -> Either Route Unit --}
-{-- fromUrl str = do --}
-{--   let t = drop 2 str -- #/ --}
-{--   if (t `startsWith` "photobooths") then Left PhotoboothsPage --}              
-{--                                     else Right unit --}
-{--   if (t `startsWith` "events")      then Left (EventsPage (drop (length "events" + 1) t)) --}
-{--                                     else Right unit --}
-{--   if (t `startsWith` "statistics")  then Left (StatisticsPage (drop (length "statistics" + 1) t)) --} 
-{--                                     else Right unit --}
-
-{-- startsWith :: String -> String -> Boolean --}
-{-- startsWith str start = take (length start) str == start --}
-
-{-- toUrl :: Route -> String --}
-{-- toUrl (EventsPage cname) = "/events/" <> cname --}
-{-- toUrl (StatisticsPage cname) = "/statistics/" <> cname --} 
-{-- toUrl PhotoboothsPage = "/photobooths" --}
 
 toUrl :: Route -> String
 toUrl = toJSONGeneric defaultOptions
 
 fromUrl :: String -> F Route
 fromUrl = readJSONGeneric defaultOptions
-
-{-- getBaseUrl :: Route -> String --}
-{-- getBaseUrl PhotoboothsPage = "photobooths" --}
-{-- getBaseUrl (EventsPage _) = "events" --}
-{-- getBaseUrl (StatisticsPage _) = "statistics" --}
-
-{-- matchBase :: forall a. String -> Maybe (MyRoute a) --}
-{-- matchBase "photobooths" = Just photoboothsRoute --}
-{-- matchBase "events" = Just eventsRoute --}
-{-- matchBase "statistics" = Just statisticsRoute --}
-{-- matchBase _ = Nothing --}
-
-{-- foreign import getBasePathImpl :: forall a. (a -> Maybe a) -> Maybe a -> String -> Maybe String --}
-{-- getBasePath :: String -> Maybe String --}
-{-- getBasePath = getBasePathImpl Just Nothing --}
-
-{-- match3 :: forall a. (Serializable a) => String -> Maybe (RouteInstance a) --}
-{-- match3 hash = do --}
-{--   basepath <- getBasePath hash --}
-{--   route <- matchBase basepath --}
-{--   either (const Nothing) Just (matchParams route hash) --}
-
-{-- matchParams :: forall a. (Serializable a) => MyRoute a -> String -> Either Error (RouteInstance a) --}
-{-- matchParams r@(MyRoute name) hash = do --}
-{--   if (hash `startsWith` name) then Right unit else (Left $ error $ hash <> " doesn't start with " <> name) --}
-{--   a <- deserialize (drop (length ("#/" <> name <> "?params=")) hash) --}
-{--   return $ RouteInstance r a --}
-
-{-- toUrl :: forall a. (Serializable a) => RouteInstance a -> String --}
-{-- toUrl (RouteInstance (MyRoute name) a) = "/" <> name <> "?params=" <> serialize a --}
-
-{-- data MyRoute a = MyRoute String --}
-{-- data RouteInstance a = RouteInstance (MyRoute a) a --}
-
-{-- photoboothsRoute :: MyRoute Unit --}
-{-- photoboothsRoute = MyRoute "photobooths" --}
-
-{-- eventsRoute :: MyRoute String --}
-{-- eventsRoute = MyRoute "events" --}
-
-{-- statisticsRoute :: MyRoute String --}
-{-- statisticsRoute = MyRoute "statistics" --}
-
-{-- fromUrl :: forall a. (Serializable a) => String -> Either Error (RouteInstance a) --}
-{-- fromUrl url = do --}
-{--   let t = drop 2 url -- #/ --}

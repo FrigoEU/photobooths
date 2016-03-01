@@ -19,7 +19,7 @@ import Data.Lens.Common
 import Data.Lens (view, over)
 import Data.Lens.Traversal (traversed)
 import Data.Tuple (Tuple(..))
-import Data.Array (cons)
+import Data.Array (cons, length)
 import Data.StrMap (StrMap(), lookup)
 
 import DOM.File.Types (File())
@@ -41,11 +41,15 @@ import App.GUI.Views.Crud
 import App.GUI.Views.Profiles
 import App.Endpoint
 import App.GUI.Load
+import App.GUI.Router
 import App.GUI.Components.CrudButtons
 
 data EventsCommand eff = Crud (CrudCommand (EventWithState eff))
 
 eventsPage :: forall eff. String ->
+                          String ->
+                          Int ->
+                          Nav (ANDRT eff) ->
                           AppUI (ANDRT eff) 
                           { collection :: AsyncModel (ANDRT eff) (Array (EventWithState (ANDRT eff)))
                           , profiles :: AsyncModel (ANDRT eff) Profiles
@@ -53,13 +57,21 @@ eventsPage :: forall eff. String ->
                                    , state :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
                           , editing :: Maybe {index :: Int, previous :: (EventWithState (ANDRT eff)), saving :: AsyncModel (ANDRT eff) (EventWithState (ANDRT eff))}
                           , deleting :: Maybe {index :: Int, saving :: AsyncModel (ANDRT eff) Unit}}
-eventsPage cn = with c
+eventsPage cn alias page nav = with c
   where c s h =
-          let impls = { loadAll: loadEvents cn, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent, delete: const (return unit)
+          let impls = { loadAll: loadEventsWithState cn page, saveNew: saveNewEvent, saveEdit: saveUpdatedEvent, delete: const (return unit)
                       , initial: (now >>= \d -> return {id: Nothing, computername: cn, name: "", datefrom: d, dateuntil: d, profile: "", files: []})
                       , constr: (\a ->{model: Event a, state: {savingFile: Initial, file: Nothing}})}
               handle (Crud command) = crudHandler s h impls command
-           in mconcat [ ui $ pageTitle (H.text "Events for: " <> H.em [] (H.text cn))
+              pageSize = 20
+           in mconcat [ ui $ pageTitle (mconcat [ H.button [ H.classA "btn-nav" , H.onClick \_ -> nav  PhotoboothsPage] (H.text "^")
+                                                , H.text " Events for: " , H.em [] (H.text alias) 
+                                                , H.text ", page " , H.em [] (H.text $ show $ page + 1)
+                                                , H.button [ H.classA ("btn-nav" <> if (page > 0) then "" else " hide")
+                                                           , H.onClick \_ -> nav $ EventsPage cn alias (page - 1)] (H.text "<")
+                                                , H.button [ H.classA ("btn-nav" <> if (length (view (_collection <<< _Done) s) == pageSize) then "" else " hide")
+                                                           , H.onClick \_ -> nav $ EventsPage cn alias (page + 1)] (H.text ">") 
+                                                ])
                       , withView crudTable $ mconcat [ ui $ tableHeader [H.classA "indexed-tr"] ["" , "Computer" , "Name" , "Start" , "End" , "Profile" , "Actions" , "Files"]
                                                      , _new $ makeNewEvent handle
                                                      , _collectionEditing $ showEvents handle (view (_profiles <<< _Done) s) 

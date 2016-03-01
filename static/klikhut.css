@@ -52,6 +52,18 @@ h1.page-title em{
   color: #FFF;
   background-color: #926E2F;
 }
+.btn-nav{
+  margin-left: 15px;
+  background: white;
+  border: none;
+  color: #484848;
+  padding: 0 10px;
+  border-radius: 22px;
+}
+.btn-nav.hide, .btn-nav.is-home{
+  display: inline-block !important;
+  visibility: hidden !important;
+}
 .form-control{
   border: 0;
   outline: 1px solid #CCC;

@@ -27,8 +27,8 @@ main = do
     let nav' = nav s h
      in case view _route s of
             PhotoboothsPage -> _pbPage (photoboothsPage nav')
-            (EventsPage _ alias) -> _eventsPage $ eventsPage alias
-            (StatisticsPage _ alias) -> _statisticsPage $ statisticsPage alias
+            (EventsPage cn alias page) -> _eventsPage $ eventsPage cn alias page nav'
+            (StatisticsPage _ alias) -> _statisticsPage $ statisticsPage alias nav'
   hashChanged (\str -> driver (\s -> do let newRoute = match str
                                         newSt <- resolve s newRoute
                                         return $ set _route newRoute newSt))

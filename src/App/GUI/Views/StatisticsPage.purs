@@ -2,7 +2,7 @@ module App.GUI.Views.StatisticsPage where
 
 import Prelude (show, (<>), (<<<), (<$>), ($), (==), map)
 
-import OpticUI.Markup.HTML (td, tr, classA, div, em) as H
+import OpticUI.Markup.HTML (td, tr, classA, div, em, onClick, button) as H
 import OpticUI.Markup (text) as H
 import OpticUI (with, ui, Markup(), runHandler)
 import OpticUI.Components.Async (onResult)
@@ -20,14 +20,17 @@ import App.Model.Statistic (AllStatistics(AllStatistics), EventStatistic(EventSt
 import App.Model.Async (AsyncModel(Errored, Done), _Errored, _Busy)
 import App.Model.Date (toLocalDatetime)
 import App.GUI.Types (AppUI)
-import App.GUI.State (EventWithState, _events, _statistics)
+import App.GUI.State (Route(PhotoboothsPage), _events, _statistics)
 import App.GUI.Components.Markup (pageTitle, tableHeader, crudTable)
+import App.GUI.Router (Nav)
 
 statisticsPage :: forall eff. 
                   String ->
+                  Nav (ref :: REF | eff) ->
                   AppUI (ref :: REF | eff) { statistics :: AsyncModel (ref :: REF | eff) AllStatistics 
-                                           , events :: AsyncModel (ref :: REF | eff) (Array (EventWithState (ref :: REF | eff)))}
-statisticsPage cn = ui (pageTitle $ H.text "Statistics for: " <> H.em [] (H.text cn)) <> (with \s h -> mconcat [
+                                           , events :: AsyncModel (ref :: REF | eff) (Array Event)}
+statisticsPage cn nav = ui (pageTitle $ H.button [ H.classA "btn-nav" , H.onClick \_ -> nav PhotoboothsPage] (H.text "^") <> H.text " Statistics for: " <> H.em [] (H.text cn)) 
+  <> (with \s h -> mconcat [
      (_statistics <<< _Busy) $ onResult (\a -> runHandler h (set _statistics (Done a) s)) (\err -> runHandler h (set _statistics (Errored err) s)) <> (ui $ H.div [] $ H.text "Loading statistics"),
      (_statistics <<< _Errored) $ with \err _ -> ui $ H.div [H.classA "alert alert-danger"] $ H.text ("Statistics failed to load: " <> message err),
      (_events <<< _Busy) $ onResult (\a -> runHandler h (set _events (Done a) s)) (\err -> runHandler h (set _events (Errored err) s)) <> (ui $ H.div [] $ H.text "Loading events"),
@@ -47,11 +50,11 @@ monthlyStatisticsLine (MonthlyStatistic ms) = H.tr [] <<< mconcat $ (H.td [] <<<
     show ms.prints
   ]
 
-eventStatisticsLine :: forall eff. Array (EventWithState eff) -> EventStatistic -> Markup
+eventStatisticsLine :: Array Event -> EventStatistic -> Markup
 eventStatisticsLine events (EventStatistic es) = H.tr [] $
-  case find (\{model: Event ev} -> maybe false (\i -> i == es.eventId) ev.id) events of
+  case find (\(Event ev) -> maybe false (\i -> i == es.eventId) ev.id) events of
        Nothing -> H.td [] $ H.text "No event found for statistic"
-       Just {model: Event ev} -> mconcat $ (H.td [] <<< H.text) <$> [
+       Just (Event ev) -> mconcat $ (H.td [] <<< H.text) <$> [
            (ev.computername <> " " <> ev.name <> ": Van " <> toLocalDatetime ev.datefrom <> " tot " <> toLocalDatetime ev.dateuntil),
            show es.pictures,
            show es.prints

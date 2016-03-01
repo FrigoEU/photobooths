@@ -110,12 +110,28 @@ allPhotobooths conn = query_ (selectStar photoboothsTable "" :: Query Photobooth
 
 queryEvents :: forall eff. Connection -> String -> Aff (db :: DB | eff) (Array Event)
 queryEvents conn cname = 
-  let q = (Query "Select * from EVENTS WHERE computername = ?" :: Query PartialEvent)
-   in do partialEvs <- query q [toSql cname] conn
-         let ids = (\(PartialEvent {id: mi}) -> fromMaybe (-1) mi) <$> partialEvs
-         files <- if length ids > -1 then selectFilesForEvents ids conn else return []
-         let createEvent pe@(PartialEvent {id: mi}) = mkEvent pe (filter (\(SavedFile im) -> im.eventId == (fromMaybe 0 mi)) files)
-         return $ createEvent <$> partialEvs
+  let q = Query "Select * from EVENTS WHERE computername = ?" :: Query PartialEvent
+   in query q [toSql cname] conn >>= addFilesToEvents conn
+
+queryEventsPaged :: forall eff. Connection -> Int -> String -> Aff (db :: DB | eff) (Array Event)
+queryEventsPaged conn i cname = 
+  let q = Query "Select * from EVENTS WHERE computername = ? order by id desc limit ? offset ?" :: Query PartialEvent
+      pageSize = 20
+      params = [toSql cname, toSql pageSize, toSql (pageSize * i)]
+   in query q params conn >>= addFilesToEvents conn
+
+queryEventsByIds :: forall eff. Connection -> Array Int -> Aff (db :: DB | eff) (Array Event)
+queryEventsByIds conn ids = 
+  let is = joinWith "," (show <$> ids)
+      q = Query ("Select * from EVENTS WHERE id in (" <> is <> ")") :: Query PartialEvent
+   in query_ q conn >>= addFilesToEvents conn
+
+addFilesToEvents :: forall eff. Connection -> Array PartialEvent -> Aff(db :: DB |eff)(Array Event)
+addFilesToEvents conn partialEvs = do
+  let ids = (\(PartialEvent {id: mi}) -> fromMaybe (-1) mi) <$> partialEvs
+  files <- if length ids > -1 then selectFilesForEvents ids conn else return []
+  let createEvent pe@(PartialEvent {id: mi}) = mkEvent pe (filter (\(SavedFile im) -> im.eventId == (fromMaybe 0 mi)) files)
+  return $ createEvent <$> partialEvs
 
 
 newPB :: forall eff. Connection -> Photobooth -> Aff (db :: DB | eff) Photobooth

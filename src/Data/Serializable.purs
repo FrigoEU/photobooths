@@ -1,12 +1,17 @@
 module Data.Serializable where
 
-import Prelude (Unit, (<>), unit, (==), return, ($), bind, id, (<<<))
+import Prelude (Unit, (<$>), (<>), ($), unit, (==), return, bind, id, (<<<))
+
 import Control.Monad.Eff.Exception (Error, error)
+
 import Data.Maybe (Maybe(Nothing, Just), maybe)
 import Data.Either (Either(Right, Left))
-import App.Model.Date (iso8601)
 import Data.Date (Date, fromStringStrict)
 import Data.Tuple (Tuple(Tuple))
+import Data.String (split, joinWith)
+import Data.Traversable (traverse)
+
+import App.Model.Date (iso8601)
 
 class Serializable a where
   serialize :: a -> String
@@ -70,3 +75,8 @@ instance serializableUnit :: Serializable Unit where
   serialize s = "unit"
   deserialize s = if s == "unit" then Right unit
                                  else Left $ error $ "Unable to deserialize " <> s <> " to Unit"
+
+instance serializableArray :: (Serializable a) => Serializable (Array a) where
+  serialize arr = joinWith ";" (serialize <$> arr)
+  deserialize s = traverse deserialize (split ";" s)
+

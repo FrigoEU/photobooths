@@ -44,6 +44,12 @@ postEvents = Endpoint { method: POST, url: "/api/events"}
 putEvents :: Endpoint Unit E.Event E.Event
 putEvents = Endpoint { method: PUT, url: "/api/events"}
 
+getEventsPaged :: Endpoint (Tuple String Int) Unit (Array E.Event)
+getEventsPaged = Endpoint { method: GET, url: "/api/events/paged"}
+
+getEventsByIds :: Endpoint (Array Int) Unit (Array E.Event)
+getEventsByIds = Endpoint { method: GET, url: "/api/events/byids"}
+
 attachFile :: FileUploadEndpoint (Tuple Int String) SI.SavedFile
 attachFile = FileUploadEndpoint { url: "/api/attachfiletoevent"}
 
