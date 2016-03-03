@@ -1,21 +1,25 @@
 module App.Worker where
 
-import Prelude (Unit, show, (<>), return, ($), bind, unit, (>>=), flip, (+), (<$>), (-), (/=), const, (<<<))
+import Prelude (Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), map, (/=), const, (<<<))
 
 import Control.Monad.Aff (Aff(), runAff)
-import Control.Monad.Eff.Console (log)
+import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, error)
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Eff.Class (liftEff) 
+import Control.Monad.Eff (Eff)
 
 import Database.AnyDB (DB(), Connection(), ConnectionInfo(Sqlite3), Query(Query), execute_, queryOne_, withConnection) 
 
+
 import Node.FS (FS()) 
-import Node.FS.Aff (readFile, readdir, unlink, rename, readTextFile) 
+import Node.FS.Aff (writeFile, readFile, stat, exists, readTextFile, readdir, unlink)
+import Node.FS.Stats (Stats(Stats))
 import Node.Path (FilePath(), concat, basename) 
 import Node.Buffer (BUFFER())
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
+import Node.OS (OS, hostname)
 
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
 import App.DB (updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent, safeParseInt) 
@@ -26,14 +30,17 @@ import App.Exec (exec)
 
 import Data.Traversable (traverse) 
 import Data.Maybe (Maybe(Just, Nothing), maybe) 
-import Data.Date (Date(), now) 
+import Data.Date (Date, Now, now)
 import Data.Date.Locale (Locale(), month) 
 import Data.Array (length, last, (!!))
 import Data.String.Regex (Regex, match, noFlags, regex)
-
+import Data.Function (runFn0)
 
 mainPhotosDir :: FilePath
 mainPhotosDir = "photos"
+
+mainPhotosPrintsDir :: FilePath
+mainPhotosPrintsDir = concat ["photos", "prints"]
 
 historyFolder :: FilePath
 historyFolder = "photoshistory"
@@ -48,26 +55,32 @@ workerConnI :: ConnectionInfo
 workerConnI = Sqlite3 { filename: "workerdb"
                                , memory: false }
 
-main ::  _
+main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , ex :: EXCEPTION, os :: OS, now :: Now | t350 ) Unit
 main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
-  let cname = "mycomputername"
+  --let cname = "mycomputername"
+  cname <- liftEff $ hostname
       
   ------ Move photos into photohistory folder -------------
   safeMkdir historyFolder
   safeMkdir mainPhotosDir
-  wsm <- queryOne_ queryWorkerState conn
-  ws <- maybe (throwError $ error "No Workerstate found") return wsm
+  safeMkdir mainPhotosPrintsDir
+  mws <- queryOne_ queryWorkerState conn
+  ws <- maybe (throwError $ error "No Workerstate found") return mws
   toCopy <- readdir mainPhotosDir
+  printsToCopy <- readdir mainPhotosPrintsDir
   let dirToCopyTo = case ws of (WorkerState {active}) -> mkDirForActive active
+  let printsDirToCopyTo = concat [dirToCopyTo, "prints"]
   safeMkdir dirToCopyTo
-  flip traverse toCopy (\f -> rename f (concat [dirToCopyTo, basename f]))
+  safeMkdir printsDirToCopyTo
+  flip traverse toCopy       (\f -> safeCopyFile f (concat [dirToCopyTo,       basename f]))
+  flip traverse printsToCopy (\f -> safeCopyFile f (concat [printsDirToCopyTo, basename f]))
   
   ------ Swap events ----------------------
   dateNow <- liftEff $ now
   evm <- queryActiveEvent conn dateNow 
   newActive <- case evm of
                    Nothing -> return DefaultActive
-                   (Just (PartialEvent {id: Nothing})) -> throwError $ error "No ID in active even"
+                   (Just (PartialEvent {id: Nothing})) -> throwError $ error "No ID in active event"
                    (Just (PartialEvent {id: Just i})) -> return $ EventActive i
   case ws of 
        (WorkerState {active}) -> if newActive /= active 
@@ -84,9 +97,16 @@ switchEvents dateNow conn cname old new = do
 
   ------ Handling previous event --------
   killPrograms
+
   ------ Counting photos         --------
   oldPhotos <- readdir oldPhotosFolder
-  traverse unlink oldPhotos
+  let amountOfPhotosTakenInOld = length oldPhotos - 1 -- Minus one so we don't count the "prints" directory
+
+  ------ Cleaning up main photos --------
+  photosInMain       <- map (\f -> concat [mainPhotosDir,       basename f]) <$> readdir mainPhotosDir
+  photosInMainPrints <- map (\f -> concat [mainPhotosPrintsDir, basename f]) <$> readdir mainPhotosPrintsDir
+  traverse unlink photosInMain
+  traverse unlink photosInMainPrints
 
   ------ Counting prints         --------
   printsfolders <- readdir printsdir
@@ -103,13 +123,13 @@ switchEvents dateNow conn cname old new = do
        DefaultActive -> do 
          MonthlyStatistic m <- getMonthlyStatistic cname conn monthNow
          let q = upsertMonthlyStatistic
-                   (MonthlyStatistic (m { pictures = m.pictures + length oldPhotos 
+                   (MonthlyStatistic (m { pictures = m.pictures + amountOfPhotosTakenInOld
                                         , prints = m.prints + printcount}))
          execute_ q conn 
        EventActive i -> do 
          let s = EventStatistic { computername: cname
                                 , eventId: i
-                                , pictures: length oldPhotos
+                                , pictures: amountOfPhotosTakenInOld
                                 , prints: printcount}
          let q = upsertEventStatistic s
          execute_ q conn
@@ -158,6 +178,16 @@ startPrograms = exec "logman start Prints" [] Nothing
 
 queryWorkerState :: Query WorkerState
 queryWorkerState = Query "select * from WORKERSTATE"
+
+safeCopyFile :: forall eff. FilePath -> FilePath -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit
+safeCopyFile start end = do 
+  endExists <- exists end
+  startIsFile <- stat start >>= \(Stats {isFile}) -> return $ runFn0 isFile
+  if not endExists && startIsFile then copyFile start end
+                                  else return unit
+
+copyFile :: forall eff. FilePath -> FilePath -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit
+copyFile start end = readFile start >>= writeFile end
 
 mkDirForActive :: Active -> String
 mkDirForActive DefaultActive = concat [mainPhotosDir, "default"]

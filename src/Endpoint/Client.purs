@@ -1,6 +1,6 @@
 module Endpoint.Client where
 
-import Prelude (return, show, ($), (>>>), (>>=), (<>))
+import Prelude (return, (<>), ($), (>>>), (>>=))
 
 import Control.Monad.Aff (Aff())
 import Control.Monad.Error.Class (throwError)
@@ -63,5 +63,5 @@ fileToBlob :: File -> Blob
 fileToBlob = unsafeCoerce
 
 parseOrThrow :: forall eff a. (Generic a) => String -> Aff eff a
-parseOrThrow a = 
-  either (\e -> throwError $ error $ show e) return (readJSONGeneric defaultOptions a)
+parseOrThrow s = 
+  either (\e -> throwError $ error $ "Failed to parse: " <> s) return (readJSONGeneric defaultOptions s)

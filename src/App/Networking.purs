@@ -9,7 +9,7 @@ import Database.AnyDB.Transaction
 import Data.Maybe
 import Data.Date
 import Data.Tuple
-import Data.String (joinWith, take, drop)
+import Data.String 
 import Data.Traversable
 import Data.Array (filter, elemIndex)
 import Data.Foreign
@@ -19,14 +19,15 @@ import Node.Buffer (Buffer(), BUFFER())
 import Node.FS.Aff (readdir, mkdir, writeFile, exists)
 import Node.FS (FS())
 import Node.Path (normalize, concat, basename)
+import Node.OS
 
 import Network.HTTP.Affjax 
 import Network.HTTP.Method (Method(..))
-
+ 
 import Control.Monad.Eff.Console (log, CONSOLE())
 import Control.Monad.Eff.Class
 import Control.Monad.Aff (runAff)
-import Control.Monad.Error.Class (throwError, MonadError)
+import Control.Monad.Error.Class (throwError, class MonadError)
 import Control.Monad.Eff.Exception (error, Error())
 import Control.Monad.Aff (Aff())
 import Control.Alt
@@ -45,9 +46,10 @@ networkingConnectionInfo = Sqlite3
   , memory: false }
   
 main = do
-  let cname = "mycomputername"
+  --let cname = "mycomputername"
   let baseurl = "http://localhost:8080"
   runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do
+    cname <- liftEff $ hostname
     ------ For testing purposes ----- 
     dropDB conn
     makeDB conn
@@ -105,7 +107,7 @@ main = do
     ------ Make folders for events --------------
     safeMkdir (normalize "clientprofiles")
     events :: Array PartialEvent <- query getEventsByCname [toSql cname] conn
-    eventFolders :: Array String <- (filter (\s -> take 6 s == "event_")) <$> readdir (normalize "clientprofiles")
+    eventFolders :: Array String <- filter (flip startsWith "event_") <$> readdir (normalize "clientprofiles")
     let eventIdsFromFolders = (\i -> maybe (-1) id $ safeParseInt i) <<< (drop 6) <$> eventFolders
     let missingEvents = filter (\(PartialEvent {id: Just id}) -> isNothing $ elemIndex id eventIdsFromFolders) events
     liftEff $ log $ "Making event folders for: " <> (joinWith ", " $ (\(PartialEvent {name: name}) -> name) <$> missingEvents)
@@ -130,6 +132,8 @@ main = do
    
    
     
+startsWith :: String -> String -> Boolean
+startsWith big small = take (length small) big == small
     
 data LastUpdated = LastUpdated String
                
