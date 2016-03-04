@@ -20,6 +20,7 @@ import Node.Buffer (BUFFER())
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
 import Node.OS (OS, hostname)
+import Node.Process (PROCESS)
 
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
 import App.DB (updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent, safeParseInt) 
@@ -27,6 +28,7 @@ import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(Wo
 import App.Model.Event (PartialEvent(PartialEvent)) 
 import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt) 
 import App.Exec (exec)
+import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
 
 import Data.Traversable (traverse) 
 import Data.Maybe (Maybe(Just, Nothing), maybe) 
@@ -35,6 +37,7 @@ import Data.Date.Locale (Locale(), month)
 import Data.Array (length, last, (!!))
 import Data.String.Regex (Regex, match, noFlags, regex)
 import Data.Function (runFn0)
+import Data.Either (either)
 
 mainPhotosDir :: FilePath
 mainPhotosDir = "photos"
@@ -55,10 +58,13 @@ workerConnI :: ConnectionInfo
 workerConnI = Sqlite3 { filename: "workerdb"
                                , memory: false }
 
-main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , ex :: EXCEPTION, os :: OS, now :: Now | t350 ) Unit
+main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , ex :: EXCEPTION, os :: OS, now :: Now, process :: PROCESS | t350 ) Unit
 main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
   --let cname = "mycomputername"
   cname <- liftEff $ hostname
+  fcf <- liftEff $ readConfigFile
+  photoProgramPath <- either (throwError <<< error <<< show) 
+                             (\(WorkerConfig {photoProgramPath}) -> return photoProgramPath) fcf
       
   ------ Move photos into photohistory folder -------------
   safeMkdir historyFolder

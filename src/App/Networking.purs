@@ -14,6 +14,7 @@ import Data.Traversable
 import Data.Array (filter, elemIndex)
 import Data.Foreign
 import Data.Foreign.Class
+import Data.Either
 
 import Node.Buffer (Buffer(), BUFFER())
 import Node.FS.Aff (readdir, mkdir, writeFile, exists)
@@ -39,6 +40,7 @@ import App.Model.Photobooth
 import App.Model.Event
 import App.Model.SavedFile
 import App.FS
+import App.Config
 
 networkingConnectionInfo :: ConnectionInfo
 networkingConnectionInfo = Sqlite3
@@ -47,8 +49,11 @@ networkingConnectionInfo = Sqlite3
   
 main = do
   --let cname = "mycomputername"
-  let baseurl = "http://localhost:8080"
   runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do
+    fcf <- liftEff $ readConfigFile
+    baseurl <- either (throwError <<< error <<< show) 
+                      (\(WorkerConfig {webServiceHost}) -> return webServiceHost) fcf
+    --let baseurl = "http://localhost:8080"
     cname <- liftEff $ hostname
     ------ For testing purposes ----- 
     dropDB conn
