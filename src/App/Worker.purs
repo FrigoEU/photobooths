@@ -58,7 +58,7 @@ workerConnI :: ConnectionInfo
 workerConnI = Sqlite3 { filename: "workerdb"
                                , memory: false }
 
-main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , ex :: EXCEPTION, os :: OS, now :: Now, process :: PROCESS | t350 ) Unit
+main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , err :: EXCEPTION, os :: OS, now :: Now, process :: PROCESS | t350 ) Unit
 main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
   --let cname = "mycomputername"
   cname <- liftEff $ hostname
@@ -96,7 +96,7 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   
   
 switchEvents :: forall eff. Date -> Connection -> String -> Active -> Active ->
-                Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, ex :: EXCEPTION | eff) Unit 
+                Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, err :: EXCEPTION | eff) Unit 
 switchEvents dateNow conn cname old new = do
   let oldPhotosFolder = mkDirForActive old
   let newPhotosFolder = mkDirForActive new

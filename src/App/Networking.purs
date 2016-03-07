@@ -42,11 +42,6 @@ import App.Model.SavedFile
 import App.FS
 import App.Config
 
-networkingConnectionInfo :: ConnectionInfo
-networkingConnectionInfo = Sqlite3
-  { filename: "networkingdb"
-  , memory: false }
-  
 main = do
   --let cname = "mycomputername"
   runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do

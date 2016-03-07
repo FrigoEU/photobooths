@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude 
+import Prelude (Unit, return, ($), (>>=), flip, (<<<), bind, (<$>), (<>), show, (++))
 
 import Control.Monad.Eff (Eff ())
 import Control.Monad.Eff.Exception (error, Error())
@@ -12,10 +12,10 @@ import Data.Date (Now, now)
 import Data.Array (filterM)
 import Data.StrMap (lookup)
 import Data.Tuple (Tuple(..))
-import Data.Maybe 
+import Data.Maybe (maybe)
 import Data.Traversable (traverse) 
 
-import Database.AnyDB (DB(), withConnection, Connection(), ConnectionInfo(..))
+import Database.AnyDB (DB, Connection, withConnection)
 import Node.Path (normalize, concat)
 import Node.FS (FS())
 import Node.FS.Aff (readdir, stat)
@@ -29,18 +29,13 @@ import App.DB
 port :: Int
 port = 8080
 
-connectionInfo :: ConnectionInfo
-connectionInfo = Sqlite3
-  { filename: "klikhutdb"
-  , memory: false }
-
 withServerConn :: forall a eff. (Connection -> Aff (db :: DB | eff) a) -> Aff (db :: DB | eff) a 
-withServerConn = withConnection connectionInfo
+withServerConn = withConnection mainConnectionInfo
 
 main :: forall eff. Eff (now :: Now, console :: CONSOLE, db :: DB, express :: EXPRESS, fs :: FS | eff) Unit
 main = do
   dateNow <- now
-  --runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection connectionInfo \conn -> do
+  --runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do
       --dropDB conn
       --makeDB conn
       --loadWithDummy conn dateNow

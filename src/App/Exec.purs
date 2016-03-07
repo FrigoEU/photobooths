@@ -29,7 +29,7 @@ import Node.Platform (Platform(Win32))
 -- | and any stdout and stderr from the child process are relayed back out by
 -- | pulp, which usually means they will immediately appear in the terminal).
 exec :: forall eff. String -> Array String -> Maybe (StrMap String) 
-                    -> Aff (cp :: CP.CHILD_PROCESS, ex :: EXCEPTION | eff) Unit
+                    -> Aff (cp :: CP.CHILD_PROCESS, err :: EXCEPTION | eff) Unit
 exec cmd args env = do
   child <- liftEff $ CP.spawn cmd args (def { env = env
                                             , stdio = CP.inherit })
@@ -55,8 +55,8 @@ wait child = makeAff \_ win -> do
   CP.onExit child (win <<< Right)
   CP.onError child (win <<< Left)
   
-handleErrors :: forall a eff. String -> (String -> Aff (ex :: EXCEPTION | eff) a) -> CP.Error 
-                              -> Aff (ex :: EXCEPTION | eff) a
+handleErrors :: forall a eff. String -> (String -> Aff (err :: EXCEPTION | eff) a) -> CP.Error 
+                              -> Aff (err :: EXCEPTION | eff) a
 handleErrors cmd retry err
   | err.code == "ENOENT" = do
      -- On windows, if the executable wasn't found, try adding .cmd

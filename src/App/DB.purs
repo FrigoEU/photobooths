@@ -17,7 +17,7 @@ import Data.Monoid (mempty)
 import Data.Foreign
 import Data.Foreign.Class
 
-import Database.AnyDB (Query(..), execute_, query_, DB(), queryOne_, execute, Connection(), query, queryOne)
+import Database.AnyDB 
 import Database.AnyDB.SqlValue (toSql)
 import Node.Buffer (Buffer())
 
@@ -32,6 +32,16 @@ import App.Model.StrMap
 import App.Model.NetworkingState
 import App.Model.WorkerState
 import App.DB
+
+networkingConnectionInfo :: ConnectionInfo
+networkingConnectionInfo = Sqlite3
+  { filename: "networkingdb"
+  , memory: false }
+  
+mainConnectionInfo :: ConnectionInfo
+mainConnectionInfo = Sqlite3
+  { filename: "klikhutdb"
+  , memory: false }
 
 ----- THIS FILE SHOULD NOT HAVE ANYTHING WITH "INPUT" TYPE IN IT ----------
 
