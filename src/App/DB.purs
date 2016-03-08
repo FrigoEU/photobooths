@@ -16,6 +16,7 @@ import Data.Traversable
 import Data.Monoid (mempty)
 import Data.Foreign
 import Data.Foreign.Class
+import Data.Int.Extended
 
 import Database.AnyDB 
 import Database.AnyDB.SqlValue (toSql)
@@ -273,11 +274,6 @@ queryAllStatistics conn cname = do
   eventStatistics <- query (Query "select * from eventstatistics where computername = ?") [toSql cname] conn
   monthlyStatistics <- query (Query "select * from monthlystatistics where computername = ?") [toSql cname] conn
   return $ AllStatistics {eventStatistics, monthlyStatistics}
-
-foreign import pInt :: forall a. Maybe a -> (a -> Maybe a) -> String -> Maybe Int
-
-safeParseInt :: String -> Maybe Int
-safeParseInt str = pInt Nothing Just str
 
 queryNewEvents :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array PartialEvent)
 queryNewEvents conn (Tuple cname d) = query q [toSql cname, toSql d] conn

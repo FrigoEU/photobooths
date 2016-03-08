@@ -33,7 +33,7 @@ import App.Model.Event (Event(Event))
 import App.Model.Statistic (AllStatistics(AllStatistics), MonthlyStatistic(MonthlyStatistic))
 import App.Model.SavedFile (SavedFile)
 import App.FS (safeMkdir, rmdirRecur)
-import App.Exec (exec)
+import App.Exec (simpleExec)
 
 photosDir :: String
 photosDir = normalize "photos"
@@ -75,7 +75,7 @@ main = do
   liftEff $ chdir ".."
 
   liftEff $ chdir "klikhut-slave"
-  exec "node networking.js" [] Nothing
+  simpleExec "node networking.js" [] Nothing
   liftEff $ chdir ".."
 
   liftEff $ chdir "klikhut-master"
@@ -116,7 +116,7 @@ checkStatisticsSync mainDB cname = do
 
 runWorkerAndCheckEvent :: Connection -> String -> Aff TestEffects Unit
 runWorkerAndCheckEvent workerDB cname = do
-  exec "node worker.js" [] Nothing
+  simpleExec "node worker.js" [] Nothing
   (AllStatistics {eventStatistics, monthlyStatistics}) <- queryAllStatistics workerDB cname
   liftEff $ check (length eventStatistics == 0) "No eventstatistics yet"
   (MonthlyStatistic mstat) <- maybe (throwError $ error "No monthly stat found!") return $ monthlyStatistics !! 0
@@ -148,13 +148,13 @@ addEventData workerDB cname = do
 
 runWorkerAndCheckDefault :: Aff TestEffects Unit
 runWorkerAndCheckDefault = do
-  exec "node worker.js" [] Nothing
+  simpleExec "node worker.js" [] Nothing
   activeFiles <- readdir backgroundImagesDir
   liftEff $ check (activeFiles == ["def.txt"]) "Default Profile active"
 
 runAndCheckSync :: Connection -> String -> Aff TestEffects Unit
 runAndCheckSync workerDB cname = do
-  exec "node networking.js" [] Nothing
+  simpleExec "node networking.js" [] Nothing
   pbs <- allPhotobooths workerDB
   liftEff $ check (length pbs == 1) "Photobooth syncing"
   evs <- queryEvents workerDB cname

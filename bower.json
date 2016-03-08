@@ -21,12 +21,13 @@
     "purescript-generics": "https://github.com/FrigoEU/purescript-generics.git#master",
     "purescript-maps": "0.5.4",
     "purescript-node-buffer": "#fa0acd2c0b",
-    "purescript-node-child-process": "~0.4.2",
+    "purescript-node-child-process": "~0.5.1",
     "purescript-node-fs-aff": "^0.2.1",
     "purescript-node-http": "0.2.0",
     "purescript-optic-ui": "https://github.com/FrigoEU/purescript-optic-ui.git#a73f03aaa4a574bdb1697d81670bcd45af9bca6e",
     "purescript-timers": "~1.0.0",
-    "purescript-node-process": "~0.3.0"
+    "purescript-node-process": "~0.3.0",
+    "purescript-yargs": "~0.7.2"
   },
   "devDependencies": {
     "purescript-spec": "~0.7.2"

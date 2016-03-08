@@ -1,6 +1,6 @@
 "use strict";
 
-//module App.DB
+//module Data.Int.Extended
 
 exports.pInt = function pInt(nothing){
   return function(just){

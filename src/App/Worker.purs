@@ -11,7 +11,6 @@ import Control.Monad.Eff (Eff)
 
 import Database.AnyDB (DB(), Connection(), ConnectionInfo(Sqlite3), Query(Query), execute_, queryOne_, withConnection) 
 
-
 import Node.FS (FS()) 
 import Node.FS.Aff (writeFile, readFile, stat, exists, readTextFile, readdir, unlink)
 import Node.FS.Stats (Stats(Stats))
@@ -23,11 +22,11 @@ import Node.OS (OS, hostname)
 import Node.Process (PROCESS)
 
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
-import App.DB (updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent, safeParseInt) 
+import App.DB (updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent) 
 import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState)) 
 import App.Model.Event (PartialEvent(PartialEvent)) 
 import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt) 
-import App.Exec (exec)
+import App.Exec (simpleExec)
 import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
 
 import Data.Traversable (traverse) 
@@ -38,6 +37,7 @@ import Data.Array (length, last, (!!))
 import Data.String.Regex (Regex, match, noFlags, regex)
 import Data.Function (runFn0)
 import Data.Either (either)
+import Data.Int.Extended (safeParseInt)
 
 mainPhotosDir :: FilePath
 mainPhotosDir = "photos"
@@ -53,6 +53,11 @@ targetDir = "background_images"
 
 printsdir :: FilePath
 printsdir = "prints"
+
+exename :: String
+exename = "photossoftware.exe"
+exefullpath :: String
+exefullpath = concat ["C","photosoftware", "exename"]
 
 workerConnI :: ConnectionInfo
 workerConnI = Sqlite3 { filename: "workerdb"
@@ -176,11 +181,15 @@ readPrintCount fp = do
                                 (safeParseInt n)
 
   
-killPrograms :: forall eff. Aff (cp :: CHILD_PROCESS, ex :: EXCEPTION | eff) Unit
-killPrograms = exec "logman stop Prints" [] Nothing
+killPrograms :: forall t78. Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t78 ) String
+killPrograms = do
+  simpleExec ("taskkill /F /IM " <> exename) [] Nothing
+  simpleExec "logman stop Prints" [] Nothing
 
-startPrograms :: forall eff. Aff (cp :: CHILD_PROCESS, ex :: EXCEPTION | eff) Unit
-startPrograms = exec "logman start Prints" [] Nothing
+startPrograms :: forall t88. Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t88 ) String
+startPrograms = do
+  simpleExec "logman start Prints" [] Nothing
+  simpleExec ("start " <> exefullpath) [] Nothing
 
 queryWorkerState :: Query WorkerState
 queryWorkerState = Query "select * from WORKERSTATE"

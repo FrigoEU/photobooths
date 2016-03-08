@@ -3,7 +3,7 @@ module Main where
 import Prelude (Unit, return, ($), (>>=), flip, (<<<), bind, (<$>), (<>), show, (++))
 
 import Control.Monad.Eff (Eff ())
-import Control.Monad.Eff.Exception (error, Error())
+import Control.Monad.Eff.Exception (error, Error(), EXCEPTION)
 import Control.Monad.Eff.Console (log, CONSOLE())
 import Control.Monad.Aff (Aff())
 import Control.Monad.Error.Class (throwError, class MonadError)
@@ -12,28 +12,38 @@ import Data.Date (Now, now)
 import Data.Array (filterM)
 import Data.StrMap (lookup)
 import Data.Tuple (Tuple(..))
-import Data.Maybe (maybe)
+import Data.Maybe (Maybe(Just), maybe)
 import Data.Traversable (traverse) 
+import Data.Either (Either(Left))
+import Data.Int (ceil)
+import Data.Int.Extended
 
 import Database.AnyDB (DB, Connection, withConnection)
 import Node.Path (normalize, concat)
 import Node.FS (FS())
 import Node.FS.Aff (readdir, stat)
 import Node.FS.Stats (isDirectory)
+import Node.Yargs.Setup (YargsSetup, example, usage)
+import Node.Yargs.Applicative (yarg, runY)
 
 import Server.Core 
 
 import App.Endpoint
 import App.DB
 
-port :: Int
-port = 8080
-
 withServerConn :: forall a eff. (Connection -> Aff (db :: DB | eff) a) -> Aff (db :: DB | eff) a 
 withServerConn = withConnection mainConnectionInfo
 
-main :: forall eff. Eff (now :: Now, console :: CONSOLE, db :: DB, express :: EXPRESS, fs :: FS | eff) Unit
-main = do
+setup :: YargsSetup
+setup = usage "$0 -p port" 
+        <> example "$0 -p 8080" "Run photobooth server!"
+
+main :: forall t346. Eff ( err :: EXCEPTION , console :: CONSOLE , now :: Now , db :: DB , express :: EXPRESS , fs :: FS | t346 ) Unit
+main = runY setup $ server <$> yarg "p" ["port"] (Just "Port") (Left 8080.0) false
+
+server :: forall eff. Number -> Eff ( now :: Now , console :: CONSOLE , db :: DB , express :: EXPRESS , fs :: FS | eff ) Unit
+server p = do
+  let port = ceil p
   dateNow <- now
   --runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do
       --dropDB conn

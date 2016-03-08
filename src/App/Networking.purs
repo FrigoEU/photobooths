@@ -10,11 +10,13 @@ import Data.Maybe
 import Data.Date
 import Data.Tuple
 import Data.String 
+import Data.String.Extended
 import Data.Traversable
 import Data.Array (filter, elemIndex)
 import Data.Foreign
 import Data.Foreign.Class
 import Data.Either
+import Data.Int.Extended
 
 import Node.Buffer (Buffer(), BUFFER())
 import Node.FS.Aff (readdir, mkdir, writeFile, exists)
@@ -131,9 +133,6 @@ main = do
    
    
    
-    
-startsWith :: String -> String -> Boolean
-startsWith big small = take (length small) big == small
     
 data LastUpdated = LastUpdated String
                
