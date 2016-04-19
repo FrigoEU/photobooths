@@ -35,6 +35,24 @@ import App.Model.SavedFile (SavedFile)
 import App.FS (safeMkdir, rmdirRecur)
 import App.Exec (simpleExec)
 
+---------------------------------------------------------------------
+-- How to:
+-- Build:
+-- npm run build
+-- npm run compile:networking -> netw.js
+-- npm run compile:worker -> work.js
+-- npm run compile:workertest -> worktest.js
+----------
+-- Put worktest.js into the base test folder
+-- This test folder should have two subfolders:
+-- * klikhut-master
+-- * klikhut-slave
+--     This one should have work.js and netw.js scripts that you want to test
+-- Run this script: "node worktest.js"
+-- Check if every log says "OK"
+----------------------------------------------------------------------
+
+
 photosDir :: String
 photosDir = normalize "photos"
 printsDir :: String
@@ -75,7 +93,7 @@ main = do
   liftEff $ chdir ".."
 
   liftEff $ chdir "klikhut-slave"
-  simpleExec "node networking.js" [] Nothing
+  simpleExec "node netw.js" [] Nothing
   liftEff $ chdir ".."
 
   liftEff $ chdir "klikhut-master"
@@ -116,7 +134,7 @@ checkStatisticsSync mainDB cname = do
 
 runWorkerAndCheckEvent :: Connection -> String -> Aff TestEffects Unit
 runWorkerAndCheckEvent workerDB cname = do
-  simpleExec "node worker.js" [] Nothing
+  simpleExec "node work.js" [] Nothing
   (AllStatistics {eventStatistics, monthlyStatistics}) <- queryAllStatistics workerDB cname
   liftEff $ check (length eventStatistics == 0) "No eventstatistics yet"
   (MonthlyStatistic mstat) <- maybe (throwError $ error "No monthly stat found!") return $ monthlyStatistics !! 0
@@ -148,13 +166,13 @@ addEventData workerDB cname = do
 
 runWorkerAndCheckDefault :: Aff TestEffects Unit
 runWorkerAndCheckDefault = do
-  simpleExec "node worker.js" [] Nothing
+  simpleExec "node work.js" [] Nothing
   activeFiles <- readdir backgroundImagesDir
   liftEff $ check (activeFiles == ["def.txt"]) "Default Profile active"
 
 runAndCheckSync :: Connection -> String -> Aff TestEffects Unit
 runAndCheckSync workerDB cname = do
-  simpleExec "node networking.js" [] Nothing
+  simpleExec "node netw.js" [] Nothing
   pbs <- allPhotobooths workerDB
   liftEff $ check (length pbs == 1) "Photobooth syncing"
   evs <- queryEvents workerDB cname
