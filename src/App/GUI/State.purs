@@ -1,25 +1,20 @@
 module App.GUI.State where
 
-import Prelude
-
-import Control.Monad.Eff (Eff())
-import Control.Monad.Eff.Ref (REF())
-
-import DOM (DOM())
-import DOM.File.Types (File())
-import Network.HTTP.Affjax (AJAX())
-
-import Data.Lens (lens, Lens(), LensP())
-import Data.Maybe(Maybe(..))
-import Data.Date (Date(), now, Now())
-import Data.Generic (class Generic)
-
-import App.Model.Async
-import App.Model.Photobooth as PB
+import App.Model.Async (AsyncModel, AsyncModel(Initial))
 import App.Model.Event as E
-import App.Model.Profile
-import App.Model.SavedFile
-import App.Model.Statistic
+import App.Model.Photobooth as PB
+import App.Model.Profile (Profiles)
+import App.Model.SavedFile (SavedFile)
+import App.Model.Session (Session)
+import App.Model.Statistic (AllStatistics)
+import Control.Monad.Eff (Eff)
+import DOM.File.Types (File)
+import Data.Date (Date, now, Now)
+import Data.Generic (class Generic)
+import Data.Lens (lens, Lens, LensP)
+import Data.Maybe (Maybe(..))
+import Data.Profunctor.Strong (class Strong)
+import Prelude (Unit, return, bind)
 
 -------------------------------------------
 
@@ -27,8 +22,12 @@ initialState :: Route -> forall eff. Eff (now :: Now | eff) (State (now :: Now |
 initialState initRoute = do
   dateNow <- now
   return { route: initRoute
+  , session: Nothing
   , photobooths: Initial
   , profiles: Initial
+  , loginPage: { username: ""
+               , password: ""
+               , loggingIn: Initial }
   , statisticsPage: { events: Initial
                     , statistics: Initial }
   , eventsPage: 
@@ -48,8 +47,12 @@ initialState initRoute = do
     , deleting: Nothing}}
 
 type State eff = { route :: Route
+                 , session :: Maybe Session
                  , photobooths :: AsyncModel eff (Array PB.Photobooth)
                  , profiles :: AsyncModel eff Profiles
+                 , loginPage :: { username :: String
+                                , password :: String
+                                , loggingIn :: AsyncModel eff Session }
                  , statisticsPage :: { events :: AsyncModel eff (Array E.Event)
                                      , statistics :: AsyncModel eff AllStatistics }
                  , eventsPage :: 
@@ -72,7 +75,8 @@ type EventWithState eff = {model :: E.Event, state :: {savingFile :: AsyncModel 
 
 ------ ROUTES --------------------------
 
-data Route = PhotoboothsPage
+data Route = LoginPage
+           | PhotoboothsPage
            | EventsPage String String Int
            | StatisticsPage String String
 
@@ -83,9 +87,11 @@ derive instance genericRoute :: Generic Route
 _collection :: forall a b o. Lens {collection :: a | o} {collection :: b | o} a b
 _collection = lens _.collection (_ {collection = _})
 
+_collectionEditing :: forall p t449 t450 t451 t452 t453 t454. (Strong p) => p { collection :: t453 , editing :: t454 } { editing :: t451 , collection :: t450 | t449 } -> p { editing :: t454 , collection :: t453 | t452 } { collection :: t450 , editing :: t451 | t452 }
 _collectionEditing = lens (\{collection: a, editing: b} -> {collection: a, editing: b})
                            (\old {collection: a, editing: b} -> old {collection = a, editing = b})
 
+_collectionEditingD :: forall p t429 t430 t431 t432 t433 t434 t435 t436. (Strong p) => p { collection :: t434 , editing :: t435 , deleting :: t436 } { deleting :: t432 , editing :: t431 , collection :: t430 | t429 } -> p { deleting :: t436 , editing :: t435 , collection :: t434 | t433 } { collection :: t430 , editing :: t431 , deleting :: t432 | t433 }
 _collectionEditingD = lens (\{collection: a, editing: b, deleting: c} -> {collection: a, editing: b, deleting: c})
                             (\old {collection: a, editing: b, deleting: c} -> old {collection = a, editing = b, deleting = c})
 
@@ -94,6 +100,15 @@ _new = lens _.new (_ {new = _})
 
 _model :: forall a b o. Lens {model :: a | o} {model :: b | o} a b
 _model = lens _.model (_ {model = _})
+
+_username :: forall a b o. Lens {username :: a | o} {username :: b | o} a b
+_username = lens _.username (_ {username = _})
+
+_password :: forall a b o. Lens {password :: a | o} {password :: b | o} a b
+_password = lens _.password (_ {password = _})
+
+_loggingIn :: forall a b o. Lens {loggingIn :: a | o} {loggingIn :: b | o} a b
+_loggingIn = lens _.loggingIn (_ {loggingIn = _})
 
 _state :: forall a b o. Lens {state :: a | o} {state :: b | o} a b
 _state = lens _.state (_ {state = _})
@@ -116,6 +131,19 @@ _saving = lens _.saving (_ {saving = _})
 _route :: forall a b o. Lens {route :: a | o} {route :: b | o} a b
 _route = lens _.route (_ {route = _})
 
+_loginPage :: forall a b c d o. LensP {session :: a, loginPage :: {username :: b, password :: c, loggingIn :: d} | o}
+                                 {session :: a, username :: b, password :: c, loggingIn :: d}
+_loginPage = lens (\obj -> { session: obj.session
+                           , username: obj.loginPage.username
+                           , password: obj.loginPage.password
+                           , loggingIn: obj.loginPage.loggingIn
+                           })
+                  (\old obj ->
+                      old { session = obj.session
+                          , loginPage = {username: obj.username, password: obj.password, loggingIn: obj.loggingIn}
+                          })
+
+
 _pbPage :: forall a b c d e o. LensP {photobooths :: a, profiles :: e, photoboothsPage :: {new :: b, editing :: c, deleting :: d} | o}
                                 {collection :: a, profiles :: e, new :: b, editing :: c, deleting :: d}
 _pbPage = lens (\obj -> {collection: obj.photobooths
@@ -129,6 +157,10 @@ _pbPage = lens (\obj -> {collection: obj.photobooths
                        , profiles = obj.profiles
                        , photoboothsPage = {new: obj.new, editing: obj.editing, deleting: obj.deleting}
                        })
+
+_session :: forall a b o. Lens {session :: a | o} {session :: b | o} a b
+_session = lens _.session (_ {session = _})
+
 
 _eventsPage :: forall a b c d e o. LensP {profiles :: e, eventsPage :: {events :: a, new :: b, editing :: c, deleting :: d} | o}
                                 {collection :: a, profiles :: e, new :: b, editing :: c, deleting :: d}

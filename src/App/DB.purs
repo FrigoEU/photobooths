@@ -1,38 +1,35 @@
 module App.DB where
   
-import Prelude
-
+import Prelude (Unit, return, ($), bind, (<<<), (>>=), (<>), (>>>), unit, show, map, (<$>), (==), negate, (>), (*))
+import Database.AnyDB (DB, Connection, ConnectionInfo(Sqlite3), Query(Query), queryOne_, execute, queryOne, execute_, query, query_)
+import SQL (selectLastInserted, insert, selectStar, selectStarId, update, createTable, updatedonUpdateTrigger, updatedonInsertTrigger, dropTable)
+import App.Model.Statistic (AllStatistics(AllStatistics), EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthlyStatisticsTable, eventStatisticsTable, createMonthlyStatisticsTable, createEventStatisticsTable)
+import App.DB (MyFile(MyFile), unpack, upsertEventStatistic, upsertMonthlyStatistic, selectFilesForEvent, insertEvent, insertPB, selectFilesForEvents, addFilesToEvents, myuser, newUser, mymonthlystatistic, myeventstatistic, myevent, yourbooth, mybooth)
+import App.Model.Date (toISOString)
+import App.Model.Event (Event(Event), PartialEvent(PartialEvent), mkEvent, eventsTable)
+import App.Model.NetworkingState (createNetworkingStateTable, networkingStateTable)
+import App.Model.Photobooth (Photobooth(Photobooth), photoboothsTable)
+import App.Model.SavedFile (SavedFile(SavedFile), savedFileTable)
+import App.Model.Session (Session, sessionsTable)
+import App.Model.StrMap (fromArray)
+import App.Model.User (User(User), usersTable)
+import App.Model.WorkerState (WorkerState(WorkerState), createWorkerStateTable, workerStateTable)
+import Control.Apply ((*>))
+import Control.Monad.Aff (Aff)
+import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Exception (error)
 import Control.Monad.Error.Class (throwError)
-import Control.Monad.Aff (Aff())
-import Control.Apply ((*>))
-
-import Data.Date (Date())
 import Data.Array (replicate, filter, length)
-import Data.String (joinWith)
-import Data.Tuple (Tuple(..))
-import Data.Maybe
-import Data.Traversable
+import Data.Date (Now, Date, now)
+import Data.Foreign (unsafeFromForeign)
+import Data.Foreign.Class (class IsForeign, readProp)
+import Data.Maybe (Maybe(Just, Nothing), maybe, fromMaybe)
 import Data.Monoid (mempty)
-import Data.Foreign
-import Data.Foreign.Class
-import Data.Int.Extended
-
-import Database.AnyDB 
+import Data.String (joinWith)
+import Data.Traversable (traverse)
+import Data.Tuple (Tuple(..))
 import Database.AnyDB.SqlValue (toSql)
-import Node.Buffer (Buffer())
-
-import SQL
-
-import App.Model.Photobooth
-import App.Model.Event
-import App.Model.SavedFile
-import App.Model.Statistic
-import App.Model.Date
-import App.Model.StrMap
-import App.Model.NetworkingState
-import App.Model.WorkerState
-import App.DB
+import Node.Buffer (Buffer)
 
 networkingConnectionInfo :: ConnectionInfo
 networkingConnectionInfo = Sqlite3
@@ -55,6 +52,8 @@ dropDB conn = do
   execute_ (dropTable monthlyStatisticsTable) conn
   execute_ (dropTable networkingStateTable) conn
   execute_ (dropTable workerStateTable) conn
+  execute_ (dropTable usersTable) conn
+  execute_ (dropTable sessionsTable) conn
 
 makeDB :: forall eff. Connection -> Aff (db :: DB | eff) Unit
 makeDB conn = do
@@ -75,6 +74,8 @@ makeDB conn = do
   execute_ (updatedonUpdateTrigger monthlyStatisticsTable ["computername", "month"]) conn
   execute_ createNetworkingStateTable conn
   execute_ createWorkerStateTable conn
+  execute_ (createTable usersTable) conn
+  execute_ (createTable sessionsTable) conn
   
 loadWithDummy :: forall eff. Connection -> Date -> Aff (db :: DB | eff) Unit
 loadWithDummy conn dateNow = do
@@ -83,6 +84,7 @@ loadWithDummy conn dateNow = do
   execute_ (insertEvent (myevent dateNow)) conn
   execute_ (upsertEventStatistic myeventstatistic) conn
   execute_ (upsertMonthlyStatistic mymonthlystatistic) conn
+  execute_ (newUser myuser) conn
   
 mybooth :: Photobooth
 mybooth = Photobooth { id: Nothing
@@ -103,6 +105,11 @@ myevent d = Event { id: Nothing
                   , dateuntil: d
                   , profile: "myprofile"
                   , files: []}
+
+myuser :: User
+myuser = User { id: 1
+              , name: "admin"
+              , password: "test"}
 
 myeventstatistic :: EventStatistic
 myeventstatistic = EventStatistic { eventId: 1
@@ -175,12 +182,18 @@ newEvent conn ev = do
          Just pe@(PartialEvent {id: Nothing}) -> return $ mkEvent pe []
          Just pe@(PartialEvent {id: Just i}) -> selectFilesForEvent i conn >>= \ims -> return $ mkEvent pe ims
 
+newUser :: User -> Query Unit
+newUser (User u) = insert usersTable (fromArray [ Tuple "id" $ show u.id
+                                                , Tuple "name" u.name
+                                                , Tuple "password" u.password]) false ""
+
+
 insertEvent :: Event -> Query Unit
 insertEvent (Event e) = insert eventsTable
                         (fromArray [ Tuple "computername" e.computername
                                    , Tuple "name" e.name
-                                   , Tuple "datefrom" $ iso8601 e.datefrom
-                                   , Tuple "dateuntil" $ iso8601 e.dateuntil
+                                   , Tuple "datefrom" $ toISOString e.datefrom
+                                   , Tuple "dateuntil" $ toISOString e.dateuntil
                                    , Tuple "profile" $ e.profile
                                    ]) false ""
                                    
@@ -189,8 +202,8 @@ upsertPartialEvent (PartialEvent e) = insert eventsTable
                         (fromArray [ maybe mempty (\s -> Tuple "id" $ show s) e.id
                                    , Tuple "computername" e.computername
                                    , Tuple "name" e.name
-                                   , Tuple "datefrom" $ iso8601 e.datefrom
-                                   , Tuple "dateuntil" $ iso8601 e.dateuntil
+                                   , Tuple "datefrom" $ toISOString e.datefrom
+                                   , Tuple "dateuntil" $ toISOString e.dateuntil
                                    , Tuple "profile" $ e.profile
                                    ]) true ""
 
@@ -216,8 +229,8 @@ updateEvent _    (Event    {id: Nothing}) =
 updateEvent conn (Event e@{id: Just i}) =
   let query = update eventsTable i (fromArray [ Tuple "computername" e.computername
                                               , Tuple "name" e.name
-                                              , Tuple "datefrom" $ iso8601 e.datefrom
-                                              , Tuple "dateuntil" $ iso8601 e.dateuntil
+                                              , Tuple "datefrom" $ toISOString e.datefrom
+                                              , Tuple "dateuntil" $ toISOString e.dateuntil
                                               , Tuple "profile" e.profile
                                               ]) ""
    in do
@@ -237,9 +250,9 @@ upsertSavedFile (SavedFile sf) = insert savedFileTable
 
 saveFileToDb :: forall eff. Connection -> Tuple Int String -> Buffer 
                             -> Aff (db :: DB | eff) SavedFile
-saveFileToDb conn (Tuple eventId name) buff = do
+saveFileToDb conn (Tuple eventId name) buffer = do
   let query = Query $ "INSERT INTO " <> savedFileTable.name <> " (name, eventid, File) VALUES (?, ?, ?)"
-  execute query [toSql name, toSql eventId, toSql buff] conn
+  execute query [toSql name, toSql eventId, toSql buffer] conn
   res <- queryOne_ (selectLastInserted savedFileTable) conn
   maybe (throwError $ error $ "Failed to save File") return res
 
@@ -305,19 +318,19 @@ addStatistics c (AllStatistics {eventStatistics, monthlyStatistics}) = do
   _ <- traverse (\s -> execute_ (upsertEventStatistic s) c) eventStatistics
   return unit
   
-newtype BufferForHttp = BufferForHttp Buffer
+newtype MyFile = MyFile Buffer
 
-instance foreignBufferForHttp :: IsForeign BufferForHttp where 
+instance foreignMyFile :: IsForeign MyFile where 
   read obj = do
     file <- readProp "file" obj
-    return $ BufferForHttp $ unsafeFromForeign file
+    return $ MyFile $ unsafeFromForeign file
         
-unpack :: BufferForHttp -> Buffer
-unpack (BufferForHttp b) = b
+unpack :: MyFile -> Buffer
+unpack (MyFile b) = b
   
 getFileById :: forall eff. Connection -> Int -> Aff (db :: DB | eff) Buffer
 getFileById conn id =
-  let q = (Query "select file from files where id = ?" :: Query BufferForHttp)
+  let q = (Query "select file from files where id = ?" :: Query MyFile)
    in queryOne q [toSql id] conn >>= \mf -> maybe (throwError $ error $ "No file found") (unpack >>> return) mf
 
 updateWorkerState :: forall eff. Connection -> WorkerState -> Aff (db :: DB | eff) Unit 
@@ -330,7 +343,7 @@ queryActiveEvent c d =
   let q = Query $ "select * from EVENTS where " 
                <> "datefrom < '2015-12-13T10:27:04.038Z' " 
                <> "and dateuntil > '2015-12-13T10:27:04.038Z' "
-   in queryOne q [toSql $ iso8601 d] c
+   in queryOne q [toSql $ toISOString d] c
 
 getMonthlyStatistic :: forall e. String -> Connection -> Int -> Aff (db :: DB | e) MonthlyStatistic 
 getMonthlyStatistic cname c m = 
@@ -341,3 +354,15 @@ getMonthlyStatistic cname c m =
                                         , prints: 0}
       handle (Just i) = i
    in queryOne q [toSql m] c >>= (return <<< handle)
+
+tryLogin :: forall e. Connection -> String -> String -> Aff (db :: DB, now :: Now | e) Session
+tryLogin conn username password = 
+  let userQ = Query "select * from users WHERE name = ? AND password = ?"
+      q     = Query "insert into SESSIONS (userId, createdOn) VALUES (?, ?)"
+   in do 
+     userQueryRes <- (queryOne userQ [toSql username, toSql password] conn)
+     (User u) <- maybe (throwError $ error $ "Username or PW not found") return userQueryRes
+     d <- liftEff $ now
+     execute q [toSql u.id, toSql $ toISOString d] conn
+     res <- queryOne_ (selectLastInserted sessionsTable) conn
+     maybe (throwError $ error $ "Failed to make new session") return res

@@ -18,7 +18,10 @@ import Data.Generic (class Generic)
 import Data.Serializable (class Serializable, deserialize)
 import Data.Maybe (Maybe(Nothing, Just), maybe)
 
-import Network.HTTP.Method (Method(..))
+import DOM.File.Types (Blob())
+import Unsafe.Coerce (unsafeCoerce)
+
+import Data.HTTP.Method (Method(..))
 
 import Node.Buffer (Buffer())
 
@@ -54,6 +57,9 @@ type Input a = { url :: String
                , headers :: StrMap String
                }
 
+mapBody :: forall a b. (a -> b) -> Input a -> Input b
+mapBody f (i@{body}) = i {body = f body}
+
 hostEndpoint :: forall a b c eff. (Serializable a, Generic b, Generic c) =>
                   App -> Endpoint a b c -> Handler (express :: EXPRESS, console :: CONSOLE | eff) a b c
                   -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
@@ -75,7 +81,8 @@ hostEndpoint app (Endpoint {method, url}) h =
                                  h qp body)
 
 hostFileUploadEndpoint :: forall eff a b. (Serializable a, Generic b) =>
-                      App -> FileUploadEndpoint a b 
+                      App 
+                      -> FileUploadEndpoint a b 
                       -> Handler (express :: EXPRESS, console :: CONSOLE | eff) a Buffer b
                       -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
 hostFileUploadEndpoint app (FileUploadEndpoint {url}) h = post app url bufferParser handler
@@ -83,9 +90,11 @@ hostFileUploadEndpoint app (FileUploadEndpoint {url}) h = post app url bufferPar
                                      log $ "Failed hostFileUploadEndpoint on " <> url <> message err
                                      sendStr res $ message err)
                                  (\a -> sendStr res $ toJSONGeneric defaultOptions a) 
-                                 (let i = convertBuffer req
-                                   in parseQueryParams i >>= \qp -> h qp i)
+                                 (let i = convertBlob req
+                                   in parseQueryParams i >>= \qp -> h qp (mapBody blobToBuffer i))
 
+blobToBuffer :: Blob -> Buffer
+blobToBuffer = unsafeCoerce
 
 parseBody :: forall a m. (Generic a, MonadError Error m) => Input String -> m (Input a)
 parseBody a = either (\err -> throwError $ error $ show err)
@@ -104,7 +113,9 @@ parseQueryParams {url} = either throwError
                                        (getParams url))
 
 hostFile :: forall eff. 
-              App -> String -> (Input Unit -> Aff (express :: EXPRESS, console :: CONSOLE | eff) Buffer) 
+              App 
+              -> String 
+              -> (Input Unit -> Aff (express :: EXPRESS, console :: CONSOLE | eff) Buffer) 
               -> Eff (express :: EXPRESS, console :: CONSOLE | eff) Unit
 hostFile app url f = get app url noParser handler
   where 
@@ -118,12 +129,12 @@ convert :: Request -> Input String
 convert = mkConvert {url: _, body: _, params: _, path: _, query: _, headers: _}
                     (toJSONGeneric defaultOptions unit)
 
-convertBuffer :: Request -> Input Buffer
-convertBuffer = mkBufferConvert {url: _, body: _, params: _, path: _, query: _, headers: _}
+convertBlob :: Request -> Input Blob
+convertBlob = mkBufferConvert {url: _, body: _, params: _, path: _, query: _, headers: _}
 
 foreign import mkConvert :: 
   forall a. (String -> a -> StrMap String -> String -> StrMap String -> StrMap String -> Input a) 
             -> String -> Request -> Input a
 foreign import mkBufferConvert :: 
-  (String -> Buffer -> StrMap String -> String -> StrMap String -> StrMap String -> Input Buffer) 
-            -> Request -> Input Buffer
+  (String -> Blob -> StrMap String -> String -> StrMap String -> StrMap String -> Input Blob) 
+            -> Request -> Input Blob

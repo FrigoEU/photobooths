@@ -1,17 +1,15 @@
 module Data.Serializable where
 
-import Prelude (Unit, (<$>), (<>), ($), unit, (==), return, bind, id, (<<<))
-
-import Control.Monad.Eff.Exception (Error, error)
-
-import Data.Maybe (Maybe(Nothing, Just), maybe)
-import Data.Either (Either(Right, Left))
+import Prelude
+import App.Model.Date (toISOString)
+import Control.Monad.Eff.Exception (error, Error)
+import Data.Date (fromStringStrict, Date)
 import Data.Date (Date, fromStringStrict)
-import Data.Tuple (Tuple(Tuple))
+import Data.Either (Either(Right, Left))
+import Data.Maybe (maybe, Maybe(Nothing, Just))
 import Data.String (split, joinWith)
 import Data.Traversable (traverse)
-
-import App.Model.Date (iso8601)
+import Data.Tuple (Tuple(Tuple))
 
 class Serializable a where
   serialize :: a -> String
@@ -52,7 +50,7 @@ instance serializableBoolean :: Serializable Boolean where
                         (parseBool a)
 
 instance serializableDate :: Serializable Date where
-  serialize = iso8601
+  serialize = toISOString
   deserialize a = maybe (Left $ error $ "Unable to deserialize " <> a <> " to Date") 
                         Right 
                         (fromStringStrict a)

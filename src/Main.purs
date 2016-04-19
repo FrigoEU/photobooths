@@ -1,35 +1,33 @@
 module Main where
 
-import Prelude (Unit, return, ($), (>>=), flip, (<<<), bind, (<$>), (<>), show, (++))
-
-import Control.Monad.Eff (Eff ())
-import Control.Monad.Eff.Exception (error, Error(), EXCEPTION)
-import Control.Monad.Eff.Console (log, CONSOLE())
-import Control.Monad.Aff (Aff())
+import App.DB (mainConnectionInfo, getFileById, saveFileToDb, tryLogin, addStatistics, queryNewFiles, queryAllStatistics, queryNewEvents, queryEventsByIds, queryEventsPaged, updateEvent, newEvent, queryEvents, deletePB, updatePB, newPB, allPhotobooths, queryPhotobooth)
+import App.Endpoint (attachFile, login, getProfileFiles, postStatistics, getNewFiles, getStatistics, getProfiles, getNewEvents, getEventsByIds, getEventsPaged, putEvents, postEvents, getEvents, deletePhotobooth, putPhotobooths, postPhotobooths, getPhotobooths, getPhotobooth)
+import Control.Monad.Aff (Aff)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (log, CONSOLE)
+import Control.Monad.Eff.Exception (error, Error, EXCEPTION)
 import Control.Monad.Error.Class (throwError, class MonadError)
-
-import Data.Date (Now, now)
+import DOM.File.Types (Blob)
 import Data.Array (filterM)
-import Data.StrMap (lookup)
-import Data.Tuple (Tuple(..))
-import Data.Maybe (Maybe(Just), maybe)
-import Data.Traversable (traverse) 
+import Data.Date (Now, now)
 import Data.Either (Either(Left))
 import Data.Int (ceil)
-import Data.Int.Extended
-
+import Data.Int.Extended (safeParseInt)
+import Data.Maybe (Maybe(Just), maybe)
+import Data.StrMap (lookup)
+import Data.Traversable (traverse)
+import Data.Tuple (Tuple(..))
 import Database.AnyDB (DB, Connection, withConnection)
-import Node.Path (normalize, concat)
-import Node.FS (FS())
+import Node.Buffer (Buffer)
+import Node.FS (FS)
 import Node.FS.Aff (readdir, stat)
 import Node.FS.Stats (isDirectory)
-import Node.Yargs.Setup (YargsSetup, example, usage)
+import Node.Path (normalize, concat)
 import Node.Yargs.Applicative (yarg, runY)
-
-import Server.Core 
-
-import App.Endpoint
-import App.DB
+import Node.Yargs.Setup (YargsSetup, example, usage)
+import Prelude (Unit, return, ($), (>>=), flip, (<<<), bind, (<$>), (<>), show, (++))
+import Server.Core (Input, EXPRESS, listen, hostStatic, hostFile, hostFileUploadEndpoint, hostEndpoint, makeApp)
+import Unsafe.Coerce (unsafeCoerce)
 
 withServerConn :: forall a eff. (Connection -> Aff (db :: DB | eff) a) -> Aff (db :: DB | eff) a 
 withServerConn = withConnection mainConnectionInfo
@@ -67,6 +65,8 @@ server p = do
   hostEndpoint app getNewFiles     \ qp _     -> withServerConn \conn -> queryNewFiles conn qp
   hostEndpoint app postStatistics  \ _ {body} -> withServerConn \c -> addStatistics c body
   hostEndpoint app getProfileFiles \ qp _     -> findProfileFiles qp
+  hostEndpoint app login \_ {body:(Tuple u p)}-> withServerConn \c -> tryLogin c u p 
+
   hostFileUploadEndpoint app attachFile \qp {body} -> withServerConn \c -> saveFileToDb c qp body
   hostFile app "/api/files/:id" $ readParams1 "GetFile" "id" 
                                     \stri -> safeParseIntE "GetFile" stri >>= 
@@ -76,6 +76,10 @@ server p = do
   hostStatic app "profiles"
   listen app port
   log $ "Starting server on " ++ show port
+
+------- Conversions -----------------------------
+blobToBuffer :: Blob -> Buffer
+blobToBuffer = unsafeCoerce
 
 ------- Query Param helpers ---------------------
 readParams1 :: forall a m. (MonadError Error m) => String -> String -> (String -> m a) -> 

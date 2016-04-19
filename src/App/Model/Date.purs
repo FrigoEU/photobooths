@@ -1,9 +1,9 @@
 module App.Model.Date where
 
-import Data.Date (Date())
-import Data.Maybe
+import Data.Date (Date)
+import Data.Maybe (Maybe(Just, Nothing))
 
-foreign import iso8601 :: Date -> String
+foreign import toISOString :: Date -> String
 foreign import toLocalDatetime :: Date -> String
 foreign import fromLocalDatetimeImpl :: forall a. Maybe a -> (a -> Maybe a) -> String -> Maybe Date
 

@@ -2,7 +2,7 @@ module App.Endpoint (module Endpoint.Client, module App.Endpoint) where
 
 import Prelude (Unit)
 
-import Network.HTTP.Method (Method(..))
+import Data.HTTP.Method (Method(..))
 
 import Data.Tuple (Tuple(..))
 import Data.Date(Date())
@@ -12,7 +12,8 @@ import App.Model.Photobooth as PB
 import App.Model.Event as E
 import App.Model.SavedFile as SI
 import App.Model.Statistic as S
-import App.Model.Date (fromLocalDatetime, fromLocalDatetimeImpl, iso8601, toLocalDatetime)
+import App.Model.Date (fromLocalDatetime, fromLocalDatetimeImpl, toLocalDatetime)
+import App.Model.Session
 
 import Endpoint.Client (Endpoint(Endpoint), FileUploadEndpoint(FileUploadEndpoint), execEndpoint, execEndpoint_, execFileUploadEndpoint, fileToBlob, parseOrThrow)
 
@@ -74,3 +75,7 @@ getProfiles = Endpoint { method: GET, url: "/api/profiles/all"}
 
 getProfileFiles :: Endpoint (Tuple String String) Unit (Array String)
 getProfileFiles = Endpoint {method: GET, url: "/api/profiles/files" }
+
+------- Security ------------------------
+login :: Endpoint Unit (Tuple String String) Session
+login = Endpoint {method: POST, url: "/api/login"}

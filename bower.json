@@ -11,35 +11,33 @@
     "output"
   ],
   "dependencies": {
-    "purescript-affjax": "https://github.com/FrigoEU/purescript-affjax.git#master",
-    "purescript-any-db": "https://github.com/FrigoEU/purescript-any-db.git",
-    "purescript-console": "^0.1.0",
-    "purescript-datetime": "https://github.com/FrigoEU/purescript-datetime.git#master",
-    "purescript-express": "#cb88bb2b8b",
-    "purescript-foreign": "0.7.2",
-    "purescript-foreign-generic": "^0.2.0",
+    "purescript-affjax": "*",
+    "purescript-any-db": "epost/purescript-any-db",
+    "purescript-console": "*",
+    "purescript-datetime": "wereHamster/purescript-datetime#derive-generic",
+    "purescript-foreign": "*",
+    "purescript-foreign-generic": "*",
     "purescript-generics": "https://github.com/FrigoEU/purescript-generics.git#master",
-    "purescript-maps": "0.5.4",
-    "purescript-node-buffer": "#fa0acd2c0b",
-    "purescript-node-child-process": "~0.5.1",
-    "purescript-node-fs-aff": "^0.2.1",
-    "purescript-node-http": "0.2.0",
+    "purescript-maps": "*",
+    "purescript-node-buffer": "*",
+    "purescript-node-child-process": "*",
+    "purescript-node-fs-aff": "*",
+    "purescript-node-http": "*",
     "purescript-optic-ui": "https://github.com/FrigoEU/purescript-optic-ui.git#a73f03aaa4a574bdb1697d81670bcd45af9bca6e",
-    "purescript-timers": "~1.0.0",
-    "purescript-node-process": "~0.3.0",
-    "purescript-yargs": "~0.7.2"
+    "purescript-timers": "*",
+    "purescript-node-process": "*",
+    "purescript-yargs": "*",
+    "purescript-dom": "0.2.20"
   },
   "devDependencies": {
     "purescript-spec": "~0.7.2"
   },
   "resolutions": {
-    "purescript-maps": "~0.5.2",
-    "purescript-generics": "#2acf50dfbf",
-    "purescript-datetime": "https://github.com/FrigoEU/purescript-datetime.git#master",
-    "purescript-aff": "^0.13.0",
-    "purescript-node-buffer": "#fa0acd2c0b",
-    "purescript-transformers": "~0.8.1",
-    "purescript-node-streams": "0.3.0",
-    "purescript-node-http": "0.2.0"
+    "purescript-generics": "master",
+    "purescript-node-streams": "~0.4.0",
+    "purescript-node-fs": "~0.11.0",
+    "purescript-aff": "0.16.1",
+    "purescript-options": "^0.6.0",
+    "purescript-datetime": "derive-generic"
   }
 }

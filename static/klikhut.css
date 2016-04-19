@@ -86,3 +86,26 @@ input[type="datetime-local"]{
 input[type="file"]{
   display: none;
 }
+
+.login-page{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.login-page label{
+  display: block;
+}
+.login-container{
+  width: 350px;
+  height: 250px;
+}
+.login-container .btn{
+  margin-left: 0px;
+  width: 100%;
+  margin-top: 10px;
+}
+.login-container .alert{
+  margin-top: 10px;
+  border-radius: 0px;
+}

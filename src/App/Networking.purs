@@ -17,6 +17,7 @@ import Data.Foreign
 import Data.Foreign.Class
 import Data.Either
 import Data.Int.Extended
+import Data.HTTP.Method (Method(..))
 
 import Node.Buffer (Buffer(), BUFFER())
 import Node.FS.Aff (readdir, mkdir, writeFile, exists)
@@ -25,7 +26,9 @@ import Node.Path (normalize, concat, basename)
 import Node.OS
 
 import Network.HTTP.Affjax 
-import Network.HTTP.Method (Method(..))
+
+import DOM.File.Types (Blob())
+import Unsafe.Coerce (unsafeCoerce)
  
 import Control.Monad.Eff.Console (log, CONSOLE())
 import Control.Monad.Eff.Class
@@ -168,12 +171,15 @@ getEventsByCname = Query $ "select * from events where computername = ?"
 downloadFolder :: forall eff. String -> String -> String -> String -> Aff (ajax :: AJAX, fs :: FS, buffer :: BUFFER, console :: CONSOLE | eff) Unit
 downloadFolder baseurl cname profile target = do
   files <- execEndpoint_ baseurl getProfileFiles (Tuple cname profile) unit
-  let makereq fn = {headers: [], content: Nothing, method: GET, url: baseurl ++ "/" ++ fn, username: Nothing, password: Nothing } :: AffjaxRequest Unit
-  traverse (\filename -> do {response} :: AffjaxResponse Buffer <- affjax $ makereq filename
-                            writeFile (concat [target, basename filename]) response) files
+  let makereq fn = {headers: [], content: Nothing, method: Left GET, url: baseurl ++ "/" ++ fn, username: Nothing, password: Nothing, withCredentials: false } :: AffjaxRequest Unit
+  traverse (\filename -> do {response} :: AffjaxResponse Blob <- affjax $ makereq filename
+                            writeFile (concat [target, basename filename]) $ unsafeCoerce response) files
   return unit
                                                
 data NamedBuffer = NamedBuffer String Buffer
+
+blobToBuffer :: Blob -> Buffer
+blobToBuffer = unsafeCoerce
 
 instance isForeignNamedBuffer :: IsForeign NamedBuffer where
   read obj = do
@@ -186,10 +192,10 @@ getFilesForEvent c i = query (Query "select file, name from files where eventid 
                                                           
 downloadFileById :: forall eff. String -> Int -> Aff (ajax :: AJAX | eff) Buffer
 downloadFileById s i = do
-  let req = {headers: [], content: Nothing, method: GET, url: s <> "/api/files/" <> show i, username: Nothing, password: Nothing } :: AffjaxRequest Unit 
-  res :: AffjaxResponse Buffer <- affjax req 
+  let req = {headers: [], content: Nothing, method: Left GET, url: s <> "/api/files/" <> show i, username: Nothing, password: Nothing, withCredentials: false } :: AffjaxRequest Unit 
+  res :: AffjaxResponse Blob <- affjax req 
   case res of 
-       {response} -> return response
+       {response} -> return $ blobToBuffer response
 
 saveFile :: forall eff. Connection -> Int -> Buffer -> Aff (db :: DB | eff) Unit
 saveFile c i b = execute (Query "update files set file = ? where id = ?") [toSql b, toSql i] c
