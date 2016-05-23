@@ -66,9 +66,9 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   cname <- liftEff $ hostname
   fcf <- liftEff $ readConfigFile
   photoProgramPath <- either (throwError <<< error <<< show) 
-                             (\(WorkerConfig {photoProgramPath}) -> return photoProgramPath) fcf
-  exefullpath <- either (throwError <<< error <<< show) 
-                             (\(WorkerConfig {photoProgramPath}) -> return photoProgramPath) fcf
+                             (\(WorkerConfig {photoProgramFullPath}) -> return photoProgramFullPath) fcf
+  {-- exefullpath <- either (throwError <<< error <<< show) --} 
+  {--                            (\(WorkerConfig {photoProgramPath}) -> return photoProgramPath) fcf --}
       
   ------ Move photos into photohistory folder -------------
   safeMkdir historyFolder
