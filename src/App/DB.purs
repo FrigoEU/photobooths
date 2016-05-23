@@ -80,11 +80,11 @@ makeDB conn = do
   
 loadWithDummy :: forall eff. Connection -> Date -> Aff (db :: DB | eff) Unit
 loadWithDummy conn dateNow = do
-  execute_ (insertPB mybooth) conn
-  execute_ (insertPB yourbooth) conn
-  execute_ (insertEvent (myevent dateNow)) conn
-  execute_ (upsertEventStatistic myeventstatistic) conn
-  execute_ (upsertMonthlyStatistic mymonthlystatistic) conn
+  {-- execute_ (insertPB mybooth) conn --}
+  {-- execute_ (insertPB yourbooth) conn --}
+  {-- execute_ (insertEvent (myevent dateNow)) conn --}
+  {-- execute_ (upsertEventStatistic myeventstatistic) conn --}
+  {-- execute_ (upsertMonthlyStatistic mymonthlystatistic) conn --}
   execute_ (newUser myuser) conn
   
 mybooth :: Photobooth

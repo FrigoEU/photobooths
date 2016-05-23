@@ -1,6 +1,6 @@
 module Main where
 
-import App.DB (makeDB, mainConnectionInfo, getFileById, saveFileToDb, tryLogin, addStatistics, queryNewFiles, queryAllStatistics, queryNewEvents, queryEventsByIds, queryEventsPaged, updateEvent, newEvent, queryEvents, deletePB, updatePB, newPB, allPhotobooths, queryPhotobooth)
+import App.DB (loadWithDummy, makeDB, mainConnectionInfo, getFileById, saveFileToDb, tryLogin, addStatistics, queryNewFiles, queryAllStatistics, queryNewEvents, queryEventsByIds, queryEventsPaged, updateEvent, newEvent, queryEvents, deletePB, updatePB, newPB, allPhotobooths, queryPhotobooth)
 import App.Endpoint (attachFile, login, getProfileFiles, postStatistics, getNewFiles, getStatistics, getProfiles, getNewEvents, getEventsByIds, getEventsPaged, putEvents, postEvents, getEvents, deletePhotobooth, putPhotobooths, postPhotobooths, getPhotobooths, getPhotobooth)
 import Control.Monad.Aff (runAff, Aff)
 import Control.Monad.Eff (Eff)
@@ -45,8 +45,8 @@ server p = do
   dateNow <- now
   runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do
       --dropDB conn
-      makeDB conn
-      --loadWithDummy conn dateNow
+      --makeDB conn
+      loadWithDummy conn dateNow
   app <- makeApp
   hostEndpoint app getPhotobooth   \ s _        -> withServerConn \conn -> queryPhotobooth conn s
   hostEndpoint app getPhotobooths  \ _ _        -> withServerConn allPhotobooths
