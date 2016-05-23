@@ -4,6 +4,7 @@ import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
 import App.DB (networkingConnectionInfo, updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent)
 import App.Exec (simpleExec)
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
+import App.Model.Date (toLocalDatetime)
 import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt)
 import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState))
@@ -23,6 +24,7 @@ import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.String.Regex (Regex, match, noFlags, regex)
 import Data.Traversable (traverse)
 import Database.AnyDB (DB, Connection, ConnectionInfo, Query(Query), execute_, queryOne_, withConnection)
+import Global.Unsafe (unsafeStringify)
 import Node.Buffer (BUFFER)
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
@@ -73,12 +75,12 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   ws <- maybe (startup conn >>= \_ -> pure $ WorkerState {active: DefaultActive}) return mws
   toCopy <- readdir mainPhotosDir
   printsToCopy <- readdir mainPhotosPrintsDir
-  let dirToCopyTo = case ws of (WorkerState {active}) -> mkDirForActive active
+  let dirToCopyTo = case ws of (WorkerState {active}) -> mkHistoryDirForActive active
   let printsDirToCopyTo = concat [dirToCopyTo, "prints"]
   safeMkdir dirToCopyTo
   safeMkdir printsDirToCopyTo
-  flip traverse toCopy       (\f -> safeCopyFile f (concat [dirToCopyTo,       basename f]))
-  flip traverse printsToCopy (\f -> safeCopyFile f (concat [printsDirToCopyTo, basename f]))
+  flip traverse toCopy       (\f -> safeCopyFile (concat [mainPhotosDir, f]) (concat [dirToCopyTo,       basename f]))
+  flip traverse printsToCopy (\f -> safeCopyFile (concat [mainPhotosPrintsDir, f]) (concat [printsDirToCopyTo, basename f]))
   
   ------ Swap events ----------------------
   dateNow <- liftEff $ now
@@ -95,32 +97,35 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   
   
 switchEvents :: forall eff. Date -> Connection -> String -> Active -> Active ->
-                Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, err :: EXCEPTION | eff) Unit 
+                Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, err :: EXCEPTION, console :: CONSOLE| eff) Unit 
 switchEvents dateNow conn cname old new = do
+  liftEff $ log $ "Swapping from " <> show old <> " to " <> show new
   let oldPhotosFolder = mkDirForActive old
   let newPhotosFolder = mkDirForActive new
 
   ------ Handling previous event --------
-  killPrograms
+  -- killPrograms
 
   ------ Counting photos         --------
   oldPhotos <- readdir oldPhotosFolder
   let amountOfPhotosTakenInOld = length oldPhotos - 1 -- Minus one so we don't count the "prints" directory
 
   ------ Cleaning up main photos --------
-  photosInMain       <- map (\f -> concat [mainPhotosDir,       basename f]) <$> readdir mainPhotosDir
-  photosInMainPrints <- map (\f -> concat [mainPhotosPrintsDir, basename f]) <$> readdir mainPhotosPrintsDir
-  traverse unlink photosInMain
-  traverse unlink photosInMainPrints
+  rmdirRecur mainPhotosDir
+  safeMkdir mainPhotosDir
+  {-- photosInMain       <- map (\f -> concat [mainPhotosDir,       basename f]) <$> readdir mainPhotosDir --}
+  {-- photosInMainPrints <- map (\f -> concat [mainPhotosPrintsDir, basename f]) <$> readdir mainPhotosPrintsDir --}
+  {-- traverse unlink photosInMain --}
+  {-- traverse unlink photosInMainPrints --}
 
   ------ Counting prints         --------
   printsfolders <- readdir printsdir
   let lastphotosdir = printsfolders !! (length printsfolders - 1)
   let secondtolastphotosdir = printsfolders !! (length printsfolders - 2)
-  secondtolastcount <- maybe (return 0) readPrintCount secondtolastphotosdir 
+  secondtolastcount <- maybe (return 0) (\d -> readPrintCount (concat [printsdir, d])) secondtolastphotosdir
   printcount <- case lastphotosdir of
                      Nothing -> throwError $ error $ "No print logs found"
-                     Just d -> readPrintCount d >>= \c -> return $ c - secondtolastcount
+                     Just d -> readPrintCount (concat [printsdir, d]) >>= \c -> return $ c - secondtolastcount
  
   ------ Upserting stats table   --------
   monthNow <- liftEff (monthToInt <$> month dateNow)
@@ -147,9 +152,10 @@ switchEvents dateNow conn cname old new = do
                        EventActive i -> mkEventDir i
   sourcefiles <- readdir sourcedir
   flip traverse sourcefiles (\f -> readFile (concat [sourcedir, f]) >>= overWriteFile (concat [targetDir, basename f]))
-  startPrograms
+  -- startPrograms
 
   safeMkdir newPhotosFolder
+  safeMkdir $ concat [newPhotosFolder, "prints"]
   updateWorkerState conn $ WorkerState {active: new}
               
   return unit
@@ -160,11 +166,12 @@ startup conn = do
   safeMkdir $ targetDir
   sourcefiles <- readdir defaultDir
   flip traverse sourcefiles (\f -> readFile (concat [defaultDir, f]) >>= overWriteFile (concat [targetDir, basename f]))
-  startPrograms
+  -- startPrograms
 
   let newPhotosFolder = mkDirForActive DefaultActive
 
   safeMkdir newPhotosFolder
+  safeMkdir $ concat [newPhotosFolder, "prints"]
   updateWorkerState conn $ WorkerState {active: DefaultActive}
               
   return unit
@@ -177,7 +184,7 @@ readPrintCount :: forall eff. FilePath -> Aff (fs :: FS | eff) Int
 readPrintCount fp = do
   files <- readdir fp
   lastfile <- maybe (throwError $ error $ "No printer log files found in " <> fp) return (last files)
-  contents <- readTextFile UTF8 lastfile
+  contents <- readTextFile UTF8 (concat [fp, lastfile])
   case match lastNumber contents of
        Nothing -> throwError $ error $ "No number found in print log at " <> lastfile
        Just matches -> 
@@ -203,7 +210,7 @@ startPrograms = do
 queryWorkerState :: Query WorkerState
 queryWorkerState = Query "select * from WORKERSTATE"
 
-safeCopyFile :: forall eff. FilePath -> FilePath -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit
+safeCopyFile :: forall eff. FilePath -> FilePath -> Aff (fs :: FS, buffer :: BUFFER, console :: CONSOLE | eff) Unit
 safeCopyFile start end = do 
   endExists <- exists end
   startIsFile <- stat start >>= \(Stats {isFile}) -> return $ runFn0 isFile
@@ -216,4 +223,9 @@ copyFile start end = readFile start >>= writeFile end
 mkDirForActive :: Active -> String
 mkDirForActive DefaultActive = concat [mainPhotosDir, "default"]
 mkDirForActive (EventActive i) = concat [mainPhotosDir, "event_" <> show i]
+
+mkHistoryDirForActive :: Active -> String
+mkHistoryDirForActive DefaultActive = concat [historyFolder, "default"]
+mkHistoryDirForActive (EventActive i) = concat [historyFolder, "event_" <> show i]
+
 

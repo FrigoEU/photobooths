@@ -290,7 +290,7 @@ queryAllStatistics conn cname = do
   return $ AllStatistics {eventStatistics, monthlyStatistics}
 
 queryNewEvents :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array PartialEvent)
-queryNewEvents conn (Tuple cname d) = query q [toSql cname, toSql d] conn
+queryNewEvents conn (Tuple cname d) = query q [toSql cname, toSql $ toISOString d] conn
   where
     q = Query $
         "Select * from EVENTS " <>
@@ -305,7 +305,7 @@ queryPhotobooth conn cname = queryOne q [toSql cname] conn
         "where computername = ?"
 
 queryNewFiles :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array SavedFile)
-queryNewFiles conn (Tuple cname d) = query q [toSql cname, toSql d] conn
+queryNewFiles conn (Tuple cname d) = query q [toSql cname, toSql $ toISOString d] conn
   where
     q = Query $
         "Select f.* from FILES f " <>
@@ -342,9 +342,9 @@ updateWorkerState c (WorkerState ws) =
 queryActiveEvent :: forall eff. Connection -> Date -> Aff (db :: DB | eff) (Maybe PartialEvent)
 queryActiveEvent c d = 
   let q = Query $ "select * from EVENTS where " 
-               <> "datefrom < ? " 
+               <> "datefrom <= ? " 
                <> "and dateuntil > ? "
-   in queryOne q [toSql $ toISOString d] c
+   in queryOne q [toSql $ toISOString d, toSql $ toISOString d] c
 
 getMonthlyStatistic :: forall e. String -> Connection -> Int -> Aff (db :: DB | e) MonthlyStatistic 
 getMonthlyStatistic cname c m = 

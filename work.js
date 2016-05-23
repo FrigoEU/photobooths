@@ -76,6 +76,28 @@ var PS = {};
     return n.toString();
   };
 
+  exports.showNumberImpl = function (n) {
+    /* jshint bitwise: false */
+    return n === (n | 0) ? n + ".0" : n.toString();
+  };
+
+  exports.showCharImpl = function (c) {
+    var code = c.charCodeAt(0);
+    if (code < 0x20 || code === 0x7F) {
+      switch (c) {
+        case "\x07": return "'\\a'";
+        case "\b": return "'\\b'";
+        case "\f": return "'\\f'";
+        case "\n": return "'\\n'";
+        case "\r": return "'\\r'";
+        case "\t": return "'\\t'";
+        case "\v": return "'\\v'";
+      }
+      return "'\\" + code.toString(10) + "'";
+    }
+    return c === "'" || c === "\\" ? "'\\" + c + "'" : "'" + c + "'";
+  };
+
   exports.showStringImpl = function (s) {
     var l = s.length;
     return "\"" + s.replace(
@@ -186,7 +208,18 @@ var PS = {};
       return dict.top;
   }; 
   var showString = new Show($foreign.showStringImpl);
+  var showNumber = new Show($foreign.showNumberImpl);
   var showInt = new Show($foreign.showIntImpl);
+  var showChar = new Show($foreign.showCharImpl);
+  var showBoolean = new Show(function (v) {
+      if (v) {
+          return "true";
+      };
+      if (!v) {
+          return "false";
+      };
+      throw new Error("Failed pattern match at Prelude line 842, column 3 - line 843, column 3: " + [ v.constructor.name ]);
+  });
   var show = function (dict) {
       return dict.show;
   };                                                                     
@@ -374,7 +407,10 @@ var PS = {};
   exports["ordString"] = ordString;
   exports["boundedBoolean"] = boundedBoolean;
   exports["booleanAlgebraBoolean"] = booleanAlgebraBoolean;
+  exports["showBoolean"] = showBoolean;
   exports["showInt"] = showInt;
+  exports["showNumber"] = showNumber;
+  exports["showChar"] = showChar;
   exports["showString"] = showString;
 })(PS["Prelude"] = PS["Prelude"] || {});
 (function(exports) {
@@ -1150,6 +1186,9 @@ var PS = {};
           return sortBy(Prelude.compare(dictOrd))(xs);
       };
   };
+  var $$null = function (xs) {
+      return $foreign.length(xs) === 0;
+  };
   var index = $foreign.indexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
   var $bang$bang = index;
   var last = function (xs) {
@@ -1160,6 +1199,7 @@ var PS = {};
   exports["index"] = index;
   exports["!!"] = $bang$bang;
   exports["last"] = last;
+  exports["null"] = $$null;
   exports["length"] = $foreign.length;
 })(PS["Data.Array"] = PS["Data.Array"] || {});
 (function(exports) {
@@ -1800,6 +1840,59 @@ var PS = {};
   var toSignature = function (dict) {
       return dict.toSignature;
   }; 
+  var genericShowPrec = function (d) {
+      return function (v) {
+          if (v instanceof SProd) {
+              var showParen = function (v1) {
+                  return function (x) {
+                      if (!v1) {
+                          return x;
+                      };
+                      if (v1) {
+                          return "(" + (x + ")");
+                      };
+                      throw new Error("Failed pattern match at Data.Generic line 185, column 9 - line 186, column 9: " + [ v1.constructor.name, x.constructor.name ]);
+                  };
+              };
+              var $72 = Data_Array["null"](v.value1);
+              if ($72) {
+                  return v.value0;
+              };
+              if (!$72) {
+                  return showParen(d > 10)(v.value0 + (" " + Data_String.joinWith(" ")(Prelude.map(Prelude.functorArray)(function (x) {
+                      return genericShowPrec(11)(x(Prelude.unit));
+                  })(v.value1))));
+              };
+              throw new Error("Failed pattern match at Data.Generic line 182, column 5 - line 185, column 3: " + [ $72.constructor.name ]);
+          };
+          if (v instanceof SRecord) {
+              return "{" + (Data_String.joinWith(", ")(Prelude.map(Prelude.functorArray)(function (x) {
+                  return x.recLabel + (": " + genericShowPrec(0)(x.recValue(Prelude.unit)));
+              })(v.value0)) + "}");
+          };
+          if (v instanceof SBoolean) {
+              return Prelude.show(Prelude.showBoolean)(v.value0);
+          };
+          if (v instanceof SInt) {
+              return Prelude.show(Prelude.showInt)(v.value0);
+          };
+          if (v instanceof SNumber) {
+              return Prelude.show(Prelude.showNumber)(v.value0);
+          };
+          if (v instanceof SString) {
+              return Prelude.show(Prelude.showString)(v.value0);
+          };
+          if (v instanceof SChar) {
+              return Prelude.show(Prelude.showChar)(v.value0);
+          };
+          if (v instanceof SArray) {
+              return "[" + (Data_String.joinWith(", ")(Prelude.map(Prelude.functorArray)(function (x) {
+                  return genericShowPrec(0)(x(Prelude.unit));
+              })(v.value0)) + "]");
+          };
+          throw new Error("Failed pattern match at Data.Generic line 181, column 1 - line 188, column 1: " + [ d.constructor.name, v.constructor.name ]);
+      };
+  }; 
   var genericInt = new Generic(function (v) {
       if (v instanceof SInt) {
           return new Data_Maybe.Just(v.value0);
@@ -1810,6 +1903,11 @@ var PS = {};
   }, function (x) {
       return new SInt(x);
   });
+  var gShow = function (dictGeneric) {
+      return function ($187) {
+          return genericShowPrec(0)(toSpine(dictGeneric)($187));
+      };
+  };
   var fromSpine = function (dict) {
       return dict.fromSpine;
   };
@@ -1875,6 +1973,7 @@ var PS = {};
   exports["SArray"] = SArray;
   exports["Generic"] = Generic;
   exports["gEq"] = gEq;
+  exports["gShow"] = gShow;
   exports["fromSpine"] = fromSpine;
   exports["toSignature"] = toSignature;
   exports["toSpine"] = toSpine;
@@ -3080,7 +3179,8 @@ var PS = {};
           } ]);
       };
       throw new Error("Failed pattern match at App.Model.WorkerState line 18, column 1 - line 19, column 1: " + [ v.constructor.name ]);
-  });                                                                  
+  });                                                                            
+  var showActive = new Prelude.Show(Data_Generic.gShow(genericActive));
   var foreignActive = new Data_Foreign_Class.IsForeign(function (obj) {
       return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.read(Data_Foreign_Class.intIsForeign)(obj))(function (v) {
           var $31 = v === -1;
@@ -3106,6 +3206,7 @@ var PS = {};
   exports["EventActive"] = EventActive;
   exports["genericActive"] = genericActive;
   exports["eqActive"] = eqActive;
+  exports["showActive"] = showActive;
   exports["foreignActive"] = foreignActive;
   exports["isSqlValueActive"] = isSqlValueActive;
   exports["foreignWorkerState"] = foreignWorkerState;
@@ -3156,8 +3257,8 @@ var PS = {};
   };
   var queryActiveEvent = function (c) {
       return function (d) {
-          var q = Database_AnyDB.Query("select * from EVENTS where " + ("datefrom < ? " + "and dateuntil > ? "));
-          return Database_AnyDB.queryOne(App_Model_Event.partialEventIsForeign)(q)([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(App_Model_Date.toISOString(d)) ])(c);
+          var q = Database_AnyDB.Query("select * from EVENTS where " + ("datefrom <= ? " + "and dateuntil > ? "));
+          return Database_AnyDB.queryOne(App_Model_Event.partialEventIsForeign)(q)([ Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(App_Model_Date.toISOString(d)), Database_AnyDB_SqlValue.toSql(Database_AnyDB_SqlValue.isSqlValueString)(App_Model_Date.toISOString(d)) ])(c);
       };
   };
   var networkingConnectionInfo = new Database_AnyDB.Sqlite3({
@@ -3938,6 +4039,7 @@ var PS = {};
   var App_DB = PS["App.DB"];
   var App_Exec = PS["App.Exec"];
   var App_FS = PS["App.FS"];
+  var App_Model_Date = PS["App.Model.Date"];
   var App_Model_Event = PS["App.Model.Event"];
   var App_Model_Statistic = PS["App.Model.Statistic"];
   var App_Model_WorkerState = PS["App.Model.WorkerState"];
@@ -3957,6 +4059,7 @@ var PS = {};
   var Data_String_Regex = PS["Data.String.Regex"];
   var Data_Traversable = PS["Data.Traversable"];
   var Database_AnyDB = PS["Database.AnyDB"];
+  var Global_Unsafe = PS["Global.Unsafe"];
   var Node_Buffer = PS["Node.Buffer"];
   var Node_ChildProcess = PS["Node.ChildProcess"];
   var Node_Encoding = PS["Node.Encoding"];
@@ -3981,13 +4084,33 @@ var PS = {};
       if (v instanceof App_Model_WorkerState.EventActive) {
           return Node_Path.concat([ mainPhotosDir, "event_" + Prelude.show(Prelude.showInt)(v.value0) ]);
       };
-      throw new Error("Failed pattern match at App.Worker line 217, column 1 - line 218, column 1: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at App.Worker line 224, column 1 - line 225, column 1: " + [ v.constructor.name ]);
+  };
+  var startup = function (conn) {
+      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(targetDir))(function () {
+          return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(App_FS.defaultDir))(function (v) {
+              return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v)(function (f) {
+                  return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.readFile(Node_Path.concat([ App_FS.defaultDir, f ])))(App_FS.overWriteFile(Node_Path.concat([ targetDir, Node_Path.basename(f) ])));
+              }))(function () {
+                  var newPhotosFolder = mkDirForActive(App_Model_WorkerState.DefaultActive.value);
+                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(newPhotosFolder))(function () {
+                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ newPhotosFolder, "prints" ])))(function () {
+                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.updateWorkerState(conn)(new App_Model_WorkerState.WorkerState({
+                              active: App_Model_WorkerState.DefaultActive.value
+                          })))(function () {
+                              return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
+                          });
+                      });
+                  });
+              });
+          });
+      });
   };
   var lastNumber = Data_String_Regex.regex("\"(\\d+)\"$")(Data_String_Regex.noFlags);
   var readPrintCount = function (fp) {
       return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(fp))(function (v) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No printer log files found in " + fp)))(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Array.last(v)))(function (v1) {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readTextFile(Node_Encoding.UTF8.value)(v1))(function (v2) {
+              return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readTextFile(Node_Encoding.UTF8.value)(Node_Path.concat([ fp, v1 ])))(function (v2) {
                   var $34 = Data_String_Regex.match(lastNumber)(v2);
                   if ($34 instanceof Data_Maybe.Nothing) {
                       return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No number found in print log at " + v1));
@@ -4003,38 +4126,9 @@ var PS = {};
                       if ($35 instanceof Data_Maybe.Just && $35.value0 instanceof Data_Maybe.Just) {
                           return Data_Maybe.maybe(Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("Couldn't parse " + ($35.value0.value0 + (" in " + v1)))))(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Int_Extended.safeParseInt($35.value0.value0));
                       };
-                      throw new Error("Failed pattern match at App.Worker line 184, column 10 - line 193, column 1: " + [ $35.constructor.name ]);
+                      throw new Error("Failed pattern match at App.Worker line 191, column 10 - line 200, column 1: " + [ $35.constructor.name ]);
                   };
-                  throw new Error("Failed pattern match at App.Worker line 181, column 3 - line 193, column 1: " + [ $34.constructor.name ]);
-              });
-          });
-      });
-  };
-  var historyFolder = "photoshistory";
-  var exename = "photossoftware.exe";
-  var killPrograms = Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("taskkill")(Data_Maybe.Nothing.value)([ "/F", "/IM", exename ])(Data_Maybe.Nothing.value))(function () {
-      return App_Exec.simpleExec("logman")(Data_Maybe.Nothing.value)([ "stop Prints" ])(Data_Maybe.Nothing.value);
-  });
-  var exefullpath = Node_Path.concat([ "C", "photosoftware", "exename" ]);
-  var startPrograms = Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("logman")(Data_Maybe.Nothing.value)([ "start Prints" ])(Data_Maybe.Nothing.value))(function () {
-      return App_Exec.simpleExec("start")(Data_Maybe.Nothing.value)([ exefullpath ])(Data_Maybe.Nothing.value);
-  });
-  var startup = function (conn) {
-      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(targetDir))(function () {
-          return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(App_FS.defaultDir))(function (v) {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v)(function (f) {
-                  return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.readFile(Node_Path.concat([ App_FS.defaultDir, f ])))(App_FS.overWriteFile(Node_Path.concat([ targetDir, Node_Path.basename(f) ])));
-              }))(function () {
-                  return Prelude.bind(Control_Monad_Aff.bindAff)(startPrograms)(function () {
-                      var newPhotosFolder = mkDirForActive(App_Model_WorkerState.DefaultActive.value);
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(newPhotosFolder))(function () {
-                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.updateWorkerState(conn)(new App_Model_WorkerState.WorkerState({
-                              active: App_Model_WorkerState.DefaultActive.value
-                          })))(function () {
-                              return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
-                          });
-                      });
-                  });
+                  throw new Error("Failed pattern match at App.Worker line 188, column 3 - line 200, column 1: " + [ $34.constructor.name ]);
               });
           });
       });
@@ -4044,86 +4138,80 @@ var PS = {};
           return function (cname) {
               return function (old) {
                   return function ($$new) {
-                      var oldPhotosFolder = mkDirForActive(old);
-                      var newPhotosFolder = mkDirForActive($$new);
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(killPrograms)(function () {
+                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Swapping from " + (Prelude.show(App_Model_WorkerState.showActive)(old) + (" to " + Prelude.show(App_Model_WorkerState.showActive)($$new))))))(function () {
+                          var oldPhotosFolder = mkDirForActive(old);
+                          var newPhotosFolder = mkDirForActive($$new);
                           return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(oldPhotosFolder))(function (v) {
                               var amountOfPhotosTakenInOld = Data_Array.length(v) - 1;
-                              return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude["<$>"](Control_Monad_Aff.functorAff)(Prelude.map(Prelude.functorArray)(function (f) {
-                                  return Node_Path.concat([ mainPhotosDir, Node_Path.basename(f) ]);
-                              }))(Node_FS_Aff.readdir(mainPhotosDir)))(function (v1) {
-                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude["<$>"](Control_Monad_Aff.functorAff)(Prelude.map(Prelude.functorArray)(function (f) {
-                                      return Node_Path.concat([ mainPhotosPrintsDir, Node_Path.basename(f) ]);
-                                  }))(Node_FS_Aff.readdir(mainPhotosPrintsDir)))(function (v2) {
-                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(Node_FS_Aff.unlink)(v1))(function () {
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(Node_FS_Aff.unlink)(v2))(function () {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(printsdir))(function (v3) {
-                                                  var lastphotosdir = Data_Array["!!"](v3)(Data_Array.length(v3) - 1);
-                                                  var secondtolastphotosdir = Data_Array["!!"](v3)(Data_Array.length(v3) - 2);
-                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Prelude["return"](Control_Monad_Aff.applicativeAff)(0))(readPrintCount)(secondtolastphotosdir))(function (v4) {
+                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(mainPhotosDir))(function () {
+                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(mainPhotosDir))(function () {
+                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(printsdir))(function (v1) {
+                                          var lastphotosdir = Data_Array["!!"](v1)(Data_Array.length(v1) - 1);
+                                          var secondtolastphotosdir = Data_Array["!!"](v1)(Data_Array.length(v1) - 2);
+                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Prelude["return"](Control_Monad_Aff.applicativeAff)(0))(function (d) {
+                                              return readPrintCount(Node_Path.concat([ printsdir, d ]));
+                                          })(secondtolastphotosdir))(function (v2) {
+                                              return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
+                                                  if (lastphotosdir instanceof Data_Maybe.Nothing) {
+                                                      return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No print logs found"));
+                                                  };
+                                                  if (lastphotosdir instanceof Data_Maybe.Just) {
+                                                      return Prelude[">>="](Control_Monad_Aff.bindAff)(readPrintCount(Node_Path.concat([ printsdir, lastphotosdir.value0 ])))(function (c) {
+                                                          return Prelude["return"](Control_Monad_Aff.applicativeAff)(c - v2);
+                                                      });
+                                                  };
+                                                  throw new Error("Failed pattern match at App.Worker line 126, column 17 - line 131, column 3: " + [ lastphotosdir.constructor.name ]);
+                                              })())(function (v3) {
+                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Prelude["<$>"](Control_Monad_Eff.functorEff)(App_Model_Statistic.monthToInt)(Data_Date_Locale.month(dateNow))))(function (v4) {
                                                       return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
-                                                          if (lastphotosdir instanceof Data_Maybe.Nothing) {
-                                                              return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No print logs found"));
-                                                          };
-                                                          if (lastphotosdir instanceof Data_Maybe.Just) {
-                                                              return Prelude[">>="](Control_Monad_Aff.bindAff)(readPrintCount(lastphotosdir.value0))(function (c) {
-                                                                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(c - v4);
+                                                          if (old instanceof App_Model_WorkerState.DefaultActive) {
+                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.getMonthlyStatistic(cname)(conn)(v4))(function (v5) {
+                                                                  var q = App_DB.upsertMonthlyStatistic(new App_Model_Statistic.MonthlyStatistic((function () {
+                                                                      var $49 = {};
+                                                                      for (var $50 in v5.value0) {
+                                                                          if (v5.value0.hasOwnProperty($50)) {
+                                                                              $49[$50] = v5.value0[$50];
+                                                                          };
+                                                                      };
+                                                                      $49.pictures = v5.value0.pictures + amountOfPhotosTakenInOld | 0;
+                                                                      $49.prints = v5.value0.prints + v3 | 0;
+                                                                      return $49;
+                                                                  })()));
+                                                                  return Database_AnyDB.execute_(q)(conn);
                                                               });
                                                           };
-                                                          throw new Error("Failed pattern match at App.Worker line 121, column 17 - line 126, column 3: " + [ lastphotosdir.constructor.name ]);
-                                                      })())(function (v5) {
-                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Prelude["<$>"](Control_Monad_Eff.functorEff)(App_Model_Statistic.monthToInt)(Data_Date_Locale.month(dateNow))))(function (v6) {
-                                                              return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
-                                                                  if (old instanceof App_Model_WorkerState.DefaultActive) {
-                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.getMonthlyStatistic(cname)(conn)(v6))(function (v7) {
-                                                                          var q = App_DB.upsertMonthlyStatistic(new App_Model_Statistic.MonthlyStatistic((function () {
-                                                                              var $52 = {};
-                                                                              for (var $53 in v7.value0) {
-                                                                                  if (v7.value0.hasOwnProperty($53)) {
-                                                                                      $52[$53] = v7.value0[$53];
-                                                                                  };
-                                                                              };
-                                                                              $52.pictures = v7.value0.pictures + amountOfPhotosTakenInOld | 0;
-                                                                              $52.prints = v7.value0.prints + v5 | 0;
-                                                                              return $52;
-                                                                          })()));
-                                                                          return Database_AnyDB.execute_(q)(conn);
-                                                                      });
+                                                          if (old instanceof App_Model_WorkerState.EventActive) {
+                                                              var s = new App_Model_Statistic.EventStatistic({
+                                                                  computername: cname, 
+                                                                  eventId: old.value0, 
+                                                                  pictures: amountOfPhotosTakenInOld, 
+                                                                  prints: v3
+                                                              });
+                                                              var q = App_DB.upsertEventStatistic(s);
+                                                              return Database_AnyDB.execute_(q)(conn);
+                                                          };
+                                                          throw new Error("Failed pattern match at App.Worker line 132, column 3 - line 146, column 3: " + [ old.constructor.name ]);
+                                                      })())(function () {
+                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit))(App_FS.rmdirRecur)(secondtolastphotosdir))(function () {
+                                                              var sourcedir = (function () {
+                                                                  if ($$new instanceof App_Model_WorkerState.DefaultActive) {
+                                                                      return App_FS.defaultDir;
                                                                   };
-                                                                  if (old instanceof App_Model_WorkerState.EventActive) {
-                                                                      var s = new App_Model_Statistic.EventStatistic({
-                                                                          computername: cname, 
-                                                                          eventId: old.value0, 
-                                                                          pictures: amountOfPhotosTakenInOld, 
-                                                                          prints: v5
-                                                                      });
-                                                                      var q = App_DB.upsertEventStatistic(s);
-                                                                      return Database_AnyDB.execute_(q)(conn);
+                                                                  if ($$new instanceof App_Model_WorkerState.EventActive) {
+                                                                      return App_FS.mkEventDir($$new.value0);
                                                                   };
-                                                                  throw new Error("Failed pattern match at App.Worker line 127, column 3 - line 141, column 3: " + [ old.constructor.name ]);
-                                                              })())(function () {
-                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit))(App_FS.rmdirRecur)(secondtolastphotosdir))(function () {
-                                                                      var sourcedir = (function () {
-                                                                          if ($$new instanceof App_Model_WorkerState.DefaultActive) {
-                                                                              return App_FS.defaultDir;
-                                                                          };
-                                                                          if ($$new instanceof App_Model_WorkerState.EventActive) {
-                                                                              return App_FS.mkEventDir($$new.value0);
-                                                                          };
-                                                                          throw new Error("Failed pattern match at App.Worker line 145, column 19 - line 148, column 3: " + [ $$new.constructor.name ]);
-                                                                      })();
-                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(sourcedir))(function (v7) {
-                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v7)(function (f) {
-                                                                              return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.readFile(Node_Path.concat([ sourcedir, f ])))(App_FS.overWriteFile(Node_Path.concat([ targetDir, Node_Path.basename(f) ])));
-                                                                          }))(function () {
-                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(startPrograms)(function () {
-                                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(newPhotosFolder))(function () {
-                                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.updateWorkerState(conn)(new App_Model_WorkerState.WorkerState({
-                                                                                          active: $$new
-                                                                                      })))(function () {
-                                                                                          return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
-                                                                                      });
-                                                                                  });
+                                                                  throw new Error("Failed pattern match at App.Worker line 150, column 19 - line 153, column 3: " + [ $$new.constructor.name ]);
+                                                              })();
+                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(sourcedir))(function (v5) {
+                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v5)(function (f) {
+                                                                      return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.readFile(Node_Path.concat([ sourcedir, f ])))(App_FS.overWriteFile(Node_Path.concat([ targetDir, Node_Path.basename(f) ])));
+                                                                  }))(function () {
+                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(newPhotosFolder))(function () {
+                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ newPhotosFolder, "prints" ])))(function () {
+                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.updateWorkerState(conn)(new App_Model_WorkerState.WorkerState({
+                                                                                  active: $$new
+                                                                              })))(function () {
+                                                                                  return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                                                                               });
                                                                           });
                                                                       });
@@ -4144,6 +4232,24 @@ var PS = {};
           };
       };
   };
+  var historyFolder = "photoshistory";
+  var mkHistoryDirForActive = function (v) {
+      if (v instanceof App_Model_WorkerState.DefaultActive) {
+          return Node_Path.concat([ historyFolder, "default" ]);
+      };
+      if (v instanceof App_Model_WorkerState.EventActive) {
+          return Node_Path.concat([ historyFolder, "event_" + Prelude.show(Prelude.showInt)(v.value0) ]);
+      };
+      throw new Error("Failed pattern match at App.Worker line 228, column 1 - line 229, column 1: " + [ v.constructor.name ]);
+  };
+  var exename = "photossoftware.exe";
+  var killPrograms = Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("taskkill")(Data_Maybe.Nothing.value)([ "/F", "/IM", exename ])(Data_Maybe.Nothing.value))(function () {
+      return App_Exec.simpleExec("logman")(Data_Maybe.Nothing.value)([ "stop Prints" ])(Data_Maybe.Nothing.value);
+  });
+  var exefullpath = Node_Path.concat([ "C", "photosoftware", "exename" ]);
+  var startPrograms = Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("logman")(Data_Maybe.Nothing.value)([ "start Prints" ])(Data_Maybe.Nothing.value))(function () {
+      return App_Exec.simpleExec("start")(Data_Maybe.Nothing.value)([ exefullpath ])(Data_Maybe.Nothing.value);
+  });
   var copyFile = function (start) {
       return function (end) {
           return Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.readFile(start))(Node_FS_Aff.writeFile(end));
@@ -4155,25 +4261,25 @@ var PS = {};
               return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.stat(start))(function (v1) {
                   return Prelude["return"](Control_Monad_Aff.applicativeAff)(v1.value0.isFile());
               }))(function (v1) {
-                  var $64 = !v && v1;
-                  if ($64) {
+                  var $63 = !v && v1;
+                  if ($63) {
                       return copyFile(start)(end);
                   };
-                  if (!$64) {
+                  if (!$63) {
                       return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                   };
-                  throw new Error("Failed pattern match at App.Worker line 210, column 3 - line 213, column 1: " + [ $64.constructor.name ]);
+                  throw new Error("Failed pattern match at App.Worker line 217, column 3 - line 220, column 1: " + [ $63.constructor.name ]);
               });
           });
       };
   };
-  var main = Control_Monad_Aff.runAff(function ($94) {
-      return Control_Monad_Eff_Console.log(Prelude.show(Control_Monad_Eff_Exception.showError)($94));
+  var main = Control_Monad_Aff.runAff(function ($93) {
+      return Control_Monad_Eff_Console.log(Prelude.show(Control_Monad_Eff_Exception.showError)($93));
   })(Prelude["const"](Control_Monad_Eff_Console.log("Worker done!")))(Database_AnyDB.withConnection(workerConnI)(function (conn) {
       return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_OS.hostname))(function (v) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(App_Config.readConfigFile))(function (v1) {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Either.either(function ($95) {
-                  return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error(Prelude.show(Data_Foreign.showForeignError)($95)));
+              return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Either.either(function ($94) {
+                  return Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error(Prelude.show(Data_Foreign.showForeignError)($94)));
               })(function (v2) {
                   return Prelude["return"](Control_Monad_Aff.applicativeAff)(v2.value0.photoProgramPath);
               })(v1))(function (v2) {
@@ -4188,15 +4294,15 @@ var PS = {};
                                   }))(Prelude["return"](Control_Monad_Aff.applicativeAff))(v3))(function (v4) {
                                       return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(mainPhotosDir))(function (v5) {
                                           return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(mainPhotosPrintsDir))(function (v6) {
-                                              var dirToCopyTo = mkDirForActive(v4.value0.active);
+                                              var dirToCopyTo = mkHistoryDirForActive(v4.value0.active);
                                               var printsDirToCopyTo = Node_Path.concat([ dirToCopyTo, "prints" ]);
                                               return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(dirToCopyTo))(function () {
                                                   return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(printsDirToCopyTo))(function () {
                                                       return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v5)(function (f) {
-                                                          return safeCopyFile(f)(Node_Path.concat([ dirToCopyTo, Node_Path.basename(f) ]));
+                                                          return safeCopyFile(Node_Path.concat([ mainPhotosDir, f ]))(Node_Path.concat([ dirToCopyTo, Node_Path.basename(f) ]));
                                                       }))(function () {
                                                           return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude.flip(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff))(v6)(function (f) {
-                                                              return safeCopyFile(f)(Node_Path.concat([ printsDirToCopyTo, Node_Path.basename(f) ]));
+                                                              return safeCopyFile(Node_Path.concat([ mainPhotosPrintsDir, f ]))(Node_Path.concat([ printsDirToCopyTo, Node_Path.basename(f) ]));
                                                           }))(function () {
                                                               return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Data_Date.now))(function (v7) {
                                                                   return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.queryActiveEvent(conn)(v7))(function (v8) {
@@ -4210,17 +4316,17 @@ var PS = {};
                                                                           if (v8 instanceof Data_Maybe.Just && v8.value0.value0.id instanceof Data_Maybe.Just) {
                                                                               return Prelude["return"](Control_Monad_Aff.applicativeAff)(new App_Model_WorkerState.EventActive(v8.value0.value0.id.value0));
                                                                           };
-                                                                          throw new Error("Failed pattern match at App.Worker line 86, column 16 - line 90, column 3: " + [ v8.constructor.name ]);
+                                                                          throw new Error("Failed pattern match at App.Worker line 88, column 16 - line 92, column 3: " + [ v8.constructor.name ]);
                                                                       })())(function (v9) {
                                                                           return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
-                                                                              var $91 = Prelude["/="](App_Model_WorkerState.eqActive)(v9)(v4.value0.active);
-                                                                              if ($91) {
+                                                                              var $90 = Prelude["/="](App_Model_WorkerState.eqActive)(v9)(v4.value0.active);
+                                                                              if ($90) {
                                                                                   return switchEvents(v7)(conn)(v)(v4.value0.active)(v9);
                                                                               };
-                                                                              if (!$91) {
+                                                                              if (!$90) {
                                                                                   return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                                                                               };
-                                                                              throw new Error("Failed pattern match at App.Worker line 91, column 34 - line 94, column 3: " + [ $91.constructor.name ]);
+                                                                              throw new Error("Failed pattern match at App.Worker line 93, column 34 - line 96, column 3: " + [ $90.constructor.name ]);
                                                                           })())(function () {
                                                                               return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                                                                           });
@@ -4242,6 +4348,7 @@ var PS = {};
           });
       });
   }));
+  exports["mkHistoryDirForActive"] = mkHistoryDirForActive;
   exports["mkDirForActive"] = mkDirForActive;
   exports["copyFile"] = copyFile;
   exports["safeCopyFile"] = safeCopyFile;

@@ -3,6 +3,7 @@ module WorkerTest where
 import App.DB (saveFileToDb, newEvent, newPB, queryEvents, allPhotobooths, updateEvent, queryAllStatistics, makeDB, dropDB)
 import App.Exec (simpleExec)
 import App.FS (safeMkdir, rmdirRecur)
+import App.Model.Date (toLocalDatetime)
 import App.Model.Event (Event(Event))
 import App.Model.Photobooth (Photobooth(Photobooth))
 import App.Model.SavedFile (SavedFile)
@@ -61,7 +62,7 @@ backgroundImagesDir = normalize "background_images"
 type TestEffects = ( db :: DB , fs :: FS , cp :: CHILD_PROCESS , err :: EXCEPTION, os :: OS, process :: PROCESS, console :: CONSOLE, buffer :: BUFFER, now :: Now)
 
 main :: Eff TestEffects Unit
-main = runAff (\err -> log $ show err) (\_ -> log "Done, everything fine!") test
+main = runAff (\err -> log $ show err) (\_ -> log "WorkerTest done, everything fine!") test
 
 test :: Aff TestEffects Unit
 test = do

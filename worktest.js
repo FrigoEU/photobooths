@@ -3598,6 +3598,7 @@ var PS = {};
   var App_DB = PS["App.DB"];
   var App_Exec = PS["App.Exec"];
   var App_FS = PS["App.FS"];
+  var App_Model_Date = PS["App.Model.Date"];
   var App_Model_Event = PS["App.Model.Event"];
   var App_Model_Photobooth = PS["App.Model.Photobooth"];
   var App_Model_SavedFile = PS["App.Model.SavedFile"];
@@ -3738,7 +3739,7 @@ var PS = {};
           if (!bool) {
               return Control_Monad_Eff_Console.log("ERROR - " + text);
           };
-          throw new Error("Failed pattern match at WorkerTest line 196, column 19 - line 199, column 1: " + [ bool.constructor.name ]);
+          throw new Error("Failed pattern match at WorkerTest line 197, column 19 - line 200, column 1: " + [ bool.constructor.name ]);
       };
   };
   var checkStatisticsSync = function (mainDB) {
