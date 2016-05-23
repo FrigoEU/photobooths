@@ -6022,7 +6022,7 @@ var PS = {};
           return Control_Monad_Eff_Console.log("Starting server on " + Prelude.show(Prelude.showInt)(port))();
       };
   };
-  var main = Node_Yargs_Applicative.runY(setup)(Prelude["<$>"](Node_Yargs_Applicative.functorY)(server)(Node_Yargs_Applicative.yarg(Node_Yargs_Applicative.argNumber)("p")([ "port" ])(new Data_Maybe.Just("Port"))(new Data_Either.Left(8080.0))(false)));
+  var main = Node_Yargs_Applicative.runY(setup)(Prelude["<$>"](Node_Yargs_Applicative.functorY)(server)(Node_Yargs_Applicative.yarg(Node_Yargs_Applicative.argNumber)("p")([ "port" ])(new Data_Maybe.Just("Port"))(new Data_Either.Left(process.env.PORT))(false)));
   exports["allProfiles"] = allProfiles;
   exports["findProfileFiles"] = findProfileFiles;
   exports["throwStr"] = throwStr;
