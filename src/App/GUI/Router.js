@@ -4,13 +4,13 @@
 
 exports.setHash = function setHash(s){
   return function(){
-    window.location.hash = s;
+    window.location.hash = encodeURI(s);
   };
 };
 
 exports.getHash = getHash;
 function getHash(){
-  return window.location.hash;
+  return decodeURI(window.location.hash);
 }
 
 exports.hashChanged = function hashChanged(handler) {

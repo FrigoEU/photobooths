@@ -11,7 +11,7 @@ import Control.Monad.Eff (Eff)
 import Data.Lens (view, set)
 import Data.Maybe (isNothing)
 import OpticUI (animate, with)
-import Prelude (Unit, ($), bind, (<$>), return)
+import Prelude (Unit, return, ($), bind, (<$>))
 
 ------ MAIN -----------
 

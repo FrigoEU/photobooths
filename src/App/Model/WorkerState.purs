@@ -43,4 +43,4 @@ workerStateTable = { name: "WORKERSTATE"
                    , columns: fromArray [ Tuple "activeeventid" $ S.ColumnDef S.Integer []]}
 
 createWorkerStateTable :: Query Unit
-createWorkerStateTable = Query "CREATE TABLE WORKERSTATE (activeeventid INTEGER); INSERT INTO WORKERSTATE (activeeventid) VALUES (-1)"
+createWorkerStateTable = Query "CREATE TABLE WORKERSTATE (activeeventid INTEGER);"

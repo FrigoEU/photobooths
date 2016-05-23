@@ -11,7 +11,7 @@ import Data.Lens (lens)
 import Data.Tuple (Tuple(..))
 import Data.Date (Date, fromStringStrict)
 import Data.Maybe (Maybe(Just), maybe)
-import Data.Either (Either(Right, Left))
+import Data.Either (Either(Right, Left), either)
 import Data.Array (sortBy)
 
 import App.Model.StrMap (fromArray)

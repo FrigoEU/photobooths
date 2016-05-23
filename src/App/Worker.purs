@@ -1,43 +1,38 @@
 module App.Worker where
 
-import Prelude (Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), map, (/=), const, (<<<))
-
-import Control.Monad.Aff (Aff(), runAff)
+import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
+import App.DB (networkingConnectionInfo, updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent)
+import App.Exec (simpleExec)
+import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
+import App.Model.Event (PartialEvent(PartialEvent))
+import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt)
+import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState))
+import Control.Monad.Aff (Aff, runAff)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION, error)
 import Control.Monad.Error.Class (throwError)
-import Control.Monad.Eff.Class (liftEff) 
-import Control.Monad.Eff (Eff)
-
-import Database.AnyDB (DB(), Connection(), ConnectionInfo(Sqlite3), Query(Query), execute_, queryOne_, withConnection) 
-
-import Node.FS (FS()) 
-import Node.FS.Aff (writeFile, readFile, stat, exists, readTextFile, readdir, unlink)
-import Node.FS.Stats (Stats(Stats))
-import Node.Path (FilePath(), concat, basename) 
-import Node.Buffer (BUFFER())
+import Data.Array (length, last, (!!))
+import Data.Date (Date, Now, now)
+import Data.Date.Locale (Locale, month)
+import Data.Either (either)
+import Data.Function (runFn0)
+import Data.Int.Extended (safeParseInt)
+import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Data.String.Regex (Regex, match, noFlags, regex)
+import Data.Traversable (traverse)
+import Database.AnyDB (DB, Connection, ConnectionInfo, Query(Query), execute_, queryOne_, withConnection)
+import Node.Buffer (BUFFER)
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
+import Node.FS (FS)
+import Node.FS.Aff (writeFile, readFile, stat, exists, readTextFile, readdir, unlink)
+import Node.FS.Stats (Stats(Stats))
 import Node.OS (OS, hostname)
+import Node.Path (FilePath, concat, basename)
 import Node.Process (PROCESS)
-
-import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
-import App.DB (updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent) 
-import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState)) 
-import App.Model.Event (PartialEvent(PartialEvent)) 
-import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt) 
-import App.Exec (simpleExec)
-import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
-
-import Data.Traversable (traverse) 
-import Data.Maybe (Maybe(Just, Nothing), maybe) 
-import Data.Date (Date, Now, now)
-import Data.Date.Locale (Locale(), month) 
-import Data.Array (length, last, (!!))
-import Data.String.Regex (Regex, match, noFlags, regex)
-import Data.Function (runFn0)
-import Data.Either (either)
-import Data.Int.Extended (safeParseInt)
+import Prelude (pure, Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), map, (/=), const, (<<<))
 
 mainPhotosDir :: FilePath
 mainPhotosDir = "photos"
@@ -60,8 +55,7 @@ exefullpath :: String
 exefullpath = concat ["C","photosoftware", "exename"]
 
 workerConnI :: ConnectionInfo
-workerConnI = Sqlite3 { filename: "workerdb"
-                               , memory: false }
+workerConnI = networkingConnectionInfo
 
 main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , err :: EXCEPTION, os :: OS, now :: Now, process :: PROCESS | t350 ) Unit
 main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
@@ -76,7 +70,7 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   safeMkdir mainPhotosDir
   safeMkdir mainPhotosPrintsDir
   mws <- queryOne_ queryWorkerState conn
-  ws <- maybe (throwError $ error "No Workerstate found") return mws
+  ws <- maybe (startup conn >>= \_ -> pure $ WorkerState {active: DefaultActive}) return mws
   toCopy <- readdir mainPhotosDir
   printsToCopy <- readdir mainPhotosPrintsDir
   let dirToCopyTo = case ws of (WorkerState {active}) -> mkDirForActive active
@@ -147,10 +141,12 @@ switchEvents dateNow conn cname old new = do
   maybe (return unit) rmdirRecur secondtolastphotosdir
 
   ----- Handling new event ---------------
-  sourcefiles <- case new of 
-                      DefaultActive -> readdir defaultDir
-                      EventActive i -> readdir $ mkEventDir i
-  flip traverse sourcefiles (\f -> readFile f >>= overWriteFile (concat [targetDir, basename f]))
+
+  let sourcedir = case new of 
+                       DefaultActive -> defaultDir
+                       EventActive i -> mkEventDir i
+  sourcefiles <- readdir sourcedir
+  flip traverse sourcefiles (\f -> readFile (concat [sourcedir, f]) >>= overWriteFile (concat [targetDir, basename f]))
   startPrograms
 
   safeMkdir newPhotosFolder
@@ -159,6 +155,19 @@ switchEvents dateNow conn cname old new = do
   return unit
   
   
+startup :: forall t130. Connection -> Aff ( fs :: FS , buffer :: BUFFER , cp :: CHILD_PROCESS , err :: EXCEPTION , db :: DB | t130 ) Unit
+startup conn = do
+  safeMkdir $ targetDir
+  sourcefiles <- readdir defaultDir
+  flip traverse sourcefiles (\f -> readFile (concat [defaultDir, f]) >>= overWriteFile (concat [targetDir, basename f]))
+  startPrograms
+
+  let newPhotosFolder = mkDirForActive DefaultActive
+
+  safeMkdir newPhotosFolder
+  updateWorkerState conn $ WorkerState {active: DefaultActive}
+              
+  return unit
   
   
 lastNumber :: Regex
@@ -183,13 +192,13 @@ readPrintCount fp = do
   
 killPrograms :: forall t78. Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t78 ) String
 killPrograms = do
-  simpleExec ("taskkill /F /IM " <> exename) [] Nothing
-  simpleExec "logman stop Prints" [] Nothing
+  simpleExec ("taskkill") Nothing ["/F", "/IM", exename] Nothing
+  simpleExec "logman" Nothing ["stop Prints"] Nothing
 
 startPrograms :: forall t88. Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t88 ) String
 startPrograms = do
-  simpleExec "logman start Prints" [] Nothing
-  simpleExec ("start " <> exefullpath) [] Nothing
+  simpleExec "logman" Nothing ["start Prints"] Nothing
+  simpleExec ("start") Nothing [exefullpath] Nothing
 
 queryWorkerState :: Query WorkerState
 queryWorkerState = Query "select * from WORKERSTATE"

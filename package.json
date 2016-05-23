@@ -18,11 +18,11 @@
     "build": "pulp build",
     "test": "pulp test",
     "tags": "psc-docs --format ctags `find bower_components src test -name *.purs -not -name externs.purs` `find bower_components src test -name externs.purs`  > tags",
-    "compile:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main | java -jar compiler.jar --js_output_file server.js",
-    "compile:networking": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking | java -jar compiler.jar --js_output_file netw.js",
-    "compile:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - | java -jar compiler.jar --js_output_file static/client.js",
-    "compile:worker": "psc-bundle output/**/{index,foreign}.js --main App.Worker --module App.Worker | browserify -e - | java -jar compiler.jar --js_output_file work.js",
-    "compile:workertest": "psc-bundle output/**/{index,foreign}.js --main WorkerTest --module WorkerTest | browserify -e - | java -jar compiler.jar --js_output_file worktest.js",
+    "compile:server": "pulp build --main Main --optimise --to server.js",
+    "compile:networking": "pulp build --main App.Networking --optimise --to netw.js",
+    "compile:client": "pulp browserify --main App.GUI --optimise --to static/client.js",
+    "compile:worker": "pulp build --main App.Worker --optimise --to work.js",
+    "compile:workertest": "pulp build --main WorkerTest --optimise --to worktest.js",
     "dev:server": "psc-bundle output/**/{index,foreign}.js --main Main --module Main -o server.js",
     "dev:networking": "psc-bundle output/**/{index,foreign}.js --main App.Networking --module App.Networking -o networking.js",
     "dev:client": "psc-bundle output/**/{index,foreign}.js --main App.GUI --module App.GUI | browserify -e - -o static/client.js",
@@ -35,6 +35,7 @@
     "netw": "npm run dev:networking && node networking.js",
     "watch:client": "watch  'npm run test && npm run dev:client' src/ --ignoreDotFiles",
     "--nodemon": "to check if it's a good solution for reloading serverside code",
-    "debug": "node-debug --web-port 8989 networking.js"
+    "debug": "node-debug --web-port 8989 networking.js",
+    "mkworkertest": "npm run build && npm run compile:networking && npm run compile:worker && npm run compile:workertest && npm run compile:server && cp worktest.js ~/klikhuttest && cp work.js ~/klikhuttest/klikhut-slave && cp netw.js ~/klikhuttest/klikhut-slave && cp server.js ~/klikhuttest/klikhut-master"
   }
 }

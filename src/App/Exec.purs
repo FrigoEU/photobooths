@@ -14,12 +14,13 @@ import Node.Encoding (Encoding(UTF8))
 
 simpleExec :: forall eff. 
               String 
+              -> Maybe String
               -> Array String 
               -> Maybe (StrMap String) 
               -> Aff (cp :: CHILD_PROCESS, err :: EXCEPTION, buffer :: BUFFER | eff) String
-simpleExec cmd args env = 
+simpleExec cmd cwd args env = 
   makeAff (\errcb okcb -> 
-             let ops = { cwd: Nothing
+             let ops = { cwd: cwd
                        , env: env
                        , timeout: Nothing
                        , maxBuffer: Nothing

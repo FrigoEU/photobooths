@@ -3,29 +3,24 @@ module Server.Core (
   hostStatic
 ) where
 
-import Prelude (Unit, unit, (>>=), ($), (<>), bind, return, show)
-
-import Control.Monad.Eff (Eff())
-import Control.Monad.Eff.Console (log, CONSOLE())
-import Control.Monad.Aff (runAff, Aff())
+import App.Endpoint (Endpoint(Endpoint), FileUploadEndpoint(FileUploadEndpoint))
+import Control.Monad.Aff (runAff, Aff)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (log, CONSOLE)
 import Control.Monad.Eff.Exception (message, error, Error)
 import Control.Monad.Error.Class (throwError, class MonadError)
-
-import Data.StrMap (StrMap)
+import DOM.File.Types (Blob)
 import Data.Either (Either(Left), either)
 import Data.Foreign.Generic (readJSONGeneric, toJSONGeneric, defaultOptions)
 import Data.Generic (class Generic)
-import Data.Serializable (class Serializable, deserialize)
-import Data.Maybe (Maybe(Nothing, Just), maybe)
-
-import DOM.File.Types (Blob())
-import Unsafe.Coerce (unsafeCoerce)
-
 import Data.HTTP.Method (Method(..))
-
-import Node.Buffer (Buffer())
-
-import App.Endpoint (Endpoint(Endpoint), FileUploadEndpoint(FileUploadEndpoint))
+import Data.Maybe (Maybe(Nothing, Just), maybe)
+import Data.Serializable (class Serializable, deserialize)
+import Data.StrMap (StrMap)
+import Global (decodeURI)
+import Node.Buffer (Buffer)
+import Prelude (Unit, unit, (>>=), ($), (<>), bind, return, show)
+import Unsafe.Coerce (unsafeCoerce)
 
 foreign import data App :: *
 foreign import data EXPRESS :: !
@@ -110,7 +105,7 @@ parseQueryParams {url} = either throwError
                                 return
                                 (maybe (Left $ error $ "No params found") 
                                        (\s -> deserialize s)
-                                       (getParams url))
+                                       (getParams $ decodeURI url))
 
 hostFile :: forall eff. 
               App 

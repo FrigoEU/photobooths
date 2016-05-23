@@ -27,7 +27,8 @@
     "purescript-timers": "*",
     "purescript-node-process": "*",
     "purescript-yargs": "*",
-    "purescript-dom": "0.2.20"
+    "purescript-dom": "0.2.20",
+    "purescript-debug": "*"
   },
   "devDependencies": {
     "purescript-spec": "~0.7.2"

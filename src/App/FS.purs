@@ -1,15 +1,13 @@
 module App.FS where
   
-import Prelude
-  
-import Control.Monad.Aff (Aff())
-
-import Node.Buffer (Buffer(), BUFFER())
-import Node.FS.Aff (readdir, mkdir, writeFile, exists, rmdir, readFile, unlink)
-import Node.FS (FS())
-import Node.Path (concat, FilePath())
-
-import Data.Traversable
+import Prelude (Unit, show, (<>), unit, return, (>>=), bind, not)
+import Data.Traversable (traverse)
+import Control.Monad.Aff (Aff)
+import Node.Buffer (Buffer, BUFFER)
+import Node.FS (FS)
+import Node.FS.Aff (stat, readdir, mkdir, writeFile, exists, rmdir, readFile, unlink)
+import Node.FS.Stats (isDirectory)
+import Node.Path (concat, FilePath)
 
 -- mkdir throws if the directory already exists, safeMkdir doesn't
 safeMkdir :: forall eff. FilePath -> Aff (fs :: FS | eff) Unit
@@ -21,7 +19,10 @@ rmdirRecur d = do
   exist <- exists d
   if (not exist) then return unit
                  else do filesToDelete <- readdir d
-                         traverse (\f -> unlink $ concat [d, f]) filesToDelete
+                         traverse (\f -> do
+                                      let path = concat [d, f]
+                                      s <- stat path
+                                      if isDirectory s then rmdirRecur path else unlink path ) filesToDelete
                          rmdir d
   
 overWriteFile :: forall eff. FilePath -> Buffer -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit

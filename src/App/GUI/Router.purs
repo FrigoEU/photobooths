@@ -1,26 +1,22 @@
 module App.GUI.Router where
 
-import Prelude
-
-import DOM (DOM())
-import Control.Monad.Eff (Eff())
-import Network.HTTP.Affjax (AJAX())
-import Control.Monad.Eff.Ref (REF())
+import App.GUI.Load (loadStatistics, loadEvents, loadEventsWithState)
+import App.GUI.State (State, Route(PhotoboothsPage, StatisticsPage, EventsPage), _statistics, _statisticsPage, _events, _collection, _eventsPage, _computername, _model, _new, _route)
+import App.GUI.Types (AjaxRefDom)
+import App.Model.Async (AsyncModel(Busy))
 import Control.Apply ((*>))
-
-import OpticUI (Handler(), runHandler)
-import OpticUI.Components.Async (async)
-
-import Data.Lens (set)
-import Data.String (drop)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Ref (REF)
+import DOM (DOM)
 import Data.Either (either)
 import Data.Foreign (F)
 import Data.Foreign.Generic (defaultOptions, readJSONGeneric, toJSONGeneric)
-
-import App.Model.Async (AsyncModel(Busy))
-import App.GUI.State
-import App.GUI.Load 
-import App.GUI.Types (AjaxRefDom)
+import Data.Lens (set)
+import Data.String (drop)
+import Network.HTTP.Affjax (AJAX)
+import OpticUI (Handler, runHandler)
+import OpticUI.Components.Async (async)
+import Prelude (Unit, id, const, ($), return, (<<<), bind, (>>>), (>>=))
 
 type Nav eff = Route -> Eff eff Unit
 

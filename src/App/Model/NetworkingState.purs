@@ -1,19 +1,16 @@
 module App.Model.NetworkingState where
   
-import Prelude
-
+import Prelude (class Show, class Eq, Unit, ($), return, bind)
+import Data.Date (Date, fromStringStrict)
+import Data.Generic (class Generic, gShow, gEq)
+import Data.Foreign (ForeignError(TypeMismatch))
+import Data.Foreign.Class (class IsForeign, readProp)
+import Data.Tuple (Tuple(Tuple))
+import Data.Maybe (maybe)
+import Data.Either (Either(Right, Left))
 import SQL as S
-import Database.AnyDB (Query (..))
-  
-import Data.Date
-import Data.Generic
-import Data.Foreign
-import Data.Foreign.Class
-import Data.Tuple
-import Data.Maybe
-import Data.Either
-
 import App.Model.StrMap (fromArray)
+import Database.AnyDB (Query(..))
 
 data NetworkingState = NetworkingState { lastSentStatistics :: Date }
 
@@ -34,4 +31,7 @@ networkingStateTable = { name: "NETWORKINGSTATE"
                        , columns: fromArray [ Tuple "lastsentstatistics" $ S.ColumnDef S.Date []]}
 
 createNetworkingStateTable :: Query Unit
-createNetworkingStateTable = Query "CREATE TABLE NETWORKINGSTATE (lastsentstatistics CHAR); INSERT INTO NETWORKINGSTATE (lastsentstatistics) VALUES (date('now'))"
+createNetworkingStateTable = Query "CREATE TABLE NETWORKINGSTATE (lastsentstatistics CHAR);"
+
+insertDefaultNetworkingSate :: Query Unit
+insertDefaultNetworkingSate = Query "INSERT INTO NETWORKINGSTATE (lastsentstatistics) VALUES (date('now'))"

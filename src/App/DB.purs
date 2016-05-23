@@ -1,16 +1,13 @@
 module App.DB where
   
-import Prelude (Unit, return, ($), bind, (<<<), (>>=), (<>), (>>>), unit, show, map, (<$>), (==), negate, (>), (*))
-import Database.AnyDB (DB, Connection, ConnectionInfo(Sqlite3), Query(Query), queryOne_, execute, queryOne, execute_, query, query_)
-import SQL (selectLastInserted, insert, selectStar, selectStarId, update, createTable, updatedonUpdateTrigger, updatedonInsertTrigger, dropTable)
-import App.Model.Statistic (AllStatistics(AllStatistics), EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthlyStatisticsTable, eventStatisticsTable, createMonthlyStatisticsTable, createEventStatisticsTable)
 import App.DB (MyFile(MyFile), unpack, upsertEventStatistic, upsertMonthlyStatistic, selectFilesForEvent, insertEvent, insertPB, selectFilesForEvents, addFilesToEvents, myuser, newUser, mymonthlystatistic, myeventstatistic, myevent, yourbooth, mybooth)
 import App.Model.Date (toISOString)
 import App.Model.Event (Event(Event), PartialEvent(PartialEvent), mkEvent, eventsTable)
-import App.Model.NetworkingState (createNetworkingStateTable, networkingStateTable)
+import App.Model.NetworkingState (insertDefaultNetworkingSate, createNetworkingStateTable, networkingStateTable)
 import App.Model.Photobooth (Photobooth(Photobooth), photoboothsTable)
 import App.Model.SavedFile (SavedFile(SavedFile), savedFileTable)
 import App.Model.Session (Session, sessionsTable)
+import App.Model.Statistic (AllStatistics(AllStatistics), EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthlyStatisticsTable, eventStatisticsTable, createMonthlyStatisticsTable, createEventStatisticsTable)
 import App.Model.StrMap (fromArray)
 import App.Model.User (User(User), usersTable)
 import App.Model.WorkerState (WorkerState(WorkerState), createWorkerStateTable, workerStateTable)
@@ -28,8 +25,11 @@ import Data.Monoid (mempty)
 import Data.String (joinWith)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..))
+import Database.AnyDB (DB, Connection, ConnectionInfo(Sqlite3), Query(Query), queryOne_, execute, queryOne, execute_, query, query_)
 import Database.AnyDB.SqlValue (toSql)
 import Node.Buffer (Buffer)
+import Prelude (Unit, return, ($), bind, (<<<), (>>=), (<>), (>>>), unit, show, map, (<$>), (==), negate, (>), (*))
+import SQL (selectLastInserted, insert, selectStar, selectStarId, update, createTable, updatedonUpdateTrigger, updatedonInsertTrigger, dropTable)
 
 networkingConnectionInfo :: ConnectionInfo
 networkingConnectionInfo = Sqlite3
@@ -73,6 +73,7 @@ makeDB conn = do
   execute_ (updatedonInsertTrigger monthlyStatisticsTable ["computername", "month"]) conn
   execute_ (updatedonUpdateTrigger monthlyStatisticsTable ["computername", "month"]) conn
   execute_ createNetworkingStateTable conn
+  execute_ insertDefaultNetworkingSate conn
   execute_ createWorkerStateTable conn
   execute_ (createTable usersTable) conn
   execute_ (createTable sessionsTable) conn
@@ -341,8 +342,8 @@ updateWorkerState c (WorkerState ws) =
 queryActiveEvent :: forall eff. Connection -> Date -> Aff (db :: DB | eff) (Maybe PartialEvent)
 queryActiveEvent c d = 
   let q = Query $ "select * from EVENTS where " 
-               <> "datefrom < '2015-12-13T10:27:04.038Z' " 
-               <> "and dateuntil > '2015-12-13T10:27:04.038Z' "
+               <> "datefrom < ? " 
+               <> "and dateuntil > ? "
    in queryOne q [toSql $ toISOString d] c
 
 getMonthlyStatistic :: forall e. String -> Connection -> Int -> Aff (db :: DB | e) MonthlyStatistic 

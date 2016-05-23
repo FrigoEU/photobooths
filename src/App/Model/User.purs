@@ -1,13 +1,10 @@
 module App.Model.User where
 
-import Prelude (($), return, bind)
-
 import SQL as S
-
+import App.Model.StrMap (fromArray)
 import Data.Foreign.Class (class IsForeign, readProp)
 import Data.Tuple (Tuple(Tuple))
-
-import App.Model.StrMap (fromArray)
+import Prelude (($), return, bind)
 
 ------------------------------------------
 
