@@ -1,34 +1,36 @@
 module App.Config where
 
-import Prelude (class Show, (<$>), bind, ($), return, (<>))
-
-import Node.FS (FS)
 import Control.Monad.Eff (Eff)
-import Data.Foreign (F, Foreign, ForeignError(ErrorAtProperty))
+import Data.Foreign (F, Foreign)
 import Data.Foreign.Class (class IsForeign, read, readProp)
-import Data.Either (Either(Left))
-import Node.Process (PROCESS, cwd)
+import Data.Generic (class Generic, gShow)
+import Node.FS (FS)
 import Node.Path (concat)
+import Node.Process (PROCESS, cwd)
+import Prelude (class Show, (<$>), bind, return, ($))
 
 data WorkerConfig = WorkerConfig { webServiceHost :: String
-                                 , photoProgramPath :: String }
+                                 , photoProgramExe :: String
+                                 , photoProgramFullPath :: String }
 
-instance showWorkerConfig :: Show WorkerConfig where
-  show (WorkerConfig {webServiceHost, photoProgramPath}) = 
-    "WorkerConfig: webServiceHost: " <> webServiceHost <> ", photoProgramPath: " <> photoProgramPath
+derive instance genericWorkerConfig :: Generic WorkerConfig
+instance showWorkerConfig :: Show WorkerConfig where show = gShow
+{--   show (WorkerConfig {webServiceHost, photoProgramPath}) = --} 
+{--     "WorkerConfig: webServiceHost: " <> webServiceHost <> ", photoProgramPath: " <> photoProgramPath --}
 
 instance isForeignWorkerConfig :: IsForeign WorkerConfig where
   read f = do 
     webServiceHost <- readProp "webservice" f 
-    photoProgramPath <- readProp "photoprogram" f
-    return $ WorkerConfig {webServiceHost, photoProgramPath}
+    photoProgramFullPath <- readProp "photoprogramfullpath" f
+    photoProgramExe <- readProp "photoprogram" f
+    return $ WorkerConfig {webServiceHost, photoProgramFullPath, photoProgramExe}
 
-improveWorkerConfigForeignError :: F WorkerConfig -> F WorkerConfig
-improveWorkerConfigForeignError (Left (ErrorAtProperty "webservice" a)) = Left $ ErrorAtProperty 
-  "'webservice' field not found or incorrect format in configuration file" a
-improveWorkerConfigForeignError (Left (ErrorAtProperty "photoprogram" a)) = Left $ ErrorAtProperty
-  "'photoprogram' field not found or incorrect format in configuration file" a
-improveWorkerConfigForeignError a = a
+{-- improveWorkerConfigForeignError :: F WorkerConfig -> F WorkerConfig --}
+{-- improveWorkerConfigForeignError (Left (ErrorAtProperty "webservice" a)) = Left $ ErrorAtProperty --} 
+{--   "'webservice' field not found or incorrect format in configuration file" a --}
+{-- improveWorkerConfigForeignError (Left (ErrorAtProperty "photoprogramfullpath" a)) = Left $ ErrorAtProperty --}
+{--   "'photoprogram' field not found or incorrect format in configuration file" a --}
+{-- improveWorkerConfigForeignError a = a --}
 
 foreign import requireConfigFile :: forall eff. String -> Eff (fs :: FS | eff) Foreign
 

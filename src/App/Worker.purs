@@ -53,6 +53,7 @@ printsdir = "prints"
 
 exename :: String
 exename = "photossoftware.exe"
+
 exefullpath :: String
 exefullpath = concat ["C","photosoftware", "exename"]
 
@@ -65,6 +66,8 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   cname <- liftEff $ hostname
   fcf <- liftEff $ readConfigFile
   photoProgramPath <- either (throwError <<< error <<< show) 
+                             (\(WorkerConfig {photoProgramPath}) -> return photoProgramPath) fcf
+  exefullpath <- either (throwError <<< error <<< show) 
                              (\(WorkerConfig {photoProgramPath}) -> return photoProgramPath) fcf
       
   ------ Move photos into photohistory folder -------------
