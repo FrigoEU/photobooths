@@ -31,7 +31,7 @@ import Prelude (show, Unit, ($), bind, return, (<>), (==))
 
 ---------------------------------------------------------------------
 -- How to:
--- Build:
+-- Build: (all in one: npm run mkworkertest)
 -- npm run build
 -- npm run compile:networking -> netw.js
 -- npm run compile:worker -> work.js

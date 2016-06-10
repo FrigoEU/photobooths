@@ -15,8 +15,6 @@ data WorkerConfig = WorkerConfig { webServiceHost :: String
 
 derive instance genericWorkerConfig :: Generic WorkerConfig
 instance showWorkerConfig :: Show WorkerConfig where show = gShow
-{--   show (WorkerConfig {webServiceHost, photoProgramPath}) = --} 
-{--     "WorkerConfig: webServiceHost: " <> webServiceHost <> ", photoProgramPath: " <> photoProgramPath --}
 
 instance isForeignWorkerConfig :: IsForeign WorkerConfig where
   read f = do 

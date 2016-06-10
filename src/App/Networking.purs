@@ -40,16 +40,16 @@ import Node.FS.Aff (readdir, mkdir, writeFile, exists)
 import Node.OS (hostname)
 import Node.Path (normalize, concat, basename)
 import OpticUI.Markup.HTML (map)
-import Prelude (map, pure, Unit, (<$>), ($), return, bind, show, (<>), unit, (++), flip, id, negate, (<<<), not, (>>=), (/=), const, (==))
+import Prelude (pure, map, Unit, (<$>), ($), return, bind, show, (<>), unit, (++), flip, id, negate, (<<<), not, (>>=), (/=), const, (==))
 import Unsafe.Coerce (unsafeCoerce)
 
 main = do
   --let cname = "mycomputername"
   runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do
     fcf <- liftEff $ readConfigFile
-    baseurl <- either (throwError <<< error <<< show) 
-                      (\(WorkerConfig {webServiceHost}) -> return webServiceHost) fcf
-    --let baseurl = "http://localhost:8080"
+    cf <- either (throwError <<< error <<< show) pure fcf
+    let baseurl = case cf of 
+                       (WorkerConfig {webServiceHost}) -> webServiceHost
     cname <- liftEff $ hostname
     ------ For testing purposes ----- 
     dropDB conn

@@ -2352,12 +2352,6 @@ var PS = {};
   /* global exports */
   "use strict";
 
-  // module Control.Monad.Eff.Exception
-
-  exports.showErrorImpl = function (err) {
-    return err.stack || err.toString();
-  };
-
   exports.error = function (msg) {
     return new Error(msg);
   };
@@ -2378,9 +2372,7 @@ var PS = {};
   var $foreign = PS["Control.Monad.Eff.Exception"];
   var Prelude = PS["Prelude"];
   var Data_Maybe = PS["Data.Maybe"];
-  var Control_Monad_Eff = PS["Control.Monad.Eff"];                                 
-  var showError = new Prelude.Show($foreign.showErrorImpl);
-  exports["showError"] = showError;
+  var Control_Monad_Eff = PS["Control.Monad.Eff"];
   exports["throwException"] = $foreign.throwException;
   exports["message"] = $foreign.message;
   exports["error"] = $foreign.error;
@@ -4047,10 +4039,6 @@ var PS = {};
       };
       return User;
   })();
-  var usersTable = {
-      name: "USERS", 
-      columns: App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("id")(new SQL.ColumnDef(SQL.Integer.value, [ SQL.PrimaryKey.value ])), Data_Tuple.Tuple.create("name")(new SQL.ColumnDef(SQL.Char.value, [  ])), Data_Tuple.Tuple.create("password")(new SQL.ColumnDef(SQL.Char.value, [  ])) ])
-  };
   var userIsForeign = new Data_Foreign_Class.IsForeign(function (obj) {
       return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.intIsForeign)(Data_Foreign_Index.indexString)("id")(obj))(function (v) {
           return Prelude.bind(Data_Either.bindEither)(Data_Foreign_Class.readProp(Data_Foreign_Class.stringIsForeign)(Data_Foreign_Index.indexString)("name")(obj))(function (v1) {
@@ -4065,7 +4053,6 @@ var PS = {};
       });
   });
   exports["User"] = User;
-  exports["usersTable"] = usersTable;
   exports["userIsForeign"] = userIsForeign;
 })(PS["App.Model.User"] = PS["App.Model.User"] || {});
 (function(exports) {
@@ -4229,23 +4216,10 @@ var PS = {};
           });
       };
   };
-  var newUser = function (v) {
-      return SQL.insert(App_Model_User.usersTable)(App_Model_StrMap.fromArray([ Data_Tuple.Tuple.create("id")(Prelude.show(Prelude.showInt)(v.value0.id)), new Data_Tuple.Tuple("name", v.value0.name), new Data_Tuple.Tuple("password", v.value0.password) ]))(false)("");
-  }; 
-  var myuser = new App_Model_User.User({
-      id: 1, 
-      name: "admin", 
-      password: "test"
-  });
   var mainConnectionInfo = new Database_AnyDB.Sqlite3({
       filename: "klikhutdb", 
       memory: false
   });
-  var loadWithDummy = function (conn) {
-      return function (dateNow) {
-          return Database_AnyDB.execute_(newUser(myuser))(conn);
-      };
-  };
   var insertPB = function (v) {
       return SQL.insert(App_Model_Photobooth.photoboothsTable)(App_Model_StrMap.fromArray([ new Data_Tuple.Tuple("computername", v.value0.computername), new Data_Tuple.Tuple("alias", v.value0.alias), new Data_Tuple.Tuple("defaultprofile", v.value0.defaultprofile) ]))(false)("");
   };
@@ -4378,7 +4352,6 @@ var PS = {};
   exports["deletePB"] = deletePB;
   exports["updatePB"] = updatePB;
   exports["insertEvent"] = insertEvent;
-  exports["newUser"] = newUser;
   exports["newEvent"] = newEvent;
   exports["insertPB"] = insertPB;
   exports["newPB"] = newPB;
@@ -4387,8 +4360,6 @@ var PS = {};
   exports["queryEventsPaged"] = queryEventsPaged;
   exports["queryEvents"] = queryEvents;
   exports["allPhotobooths"] = allPhotobooths;
-  exports["myuser"] = myuser;
-  exports["loadWithDummy"] = loadWithDummy;
   exports["mainConnectionInfo"] = mainConnectionInfo;
   exports["foreignMyFile"] = foreignMyFile;
 })(PS["App.DB"] = PS["App.DB"] || {});
@@ -5928,11 +5899,6 @@ var PS = {};
       var port = Data_Int.ceil(p);
       return function __do() {
           var v = Data_Date.now();
-          Control_Monad_Aff.runAff(function ($88) {
-              return Control_Monad_Eff_Console.log(Prelude.show(Control_Monad_Eff_Exception.showError)($88));
-          })(Prelude["const"](Control_Monad_Eff_Console.log("Initial SQL OK")))(Database_AnyDB.withConnection(App_DB.mainConnectionInfo)(function (conn) {
-              return App_DB.loadWithDummy(conn)(v);
-          }))();
           var v1 = Server_Core.makeApp();
           Server_Core.hostEndpoint(Data_Serializable.serializableString)(Data_Generic.genericUnit)(Data_Generic.genericMaybe(App_Model_Photobooth.genericPhotobooth))(v1)(App_Endpoint.getPhotobooth)(function (s) {
               return function (v2) {
@@ -6067,7 +6033,7 @@ var PS = {};
           return Control_Monad_Eff_Console.log("Starting server on " + Prelude.show(Prelude.showInt)(port))();
       };
   };
-  var main = Node_Yargs_Applicative.runY(setup)(Prelude["<$>"](Node_Yargs_Applicative.functorY)(server)(Node_Yargs_Applicative.yarg(Node_Yargs_Applicative.argNumber)("p")([ "port" ])(new Data_Maybe.Just("Port"))(new Data_Either.Left(process.env.PORT))(false)));
+  var main = Node_Yargs_Applicative.runY(setup)(Prelude["<$>"](Node_Yargs_Applicative.functorY)(server)(Node_Yargs_Applicative.yarg(Node_Yargs_Applicative.argNumber)("p")([ "port" ])(new Data_Maybe.Just("Port"))(new Data_Either.Left(8080.0))(false)));
   exports["allProfiles"] = allProfiles;
   exports["findProfileFiles"] = findProfileFiles;
   exports["throwStr"] = throwStr;

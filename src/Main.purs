@@ -43,10 +43,10 @@ server :: forall eff. Number -> Eff ( now :: Now , console :: CONSOLE , db :: DB
 server p = do
   let port = ceil p
   dateNow <- now
-  runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do
+  --runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do
       --dropDB conn
       --makeDB conn
-      loadWithDummy conn dateNow
+      --loadWithDummy conn dateNow
   app <- makeApp
   hostEndpoint app getPhotobooth   \ s _        -> withServerConn \conn -> queryPhotobooth conn s
   hostEndpoint app getPhotobooths  \ _ _        -> withServerConn allPhotobooths

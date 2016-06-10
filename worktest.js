@@ -2820,7 +2820,7 @@ var PS = {};
               });
           });
       });
-  }; 
+  };
   var insertPB = function (v) {
       return SQL.insert(App_Model_Photobooth.photoboothsTable)(App_Model_StrMap.fromArray([ new Data_Tuple.Tuple("computername", v.value0.computername), new Data_Tuple.Tuple("alias", v.value0.alias), new Data_Tuple.Tuple("defaultprofile", v.value0.defaultprofile) ]))(false)("");
   };
@@ -3629,7 +3629,7 @@ var PS = {};
   /**
  * -------------------------------------------------------------------
  *  How to:
- *  Build:
+ *  Build: (all in one: npm run mkworkertest)
  *  npm run build
  *  npm run compile:networking -> netw.js
  *  npm run compile:worker -> work.js
@@ -3902,7 +3902,7 @@ var PS = {};
   var main = Control_Monad_Aff.runAff(function (err) {
       return Control_Monad_Eff_Console.log(Prelude.show(Control_Monad_Eff_Exception.showError)(err));
   })(function (v) {
-      return Control_Monad_Eff_Console.log("Done, everything fine!");
+      return Control_Monad_Eff_Console.log("WorkerTest done, everything fine!");
   })(test);
   exports["makePbAndEvent"] = makePbAndEvent;
   exports["check"] = check;
