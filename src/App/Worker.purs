@@ -23,11 +23,12 @@ import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.String.Regex (Regex, match, noFlags, regex)
 import Data.Traversable (traverse)
 import Database.AnyDB (DB, Connection, ConnectionInfo, Query(Query), execute_, queryOne_, withConnection)
+import Debug.Trace (traceAny)
 import Node.Buffer (BUFFER)
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS (FS)
-import Node.FS.Aff (writeFile, readFile, stat, exists, readTextFile, readdir)
+import Node.FS.Aff (unlink, writeFile, readFile, stat, exists, readTextFile, readdir)
 import Node.FS.Stats (Stats(Stats))
 import Node.OS (OS, hostname)
 import Node.Path (FilePath, concat, basename)
@@ -70,7 +71,7 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   let printsDirToCopyTo = concat [dirToCopyTo, "prints"]
   safeMkdir dirToCopyTo
   safeMkdir printsDirToCopyTo
-  flip traverse toCopy       (\f -> safeCopyFile (concat [mainPhotosDir, f]) (concat [dirToCopyTo,       basename f]))
+  flip traverse toCopy       (\f -> safeCopyFile (concat [mainPhotosDir, f])       (concat [dirToCopyTo,       basename f]))
   flip traverse printsToCopy (\f -> safeCopyFile (concat [mainPhotosPrintsDir, f]) (concat [printsDirToCopyTo, basename f]))
   
   ------ Swap events ----------------------
@@ -91,8 +92,8 @@ switchEvents :: forall eff. Date -> Connection -> String -> Active -> Active -> 
                 Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, err :: EXCEPTION, console :: CONSOLE| eff) Unit 
 switchEvents dateNow conn cname old new cf = do
   liftEff $ log $ "Swapping from " <> show old <> " to " <> show new
-  let oldPhotosFolder = mkDirForActive old
-  let newPhotosFolder = mkDirForActive new
+  let oldPhotosFolder = mkHistoryDirForActive old
+  let newPhotosFolder = mkHistoryDirForActive new
 
   ------ Handling previous event --------
   killPrograms cf
@@ -104,13 +105,14 @@ switchEvents dateNow conn cname old new cf = do
   ------ Cleaning up main photos --------
   rmdirRecur mainPhotosDir
   safeMkdir mainPhotosDir
+  safeMkdir (concat [mainPhotosDir, "prints"])
 
   ------ Counting prints         --------
   printsfolders <- readdir printsdir
-  let lastphotosdir = printsfolders !! (length printsfolders - 1)
-  let secondtolastphotosdir = printsfolders !! (length printsfolders - 2)
-  secondtolastcount <- maybe (return 0) (\d -> readPrintCount (concat [printsdir, d])) secondtolastphotosdir
-  printcount <- case lastphotosdir of
+  let lastprintsdir = printsfolders !! (length printsfolders - 1)
+  let secondtolastprintsfolders = printsfolders !! (length printsfolders - 2)
+  secondtolastcount <- maybe (return 0) (\d -> readPrintCount (concat [printsdir, d])) secondtolastprintsfolders
+  printcount <- case lastprintsdir of
                      Nothing -> throwError $ error $ "No print logs found"
                      Just d -> readPrintCount (concat [printsdir, d]) >>= \c -> return $ c - secondtolastcount
  
@@ -130,14 +132,14 @@ switchEvents dateNow conn cname old new cf = do
                                 , prints: printcount}
          let q = upsertEventStatistic s
          execute_ q conn
-  maybe (return unit) rmdirRecur secondtolastphotosdir
+  maybe (return unit) rmdirRecur secondtolastprintsfolders
 
   ----- Handling new event ---------------
-
   let sourcedir = case new of 
                        DefaultActive -> defaultDir
                        EventActive i -> mkEventDir i
   sourcefiles <- readdir sourcedir
+  readdir targetDir >>= traverse (\f -> unlink (concat [targetDir, basename f]))
   flip traverse sourcefiles (\f -> readFile (concat [sourcedir, f]) >>= overWriteFile (concat [targetDir, basename f]))
   startPrograms cf
 
@@ -156,7 +158,7 @@ startup conn cf = do
   flip traverse sourcefiles (\f -> readFile (concat [defaultDir, f]) >>= overWriteFile (concat [targetDir, basename f]))
   startPrograms cf
 
-  let newPhotosFolder = mkDirForActive DefaultActive
+  let newPhotosFolder = mkHistoryDirForActive DefaultActive
 
   safeMkdir newPhotosFolder
   safeMkdir $ concat [newPhotosFolder, "prints"]
@@ -207,10 +209,6 @@ safeCopyFile start end = do
 
 copyFile :: forall eff. FilePath -> FilePath -> Aff (fs :: FS, buffer :: BUFFER | eff) Unit
 copyFile start end = readFile start >>= writeFile end
-
-mkDirForActive :: Active -> String
-mkDirForActive DefaultActive = concat [mainPhotosDir, "default"]
-mkDirForActive (EventActive i) = concat [mainPhotosDir, "event_" <> show i]
 
 mkHistoryDirForActive :: Active -> String
 mkHistoryDirForActive DefaultActive = concat [historyFolder, "default"]

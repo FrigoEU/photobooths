@@ -3,7 +3,6 @@ module WorkerTest where
 import App.DB (saveFileToDb, newEvent, newPB, queryEvents, allPhotobooths, updateEvent, queryAllStatistics, makeDB, dropDB)
 import App.Exec (simpleExec)
 import App.FS (safeMkdir, rmdirRecur)
-import App.Model.Date (toLocalDatetime)
 import App.Model.Event (Event(Event))
 import App.Model.Photobooth (Photobooth(Photobooth))
 import App.Model.SavedFile (SavedFile)
@@ -19,7 +18,7 @@ import Data.Date (fromStringStrict, now, Now)
 import Data.Maybe (Maybe(Nothing, Just), maybe)
 import Data.Tuple (Tuple(Tuple))
 import Database.AnyDB (ConnectionInfo(Sqlite3), Connection, DB, connect)
-import Node.Buffer (BUFFER, fromString)
+import Node.Buffer (BUFFER)
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS (FS)
@@ -27,7 +26,7 @@ import Node.FS.Aff (readFile, writeTextFile, readTextFile, readdir)
 import Node.OS (OS, hostname)
 import Node.Path (concat, normalize)
 import Node.Process (PROCESS, chdir)
-import Prelude (show, Unit, ($), bind, return, (<>), (==))
+import Prelude (class Show, class Eq, show, Unit, ($), bind, return, (<>), (==))
 
 ---------------------------------------------------------------------
 -- How to:
@@ -126,33 +125,35 @@ setup mainDB workerDB cname = do
   liftEff $ chdir "klikhut-slave"
   rmdirRecur photosDir
   rmdirRecur printsDir
+  rmdirRecur backgroundImagesDir
   safeMkdir photosDir
   safeMkdir printsDir
   safeMkdir photosPrintsDir
+  safeMkdir backgroundImagesDir
   liftEff $ chdir ".."
 
 
 checkStatisticsSync :: Connection -> String -> Aff TestEffects Unit
 checkStatisticsSync mainDB cname = do
   (AllStatistics {eventStatistics, monthlyStatistics}) <- queryAllStatistics mainDB cname
-  liftEff $ check (length eventStatistics == 0) "No eventstatistics synced"
-  liftEff $ check (length monthlyStatistics == 0) "1 monthlyStatistic synced"
+  liftEff $ check (length eventStatistics) 0 "No eventstatistics synced"
+  liftEff $ check (length monthlyStatistics) 0 "1 monthlyStatistic synced"
 
 runWorkerAndCheckEvent :: Connection -> String -> Aff TestEffects Unit
 runWorkerAndCheckEvent workerDB cname = do
   res <- simpleExec "node" Nothing ["work.js"] Nothing
   liftEff $ log $ "Result of work.js" <> res
   (AllStatistics {eventStatistics, monthlyStatistics}) <- queryAllStatistics workerDB cname
-  liftEff $ check (length eventStatistics == 0) "No eventstatistics yet"
+  liftEff $ check (length eventStatistics) 0 "No eventstatistics yet"
   (MonthlyStatistic mstat) <- maybe (throwError $ error "No monthly stat found!") return $ monthlyStatistics !! 0
-  liftEff $ check (mstat.pictures == 1) "1 picture counted for default"
-  liftEff $ check (mstat.prints == 21) "21 prints counted for default"
+  liftEff $ check (mstat.pictures) 1 "1 picture counted for default"
+  liftEff $ check (mstat.prints) 21 "21 prints counted for default"
   photosDirFiles <- readdir (normalize "photos")
-  liftEff $ check (photosDirFiles == ["prints"]) "Photos gone from 'photos' folder"
+  liftEff $ check (photosDirFiles) ["prints"] "Photos gone from 'photos' folder"
   photosHistoryFiles <- readdir (concat ["photoshistory", "default"])
-  liftEff $ check (photosDirFiles == ["prints","mypic.jpg"]) "Photos moved to photoshistory folder"
+  liftEff $ check (photosHistoryFiles) ["mypic.jpg", "prints"] "Photos moved to photoshistory folder"
   activeFiles <- readdir (normalize "background_images")
-  liftEff $ check (activeFiles == ["ev1.txt", "ev2.txt"]) "Event Profile active"
+  liftEff $ check (activeFiles) ["ev1.txt", "ev2.txt"] "Event Profile active"
 
 addEventData :: Connection -> String -> Aff TestEffects Event
 addEventData workerDB cname = do
@@ -176,26 +177,26 @@ runWorkerAndCheckDefault = do
   res <- simpleExec "node" Nothing ["work.js"] Nothing
   liftEff $ log $ "Result of work.js" <> res
   activeFiles <- readdir backgroundImagesDir
-  liftEff $ check (activeFiles == ["def.txt"]) "Default Profile active"
+  liftEff $ check (activeFiles) ["def.txt"] "Default Profile active"
 
 runAndCheckSync :: Connection -> String -> Aff TestEffects Unit
 runAndCheckSync workerDB cname = do
   res <- simpleExec "node" Nothing ["netw.js"] Nothing
   liftEff $ log $ "Result of netw.js" <> res
   pbs <- allPhotobooths workerDB
-  liftEff $ check (length pbs == 1) "Photobooth syncing"
+  liftEff $ check (length pbs) 1 "Photobooth syncing"
   evs <- queryEvents workerDB cname
-  liftEff $ check (length evs == 1) "Events syncing"
+  liftEff $ check (length evs) 1 "Events syncing"
   defFiles <- readdir (concat ["clientprofiles", "default"])
-  liftEff $ check (defFiles == ["def.txt"]) "Default Profile Folder making"
+  liftEff $ check (defFiles) ["def.txt"] "Default Profile Folder making"
   evFiles <- readdir (concat ["clientprofiles", "event_1"])
-  liftEff $ check (evFiles == ["ev1.txt", "ev2.txt"]) $ "Event Profile Folder making init: " <> show evFiles
+  liftEff $ check (evFiles) ["ev1.txt", "ev2.txt"] $ "Event Profile Folder making init: " <> show evFiles
   ev1File <- readTextFile UTF8 (concat ["clientprofiles", "event_1", "ev1.txt"]) 
-  liftEff $ check (ev1File == "changed!") $ "Event Profile Folder making overwrite: " <> show ev1File
+  liftEff $ check (ev1File) "changed!" $ "Event Profile Folder making overwrite: " <> show ev1File
 
-check :: Boolean -> String -> Eff TestEffects Unit
-check bool text = if bool then (log $ "OK - " <> text) 
-                          else (log $ "ERROR - " <> text)
+check :: forall a. (Show a, Eq a) => a -> a -> String -> Eff TestEffects Unit
+check actual expected text = if actual == expected then (log $ "OK - " <> text) 
+                                                   else (log $ "ERROR - " <> text <> ". Expected value: " <> show expected <> ". Actual value: " <> show actual)
 
 makePbAndEvent :: Connection -> String -> Aff TestEffects SavedFile
 makePbAndEvent mainDB cname = do

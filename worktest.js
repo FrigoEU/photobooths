@@ -248,6 +248,7 @@ var PS = {};
   var ordString = new Ord(function () {
       return eqString;
   }, unsafeCompare);
+  var eqInt = new Eq($foreign.refEq);
   var eq = function (dict) {
       return dict.eq;
   };
@@ -360,6 +361,7 @@ var PS = {};
   exports["semigroupoidFn"] = semigroupoidFn;
   exports["categoryFn"] = categoryFn;
   exports["functorArray"] = functorArray;
+  exports["eqInt"] = eqInt;
   exports["eqString"] = eqString;
   exports["eqArray"] = eqArray;
   exports["ordString"] = ordString;
@@ -3598,7 +3600,6 @@ var PS = {};
   var App_DB = PS["App.DB"];
   var App_Exec = PS["App.Exec"];
   var App_FS = PS["App.FS"];
-  var App_Model_Date = PS["App.Model.Date"];
   var App_Model_Event = PS["App.Model.Event"];
   var App_Model_Photobooth = PS["App.Model.Photobooth"];
   var App_Model_SavedFile = PS["App.Model.SavedFile"];
@@ -3648,55 +3649,6 @@ var PS = {};
  * --------------------------------------------------------------------
  */  
   var photosDir = Node_Path.normalize("photos");
-  var setup = function (mainDB) {
-      return function (workerDB) {
-          return function (cname) {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-slave")))(function () {
-                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.dropDB(workerDB))(function () {
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.makeDB(workerDB))(function () {
-                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("..")))(function () {
-                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-master")))(function () {
-                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.dropDB(mainDB))(function () {
-                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.makeDB(mainDB))(function () {
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("..")))(function () {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-master")))(function () {
-                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(cname))(function () {
-                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.normalize("profiles")))(function () {
-                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ "profiles", cname ])))(function () {
-                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ "profiles", cname, "defaultprofile" ])))(function () {
-                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ "profiles", cname, "eventprofile" ])))(function () {
-                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("..")))(function () {
-                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-slave")))(function () {
-                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(photosDir))(function () {
-                                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(printsDir))(function () {
-                                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(photosDir))(function () {
-                                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(printsDir))(function () {
-                                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(photosPrintsDir))(function () {
-                                                                                                  return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir(".."));
-                                                                                              });
-                                                                                          });
-                                                                                      });
-                                                                                  });
-                                                                              });
-                                                                          });
-                                                                      });
-                                                                  });
-                                                              });
-                                                          });
-                                                      });
-                                                  });
-                                              });
-                                          });
-                                      });
-                                  });
-                              });
-                          });
-                      });
-                  });
-              });
-          };
-      };
-  };
   var makePbAndEvent = function (mainDB) {
       return function (cname) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("future")))(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Date.fromStringStrict("2020-12-21T01:01:01.000Z")))(function (v) {
@@ -3731,22 +3683,29 @@ var PS = {};
           });
       };
   };
-  var check = function (bool) {
-      return function (text) {
-          if (bool) {
-              return Control_Monad_Eff_Console.log("OK - " + text);
+  var check = function (dictShow) {
+      return function (dictEq) {
+          return function (actual) {
+              return function (expected) {
+                  return function (text) {
+                      var $28 = Prelude["=="](dictEq)(actual)(expected);
+                      if ($28) {
+                          return Control_Monad_Eff_Console.log("OK - " + text);
+                      };
+                      if (!$28) {
+                          return Control_Monad_Eff_Console.log("ERROR - " + (text + (". Expected value: " + (Prelude.show(dictShow)(expected) + (". Actual value: " + Prelude.show(dictShow)(actual))))));
+                      };
+                      throw new Error("Failed pattern match at WorkerTest line 198, column 30 - line 201, column 1: " + [ $28.constructor.name ]);
+                  };
+              };
           };
-          if (!bool) {
-              return Control_Monad_Eff_Console.log("ERROR - " + text);
-          };
-          throw new Error("Failed pattern match at WorkerTest line 197, column 19 - line 200, column 1: " + [ bool.constructor.name ]);
       };
   };
   var checkStatisticsSync = function (mainDB) {
       return function (cname) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.queryAllStatistics(mainDB)(cname))(function (v) {
-              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Data_Array.length(v.value0.eventStatistics) === 0)("No eventstatistics synced")))(function () {
-                  return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Data_Array.length(v.value0.monthlyStatistics) === 0)("1 monthlyStatistic synced"));
+              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(Data_Array.length(v.value0.eventStatistics))(0)("No eventstatistics synced")))(function () {
+                  return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(Data_Array.length(v.value0.monthlyStatistics))(0)("1 monthlyStatistic synced"));
               });
           });
       };
@@ -3756,15 +3715,15 @@ var PS = {};
           return Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("node")(Data_Maybe.Nothing.value)([ "netw.js" ])(Data_Maybe.Nothing.value))(function (v) {
               return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Result of netw.js" + v)))(function () {
                   return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.allPhotobooths(workerDB))(function (v1) {
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Data_Array.length(v1) === 1)("Photobooth syncing")))(function () {
+                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(Data_Array.length(v1))(1)("Photobooth syncing")))(function () {
                           return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.queryEvents(workerDB)(cname))(function (v2) {
-                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Data_Array.length(v2) === 1)("Events syncing")))(function () {
+                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(Data_Array.length(v2))(1)("Events syncing")))(function () {
                                   return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(Node_Path.concat([ "clientprofiles", "default" ])))(function (v3) {
-                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude["=="](Prelude.eqArray(Prelude.eqString))(v3)([ "def.txt" ]))("Default Profile Folder making")))(function () {
+                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showArray(Prelude.showString))(Prelude.eqArray(Prelude.eqString))(v3)([ "def.txt" ])("Default Profile Folder making")))(function () {
                                           return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(Node_Path.concat([ "clientprofiles", "event_1" ])))(function (v4) {
-                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude["=="](Prelude.eqArray(Prelude.eqString))(v4)([ "ev1.txt", "ev2.txt" ]))("Event Profile Folder making init: " + Prelude.show(Prelude.showArray(Prelude.showString))(v4))))(function () {
+                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showArray(Prelude.showString))(Prelude.eqArray(Prelude.eqString))(v4)([ "ev1.txt", "ev2.txt" ])("Event Profile Folder making init: " + Prelude.show(Prelude.showArray(Prelude.showString))(v4))))(function () {
                                                   return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readTextFile(Node_Encoding.UTF8.value)(Node_Path.concat([ "clientprofiles", "event_1", "ev1.txt" ])))(function (v5) {
-                                                      return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(v5 === "changed!")("Event Profile Folder making overwrite: " + Prelude.show(Prelude.showString)(v5)));
+                                                      return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showString)(Prelude.eqString)(v5)("changed!")("Event Profile Folder making overwrite: " + Prelude.show(Prelude.showString)(v5)));
                                                   });
                                               });
                                           });
@@ -3783,16 +3742,16 @@ var PS = {};
           return Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("node")(Data_Maybe.Nothing.value)([ "work.js" ])(Data_Maybe.Nothing.value))(function (v) {
               return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Result of work.js" + v)))(function () {
                   return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.queryAllStatistics(workerDB)(cname))(function (v1) {
-                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Data_Array.length(v1.value0.eventStatistics) === 0)("No eventstatistics yet")))(function () {
+                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(Data_Array.length(v1.value0.eventStatistics))(0)("No eventstatistics yet")))(function () {
                           return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("No monthly stat found!")))(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Array["!!"](v1.value0.monthlyStatistics)(0)))(function (v2) {
-                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(v2.value0.pictures === 1)("1 picture counted for default")))(function () {
-                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(v2.value0.prints === 21)("21 prints counted for default")))(function () {
+                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(v2.value0.pictures)(1)("1 picture counted for default")))(function () {
+                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showInt)(Prelude.eqInt)(v2.value0.prints)(21)("21 prints counted for default")))(function () {
                                       return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(Node_Path.normalize("photos")))(function (v3) {
-                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude["=="](Prelude.eqArray(Prelude.eqString))(v3)([ "prints" ]))("Photos gone from 'photos' folder")))(function () {
+                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showArray(Prelude.showString))(Prelude.eqArray(Prelude.eqString))(v3)([ "prints" ])("Photos gone from 'photos' folder")))(function () {
                                               return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(Node_Path.concat([ "photoshistory", "default" ])))(function (v4) {
-                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude["=="](Prelude.eqArray(Prelude.eqString))(v3)([ "prints", "mypic.jpg" ]))("Photos moved to photoshistory folder")))(function () {
+                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showArray(Prelude.showString))(Prelude.eqArray(Prelude.eqString))(v4)([ "mypic.jpg", "prints" ])("Photos moved to photoshistory folder")))(function () {
                                                       return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(Node_Path.normalize("background_images")))(function (v5) {
-                                                          return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude["=="](Prelude.eqArray(Prelude.eqString))(v5)([ "ev1.txt", "ev2.txt" ]))("Event Profile active"));
+                                                          return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showArray(Prelude.showString))(Prelude.eqArray(Prelude.eqString))(v5)([ "ev1.txt", "ev2.txt" ])("Event Profile active"));
                                                       });
                                                   });
                                               });
@@ -3811,10 +3770,63 @@ var PS = {};
   var runWorkerAndCheckDefault = Prelude.bind(Control_Monad_Aff.bindAff)(App_Exec.simpleExec("node")(Data_Maybe.Nothing.value)([ "work.js" ])(Data_Maybe.Nothing.value))(function (v) {
       return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Result of work.js" + v)))(function () {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(backgroundImagesDir))(function (v1) {
-              return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude["=="](Prelude.eqArray(Prelude.eqString))(v1)([ "def.txt" ]))("Default Profile active"));
+              return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(check(Prelude.showArray(Prelude.showString))(Prelude.eqArray(Prelude.eqString))(v1)([ "def.txt" ])("Default Profile active"));
           });
       });
   });
+  var setup = function (mainDB) {
+      return function (workerDB) {
+          return function (cname) {
+              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-slave")))(function () {
+                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.dropDB(workerDB))(function () {
+                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.makeDB(workerDB))(function () {
+                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("..")))(function () {
+                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-master")))(function () {
+                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.dropDB(mainDB))(function () {
+                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_DB.makeDB(mainDB))(function () {
+                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("..")))(function () {
+                                              return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-master")))(function () {
+                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(cname))(function () {
+                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.normalize("profiles")))(function () {
+                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ "profiles", cname ])))(function () {
+                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ "profiles", cname, "defaultprofile" ])))(function () {
+                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(Node_Path.concat([ "profiles", cname, "eventprofile" ])))(function () {
+                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("..")))(function () {
+                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir("klikhut-slave")))(function () {
+                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(photosDir))(function () {
+                                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(printsDir))(function () {
+                                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.rmdirRecur(backgroundImagesDir))(function () {
+                                                                                          return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(photosDir))(function () {
+                                                                                              return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(printsDir))(function () {
+                                                                                                  return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(photosPrintsDir))(function () {
+                                                                                                      return Prelude.bind(Control_Monad_Aff.bindAff)(App_FS.safeMkdir(backgroundImagesDir))(function () {
+                                                                                                          return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_Process.chdir(".."));
+                                                                                                      });
+                                                                                                  });
+                                                                                              });
+                                                                                          });
+                                                                                      });
+                                                                                  });
+                                                                              });
+                                                                          });
+                                                                      });
+                                                                  });
+                                                              });
+                                                          });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          };
+      };
+  };
   var addEventData = function (workerDB) {
       return function (cname) {
           return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.writeTextFile(Node_Encoding.UTF8.value)(Node_Path.concat([ "photos", "mypic.jpg" ]))("myphoto"))(function () {
