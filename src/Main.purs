@@ -1,8 +1,8 @@
 module Main where
 
-import App.DB (loadWithDummy, makeDB, mainConnectionInfo, getFileById, saveFileToDb, tryLogin, addStatistics, queryNewFiles, queryAllStatistics, queryNewEvents, queryEventsByIds, queryEventsPaged, updateEvent, newEvent, queryEvents, deletePB, updatePB, newPB, allPhotobooths, queryPhotobooth)
+import App.DB (getFileById, saveFileToDb, tryLogin, addStatistics, queryNewFiles, queryAllStatistics, queryNewEvents, queryEventsByIds, queryEventsPaged, updateEvent, newEvent, queryEvents, deletePB, updatePB, newPB, allPhotobooths, queryPhotobooth, mainConnectionInfo)
 import App.Endpoint (attachFile, login, getProfileFiles, postStatistics, getNewFiles, getStatistics, getProfiles, getNewEvents, getEventsByIds, getEventsPaged, putEvents, postEvents, getEvents, deletePhotobooth, putPhotobooths, postPhotobooths, getPhotobooths, getPhotobooth)
-import Control.Monad.Aff (runAff, Aff)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log, CONSOLE)
 import Control.Monad.Eff.Exception (error, Error, EXCEPTION)
@@ -25,7 +25,7 @@ import Node.FS.Stats (isDirectory)
 import Node.Path (normalize, concat)
 import Node.Yargs.Applicative (yarg, runY)
 import Node.Yargs.Setup (YargsSetup, example, usage)
-import Prelude (const, Unit, return, ($), (>>=), flip, (<<<), bind, (<$>), (<>), show, (++))
+import Prelude (Unit, return, ($), (>>=), flip, (<<<), bind, (<$>), (<>), show, (++))
 import Server.Core (Input, EXPRESS, listen, hostStatic, hostFile, hostFileUploadEndpoint, hostEndpoint, makeApp)
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -43,10 +43,10 @@ server :: forall eff. Number -> Eff ( now :: Now , console :: CONSOLE , db :: DB
 server p = do
   let port = ceil p
   dateNow <- now
-  --runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do
-      --dropDB conn
-      --makeDB conn
-      --loadWithDummy conn dateNow
+  {-- runAff (log <<< show) (const $ log "Initial SQL OK") $ withConnection mainConnectionInfo \conn -> do --}
+  {--     dropDB conn --}
+  {--     makeDB conn --}
+  {--     loadWithDummy conn dateNow --}
   app <- makeApp
   hostEndpoint app getPhotobooth   \ s _        -> withServerConn \conn -> queryPhotobooth conn s
   hostEndpoint app getPhotobooths  \ _ _        -> withServerConn allPhotobooths

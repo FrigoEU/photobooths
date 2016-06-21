@@ -2,12 +2,12 @@ module App.Worker where
 
 import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
 import App.DB (networkingConnectionInfo, updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent)
-import App.Exec (simpleExec)
+import App.Exec (simpleExecStr, simpleExec)
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
 import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt)
 import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState))
-import Control.Monad.Aff (Aff, runAff)
+import Control.Monad.Aff (Aff, apathize, runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
@@ -23,7 +23,6 @@ import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.String.Regex (Regex, match, noFlags, regex)
 import Data.Traversable (traverse)
 import Database.AnyDB (DB, Connection, ConnectionInfo, Query(Query), execute_, queryOne_, withConnection)
-import Debug.Trace (traceAny)
 import Node.Buffer (BUFFER)
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
@@ -187,15 +186,18 @@ readPrintCount fp = do
                                 (safeParseInt n)
 
   
-killPrograms :: forall t78. WorkerConfig -> Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t78 ) String
+killPrograms :: forall t78. WorkerConfig -> Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t78 ) Unit
 killPrograms (WorkerConfig {photoProgramExe}) = do
-  simpleExec ("taskkill") Nothing ["/F", "/IM", photoProgramExe] Nothing
-  simpleExec "logman" Nothing ["stop Prints"] Nothing
+  apathize $ simpleExec ("taskkill") Nothing ["/F", "/IM", photoProgramExe] Nothing
+  apathize $ simpleExecStr "logman stop Prints" Nothing Nothing
+  pure unit
 
-startPrograms :: forall t88. WorkerConfig -> Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t88 ) String
-startPrograms (WorkerConfig {photoProgramFullPath}) = do
-  simpleExec "logman" Nothing ["start Prints"] Nothing
-  simpleExec ("start") Nothing [photoProgramFullPath] Nothing
+startPrograms :: forall t88. WorkerConfig -> Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t88 ) Unit
+startPrograms (WorkerConfig {photoProgramFullPath, photoProgramExe}) = do
+  apathize $ simpleExecStr "logman start Prints" Nothing Nothing
+  apathize $ simpleExec ("taskkill") Nothing ["/F", "/IM", photoProgramExe] Nothing
+  simpleExecStr ("start " <> photoProgramFullPath) Nothing Nothing
+  pure unit
 
 queryWorkerState :: Query WorkerState
 queryWorkerState = Query "select * from WORKERSTATE"
