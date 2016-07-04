@@ -14,7 +14,8 @@
     "semver": "*",
     "rimraf": "*",
     "request": "*",
-    "tar": "*"
+    "tar": "*",
+    "pm2": "1.1.3"
   },
   "devDependencies": {
     "browserify": "latest",
@@ -42,6 +43,8 @@
     "watch:client": "watch  'npm run test && npm run dev:client' src/ --ignoreDotFiles",
     "--nodemon": "to check if it's a good solution for reloading serverside code",
     "debug": "node-debug --web-port 8989 networking.js",
-    "mkworkertest": "npm run build && npm run compile:networking && npm run compile:worker && npm run compile:workertest && npm run compile:server && cp worktest.js ~/klikhuttest && cp work.js ~/klikhuttest/klikhut-slave && cp netw.js ~/klikhuttest/klikhut-slave && cp server.js ~/klikhuttest/klikhut-master && cp myconfig.json ~/klikhuttest/klikhut-slave/config.json"
+    "mkworkertest": "npm run build && npm run compile:networking && npm run compile:worker && npm run compile:workertest && npm run compile:server && cp worktest.js ~/klikhuttest && cp work.js ~/klikhuttest/klikhut-slave && cp netw.js ~/klikhuttest/klikhut-slave && cp server.js ~/klikhuttest/klikhut-master && cp config.json ~/klikhuttest/klikhut-slave/config.json",
+    "pm2": "pm2 start server.js",
+    "makedb": "pulp build --main App.MakeDB --optimise --to makedb.js"
   }
 }

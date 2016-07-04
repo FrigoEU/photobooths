@@ -4,6 +4,7 @@ import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
 import App.DB (queryAllStatistics, upsertSavedFile, upsertPartialEvent, upsertPB, queryPhotobooth, makeDB, dropDB, networkingConnectionInfo)
 import App.Endpoint (getProfileFiles, execEndpoint_, postStatistics, getNewFiles, getNewEvents, getPhotobooth)
 import App.FS (mkEventDir, rmdirRecur, copyDir, overWriteFile, mkTempEventDir, defaultDir, safeMkdir)
+import App.Model.Date (toISOString, toLocalDatetime)
 import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Photobooth (Photobooth(Photobooth))
 import App.Model.SavedFile (SavedFile(SavedFile))
@@ -16,7 +17,7 @@ import Control.Monad.Eff.Exception (error, Error)
 import Control.Monad.Error.Class (throwError, class MonadError)
 import DOM.File.Types (Blob)
 import Data.Array (filter, elemIndex)
-import Data.Date (Date, fromString, fromStringStrict)
+import Data.Date (Now, now, Date, fromString, fromStringStrict)
 import Data.Either (Either(Right, Left), either)
 import Data.Foreign (F, typeOf, Foreign, unsafeFromForeign)
 import Data.Foreign.Class (read, class IsForeign, readProp)
@@ -36,26 +37,36 @@ import Network.HTTP.Affjax (AffjaxResponse, AffjaxRequest, AJAX, affjax)
 import Node.Buffer (Buffer, BUFFER)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS (FS)
-import Node.FS.Aff (readdir, mkdir, writeFile, exists)
+import Node.FS.Aff (unlink, stat, appendTextFile, exists, readdir, mkdir, writeFile)
+import Node.FS.Stats (Stats(Stats))
 import Node.OS (hostname)
 import Node.Path (normalize, concat, basename)
 import OpticUI.Markup.HTML (map)
-import Prelude (pure, map, Unit, (<$>), ($), return, bind, show, (<>), unit, (++), flip, id, negate, (<<<), not, (>>=), (/=), const, (==))
+import Prelude ((>), not, pure, map, Unit, (<$>), ($), return, bind, show, (<>), unit, (++), flip, id, negate, (<<<), (>>=), (/=), const, (==))
 import Unsafe.Coerce (unsafeCoerce)
+
+logfile :: String
+logfile = "networkinglog.txt"
+
+logToFile :: forall eff. String -> Aff ( fs :: FS, now :: Now | eff ) Unit
+logToFile s = liftEff now >>= \n -> appendTextFile UTF8 logfile (toISOString n <> " " <> s <> "\n")
 
 main = do
   --let cname = "mycomputername"
   runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do
+    logToFile "Started networkingscript"
+    stat logfile >>= \(Stats {size}) -> if size > 50000000.0 then unlink logfile else pure unit
+
     fcf <- liftEff $ readConfigFile
     cf <- either (throwError <<< error <<< show) pure fcf
     let baseurl = case cf of 
                        (WorkerConfig {webServiceHost}) -> webServiceHost
     cname <- liftEff $ hostname
     ------ For testing purposes ----- 
-    dropDB conn
-    makeDB conn
+    {-- dropDB conn --}
+    {-- makeDB conn --}
     
-    liftEff $ log "Initial SQL Done"
+    logToFile "Initial SQL Done"
     
     ------ Sync Photobooth ----------
     oldPb <- queryPhotobooth conn cname
@@ -64,7 +75,7 @@ main = do
          Nothing -> throwError $ error $ "No photobooth instance found for: " <> cname
          Just pb -> execute_ (upsertPB pb) conn
     if oldPb /= pbm then rmdirRecur defaultDir else return unit
-    liftEff $ log "Synced Photobooth(s)"
+    logToFile "Synced Photobooth(s)"
     
     ------ Sync Events --------------
     maybeLastUpdatedEvents <- queryOne getLastUpdateEvents [] conn
@@ -72,7 +83,7 @@ main = do
     pes <- execEndpoint_ baseurl getNewEvents (Tuple cname lastUpdatedEvents) unit
     traverse (\(PartialEvent {id: Just id}) -> rmdirRecur $ mkEventDir id) pes -- Event updated: regenerate folder
     withTransaction (\tc -> traverse (\pe -> execute_ (upsertPartialEvent pe) conn) pes) conn
-    liftEff $ log "Synced Events"
+    logToFile "Synced Events"
     
     ------ Sync Files  --------------
     maybeLastUpdatedFiles <- queryOne getLastUpdateFiles [] conn
@@ -81,17 +92,17 @@ main = do
     let eventIdsWithNewFiles = (\(SavedFile {eventId: i}) -> i) <$> files
     traverse (\i -> rmdirRecur $ mkEventDir i) eventIdsWithNewFiles -- File updated: regenerate event folder
     withTransaction (\tc -> traverse (\sf -> execute_ (upsertSavedFile sf) conn) files) conn
-    liftEff $ log "Synced Files"
+    logToFile "Synced Files"
     
     ------ Sync File contents  --------------
     eventids <- query getEmptyFileEntries [] conn
     flip traverse eventids (\(WrappedId id) -> downloadFileById baseurl id >>= (\b -> saveFile conn id b))
-    liftEff $ log "Synced File contents"
+    logToFile "Synced File contents"
     
     ------ Sync statistics back to master  --------------
     stats <- queryAllStatistics conn cname
     execEndpoint_ baseurl postStatistics unit stats
-    liftEff $ log "Synced statistics"
+    logToFile "Synced statistics"
     
     ------ Make default profile folder -------------
     safeMkdir (normalize "clientprofiles")
@@ -111,7 +122,7 @@ main = do
     eventFolders :: Array String <- filter (flip startsWith "event_") <$> readdir (normalize "clientprofiles")
     let eventIdsFromFolders = (\i -> maybe (-1) id $ safeParseInt i) <<< (drop 6) <$> eventFolders
     let missingEvents = filter (\(PartialEvent {id: Just id}) -> isNothing $ elemIndex id eventIdsFromFolders) events
-    liftEff $ log $ "Making event folders for: " <> (joinWith ", " $ (\(PartialEvent {name: name}) -> name) <$> missingEvents)
+    logToFile $ "Making event folders for: " <> (joinWith ", " $ (\(PartialEvent {name: name}) -> name) <$> missingEvents)
     
     flip traverse missingEvents (\(PartialEvent ev) -> do 
       id <- maybe (throwError $ error $ "No id for PartialEvent") return ev.id
@@ -125,7 +136,7 @@ main = do
       filesToCopy <- readdir temptarget
       copyDir temptarget target
       rmdirRecur temptarget
-      liftEff $ log $ "Made folder for event " <> show id
+      logToFile $ "Made folder for event " <> show id
     )
     
    

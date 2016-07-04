@@ -137,7 +137,7 @@ checkStatisticsSync :: Connection -> String -> Aff TestEffects Unit
 checkStatisticsSync mainDB cname = do
   (AllStatistics {eventStatistics, monthlyStatistics}) <- queryAllStatistics mainDB cname
   liftEff $ check (length eventStatistics) 0 "No eventstatistics synced"
-  liftEff $ check (length monthlyStatistics) 0 "1 monthlyStatistic synced"
+  liftEff $ check (length monthlyStatistics) 1 "1 monthlyStatistic synced"
 
 runWorkerAndCheckEvent :: Connection -> String -> Aff TestEffects Unit
 runWorkerAndCheckEvent workerDB cname = do

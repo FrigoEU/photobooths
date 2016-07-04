@@ -2,12 +2,12 @@ module App.Worker where
 
 import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
 import App.DB (networkingConnectionInfo, updateWorkerState, upsertEventStatistic, upsertMonthlyStatistic, getMonthlyStatistic, queryActiveEvent)
-import App.Exec (simpleExecStr, simpleExec)
 import App.FS (safeMkdir, overWriteFile, mkEventDir, defaultDir, rmdirRecur)
+import App.Model.Date (toISOString)
 import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt)
 import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState))
-import Control.Monad.Aff (Aff, apathize, runAff)
+import Control.Monad.Aff (Aff, runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
@@ -27,12 +27,12 @@ import Node.Buffer (BUFFER)
 import Node.ChildProcess (CHILD_PROCESS)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS (FS)
-import Node.FS.Aff (unlink, writeFile, readFile, stat, exists, readTextFile, readdir)
+import Node.FS.Aff (unlink, appendTextFile, writeFile, readFile, stat, exists, readTextFile, readdir)
 import Node.FS.Stats (Stats(Stats))
 import Node.OS (OS, hostname)
 import Node.Path (FilePath, concat, basename)
 import Node.Process (PROCESS)
-import Prelude (pure, Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), (/=), (<<<), const)
+import Prelude ((>), pure, Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), (/=), (<<<), const)
 
 mainPhotosDir :: FilePath
 mainPhotosDir = "photos"
@@ -52,8 +52,16 @@ printsdir = "prints"
 workerConnI :: ConnectionInfo
 workerConnI = networkingConnectionInfo
 
+logfile :: String
+logfile = "workerlog.txt"
+
+logToFile :: forall eff. String -> Aff ( fs :: FS, now :: Now | eff ) Unit
+logToFile s = liftEff now >>= \n -> appendTextFile UTF8 logfile (toISOString n <> " " <> s <> "\n")
+
 main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , err :: EXCEPTION, os :: OS, now :: Now, process :: PROCESS | t350 ) Unit
 main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
+  logToFile "Started Worker Script"
+  stat logfile >>= \(Stats {size}) -> if size > 50000000.0 then unlink logfile else pure unit
   cname <- liftEff $ hostname
   fcf <- liftEff $ readConfigFile
   cf <- either (throwError <<< error <<< show) pure fcf
@@ -88,9 +96,9 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   
   
 switchEvents :: forall eff. Date -> Connection -> String -> Active -> Active -> WorkerConfig ->
-                Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, err :: EXCEPTION, console :: CONSOLE| eff) Unit 
+                Aff (fs :: FS, db :: DB, buffer :: BUFFER, locale :: Locale, cp :: CHILD_PROCESS, err :: EXCEPTION, console :: CONSOLE, now :: Now | eff) Unit 
 switchEvents dateNow conn cname old new cf = do
-  liftEff $ log $ "Swapping from " <> show old <> " to " <> show new
+  logToFile $ "Swapping from " <> show old <> " to " <> show new
   let oldPhotosFolder = mkHistoryDirForActive old
   let newPhotosFolder = mkHistoryDirForActive new
 
