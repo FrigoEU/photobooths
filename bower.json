@@ -28,7 +28,8 @@
     "purescript-node-process": "*",
     "purescript-yargs": "*",
     "purescript-dom": "0.2.20",
-    "purescript-debug": "*"
+    "purescript-debug": "*",
+    "purescript-random": "*"
   },
   "devDependencies": {
     "purescript-spec": "~0.7.2"

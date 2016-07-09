@@ -3894,6 +3894,7 @@ var PS = {};
     "use strict";
   var App_Config = PS["App.Config"];
   var App_DB = PS["App.DB"];
+  var App_Exec = PS["App.Exec"];
   var App_FS = PS["App.FS"];
   var App_Model_Date = PS["App.Model.Date"];
   var App_Model_Event = PS["App.Model.Event"];
@@ -3961,9 +3962,9 @@ var PS = {};
                       if ($37 instanceof Data_Maybe.Just && $37.value0 instanceof Data_Maybe.Just) {
                           return Data_Maybe.maybe(Control_Monad_Error_Class.throwError(Control_Monad_Aff.monadErrorAff)(Control_Monad_Eff_Exception.error("Couldn't parse " + ($37.value0.value0 + (" in " + v1)))))(Prelude["return"](Control_Monad_Aff.applicativeAff))(Data_Int_Extended.safeParseInt($37.value0.value0));
                       };
-                      throw new Error("Failed pattern match at App.Worker line 188, column 10 - line 197, column 1: " + [ $37.constructor.name ]);
+                      throw new Error("Failed pattern match at App.Worker line 189, column 10 - line 198, column 1: " + [ $37.constructor.name ]);
                   };
-                  throw new Error("Failed pattern match at App.Worker line 185, column 3 - line 197, column 1: " + [ $36.constructor.name ]);
+                  throw new Error("Failed pattern match at App.Worker line 186, column 3 - line 198, column 1: " + [ $36.constructor.name ]);
               });
           });
       });
@@ -3979,7 +3980,7 @@ var PS = {};
       if (v instanceof App_Model_WorkerState.EventActive) {
           return Node_Path.concat([ historyFolder, "event_" + Prelude.show(Prelude.showInt)(v.value0) ]);
       };
-      throw new Error("Failed pattern match at App.Worker line 224, column 1 - line 225, column 1: " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at App.Worker line 225, column 1 - line 226, column 1: " + [ v.constructor.name ]);
   };
   var startup = function (conn) {
       return function (cf) {
@@ -4035,7 +4036,7 @@ var PS = {};
                                                                       return Prelude["return"](Control_Monad_Aff.applicativeAff)(c - v2);
                                                                   });
                                                               };
-                                                              throw new Error("Failed pattern match at App.Worker line 122, column 17 - line 127, column 3: " + [ lastprintsdir.constructor.name ]);
+                                                              throw new Error("Failed pattern match at App.Worker line 123, column 17 - line 128, column 3: " + [ lastprintsdir.constructor.name ]);
                                                           })())(function (v3) {
                                                               return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Prelude["<$>"](Control_Monad_Eff.functorEff)(App_Model_Statistic.monthToInt)(Data_Date_Locale.month(dateNow))))(function (v4) {
                                                                   return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
@@ -4065,7 +4066,7 @@ var PS = {};
                                                                           var q = App_DB.upsertEventStatistic(s);
                                                                           return Database_AnyDB.execute_(q)(conn);
                                                                       };
-                                                                      throw new Error("Failed pattern match at App.Worker line 128, column 3 - line 142, column 3: " + [ old.constructor.name ]);
+                                                                      throw new Error("Failed pattern match at App.Worker line 129, column 3 - line 143, column 3: " + [ old.constructor.name ]);
                                                                   })())(function () {
                                                                       return Prelude.bind(Control_Monad_Aff.bindAff)(Data_Maybe.maybe(Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit))(App_FS.rmdirRecur)(secondtolastprintsfolders))(function () {
                                                                           var sourcedir = (function () {
@@ -4075,7 +4076,7 @@ var PS = {};
                                                                               if ($$new instanceof App_Model_WorkerState.EventActive) {
                                                                                   return App_FS.mkEventDir($$new.value0);
                                                                               };
-                                                                              throw new Error("Failed pattern match at App.Worker line 145, column 19 - line 148, column 3: " + [ $$new.constructor.name ]);
+                                                                              throw new Error("Failed pattern match at App.Worker line 146, column 19 - line 149, column 3: " + [ $$new.constructor.name ]);
                                                                           })();
                                                                           return Prelude.bind(Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(sourcedir))(function (v5) {
                                                                               return Prelude.bind(Control_Monad_Aff.bindAff)(Prelude[">>="](Control_Monad_Aff.bindAff)(Node_FS_Aff.readdir(targetDir))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Control_Monad_Aff.applicativeAff)(function (f) {
@@ -4134,7 +4135,7 @@ var PS = {};
                   if (!$69) {
                       return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                   };
-                  throw new Error("Failed pattern match at App.Worker line 217, column 3 - line 220, column 1: " + [ $69.constructor.name ]);
+                  throw new Error("Failed pattern match at App.Worker line 218, column 3 - line 221, column 1: " + [ $69.constructor.name ]);
               });
           });
       };
@@ -4151,7 +4152,7 @@ var PS = {};
               if (!$71) {
                   return Prelude.pure(Control_Monad_Aff.applicativeAff)(Prelude.unit);
               };
-              throw new Error("Failed pattern match at App.Worker line 64, column 39 - line 65, column 3: " + [ $71.constructor.name ]);
+              throw new Error("Failed pattern match at App.Worker line 65, column 39 - line 66, column 3: " + [ $71.constructor.name ]);
           }))(function () {
               return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Node_OS.hostname))(function (v) {
                   return Prelude.bind(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(App_Config.readConfigFile))(function (v1) {
@@ -4191,7 +4192,7 @@ var PS = {};
                                                                                   if (v8 instanceof Data_Maybe.Just && v8.value0.value0.id instanceof Data_Maybe.Just) {
                                                                                       return Prelude["return"](Control_Monad_Aff.applicativeAff)(new App_Model_WorkerState.EventActive(v8.value0.value0.id.value0));
                                                                                   };
-                                                                                  throw new Error("Failed pattern match at App.Worker line 87, column 16 - line 91, column 3: " + [ v8.constructor.name ]);
+                                                                                  throw new Error("Failed pattern match at App.Worker line 88, column 16 - line 92, column 3: " + [ v8.constructor.name ]);
                                                                               })())(function (v9) {
                                                                                   return Prelude.bind(Control_Monad_Aff.bindAff)((function () {
                                                                                       var $97 = Prelude["/="](App_Model_WorkerState.eqActive)(v9)(v4.value0.active);
@@ -4201,7 +4202,7 @@ var PS = {};
                                                                                       if (!$97) {
                                                                                           return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                                                                                       };
-                                                                                      throw new Error("Failed pattern match at App.Worker line 92, column 34 - line 95, column 3: " + [ $97.constructor.name ]);
+                                                                                      throw new Error("Failed pattern match at App.Worker line 93, column 34 - line 96, column 3: " + [ $97.constructor.name ]);
                                                                                   })())(function () {
                                                                                       return Prelude["return"](Control_Monad_Aff.applicativeAff)(Prelude.unit);
                                                                                   });

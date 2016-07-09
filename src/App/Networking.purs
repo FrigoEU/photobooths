@@ -1,48 +1,46 @@
 module App.Networking where
 
 import App.Config (WorkerConfig(WorkerConfig), readConfigFile)
-import App.DB (queryAllStatistics, upsertSavedFile, upsertPartialEvent, upsertPB, queryPhotobooth, makeDB, dropDB, networkingConnectionInfo)
+import App.DB (queryAllStatistics, upsertSavedFile, upsertPartialEvent, upsertPB, queryPhotobooth, networkingConnectionInfo)
 import App.Endpoint (getProfileFiles, execEndpoint_, postStatistics, getNewFiles, getNewEvents, getPhotobooth)
 import App.FS (mkEventDir, rmdirRecur, copyDir, overWriteFile, mkTempEventDir, defaultDir, safeMkdir)
-import App.Model.Date (toISOString, toLocalDatetime)
+import App.Model.Date (toISOString)
 import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Photobooth (Photobooth(Photobooth))
 import App.Model.SavedFile (SavedFile(SavedFile))
 import Control.Alt ((<|>))
 import Control.Bind (join)
-import Control.Monad.Aff (runAff, Aff)
+import Control.Monad.Aff (makeAff, runAff, Aff)
+import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (log, CONSOLE)
 import Control.Monad.Eff.Exception (error, Error)
+import Control.Monad.Eff.Random (RANDOM, randomInt)
 import Control.Monad.Error.Class (throwError, class MonadError)
 import DOM.File.Types (Blob)
 import Data.Array (filter, elemIndex)
 import Data.Date (Now, now, Date, fromString, fromStringStrict)
-import Data.Either (Either(Right, Left), either)
-import Data.Foreign (F, typeOf, Foreign, unsafeFromForeign)
-import Data.Foreign.Class (read, class IsForeign, readProp)
-import Data.HTTP.Method (Method(..))
+import Data.Either (either)
+import Data.Foreign (unsafeFromForeign)
+import Data.Foreign.Class (class IsForeign, readProp)
 import Data.Int.Extended (safeParseInt)
 import Data.Maybe (Maybe(Nothing, Just), maybe, isNothing)
 import Data.String (joinWith, drop)
 import Data.String.Extended (startsWith)
-import Data.Traversable (sequence, traverse)
+import Data.Traversable (traverse)
 import Data.Tuple (Tuple(Tuple))
 import Database.AnyDB (DB, Connection, Query(Query), execute, query, execute_, queryOne, withConnection)
 import Database.AnyDB.SqlValue (toSql)
 import Database.AnyDB.Transaction (withTransaction)
-import Debug.Trace (traceAny)
-import Global.Unsafe (unsafeStringify)
-import Network.HTTP.Affjax (AffjaxResponse, AffjaxRequest, AJAX, affjax)
+import Network.HTTP.Affjax (AJAX)
 import Node.Buffer (Buffer, BUFFER)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS (FS)
-import Node.FS.Aff (unlink, stat, appendTextFile, exists, readdir, mkdir, writeFile)
+import Node.FS.Aff (unlink, readFile, readdir, mkdir, exists, stat, appendTextFile)
 import Node.FS.Stats (Stats(Stats))
 import Node.OS (hostname)
 import Node.Path (normalize, concat, basename)
-import OpticUI.Markup.HTML (map)
-import Prelude ((>), not, pure, map, Unit, (<$>), ($), return, bind, show, (<>), unit, (++), flip, id, negate, (<<<), (>>=), (/=), const, (==))
+import Prelude (Unit, (<$>), ($), return, pure, bind, show, (<>), unit, (++), (<<<), flip, id, negate, not, (>>=), (/=), (>), const)
 import Unsafe.Coerce (unsafeCoerce)
 
 logfile :: String
@@ -62,6 +60,7 @@ main = do
     let baseurl = case cf of 
                        (WorkerConfig {webServiceHost}) -> webServiceHost
     cname <- liftEff $ hostname
+    {-- let cname = "snapyo7" --}
     ------ For testing purposes ----- 
     {-- dropDB conn --}
     {-- makeDB conn --}
@@ -175,13 +174,12 @@ getEmptyFileEntries = Query $ "select id from files where file is NULL"
 getEventsByCname :: Query PartialEvent
 getEventsByCname = Query $ "select * from events where computername = ?"
                                                        
+foreign import _downloadFile :: forall e a. String -> String -> (Error -> Eff (ajax :: AJAX | e) Unit) -> (a -> Eff (ajax :: AJAX | e) Unit) -> Eff (ajax :: AJAX | e) Unit
+
 downloadFolder :: forall eff. String -> String -> String -> String -> Aff (ajax :: AJAX, fs :: FS, buffer :: BUFFER, console :: CONSOLE | eff) Unit
 downloadFolder baseurl cname profile target = do
   files <- execEndpoint_ baseurl getProfileFiles (Tuple cname profile) unit
-  let makereq fn = {headers: [], content: Nothing, method: Left GET, url: baseurl ++ "/" ++ fn, username: Nothing, password: Nothing, withCredentials: false } :: AffjaxRequest Unit
-  traverse (\filename -> do {response} :: AffjaxResponse String <- affjax $ makereq filename
-                            buf <- liftEff $ Node.Buffer.fromString response UTF8
-                            writeFile (concat [target, basename filename]) buf) files
+  traverse (\filename -> makeAff (_downloadFile (concat [target, basename filename]) (baseurl ++ "/" ++ filename))) files
   return unit
                                                
 data NamedBuffer = NamedBuffer String Buffer
@@ -198,16 +196,14 @@ instance isForeignNamedBuffer :: IsForeign NamedBuffer where
 getFilesForEvent :: forall eff. Connection -> Int -> Aff (db :: DB | eff) (Array NamedBuffer)
 getFilesForEvent c i = query (Query "select file, name from files where eventid = ?") [toSql i] c
                                                           
-downloadFileById :: forall eff. String -> Int -> Aff (ajax :: AJAX, buffer :: BUFFER | eff) Buffer
+downloadFileById :: forall eff. String -> Int -> Aff (ajax :: AJAX, buffer :: BUFFER, fs :: FS, random :: RANDOM | eff) Buffer
 downloadFileById s i = do
-  let req = {headers: [], content: Nothing, method: Left GET, url: s <> "/api/files/" <> show i, username: Nothing, password: Nothing, withCredentials: false } :: AffjaxRequest Unit 
-  res :: AffjaxResponse String <- affjax req 
-  {-- buf <- if (typeOf res.response == "string") --} 
-  {--           then (liftEff <<< sequence) $ (\a -> Node.Buffer.fromString a UTF8) <$> (read res.response :: F String) --} 
-  {--           else (return <<< Right) (unsafeCoerce res.response :: Buffer) --}
-  {-- either (\_ -> throwError $ error $ "Couldn't parse response in downloadFileById " <> unsafeStringify res.response) --}
-  {--        pure buf --}
-  liftEff $ Node.Buffer.fromString res.response UTF8
+  ri <- liftEff $ randomInt 0 100000
+  let tempfile = "./temp" <> show ri
+  makeAff $ _downloadFile tempfile (s <> "/api/files/" <> show i)
+  buf <- readFile tempfile
+  unlink tempfile
+  pure buf
 
 saveFile :: forall eff. Connection -> Int -> Buffer -> Aff (db :: DB | eff) Unit
 saveFile c i b = execute (Query "update files set file = ? where id = ?") [toSql b, toSql i] c
