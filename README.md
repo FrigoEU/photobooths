@@ -16,8 +16,12 @@ First:
 Test:
     npm run test
 
+E2E testing:
+    check WorkerTest.purs
+
 Build dev:
     npm run dev
 
 Build prod (needs JAVA, uses closure compiler):
     npm run start
+
