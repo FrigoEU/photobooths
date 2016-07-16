@@ -8,11 +8,12 @@ import App.Model.Date (toISOString)
 import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Statistic (EventStatistic(EventStatistic), MonthlyStatistic(MonthlyStatistic), monthToInt)
 import App.Model.WorkerState (Active(EventActive, DefaultActive), WorkerState(WorkerState))
-import Control.Monad.Aff (apathize, Aff, runAff)
+import Control.Apply ((*>))
+import Control.Monad.Aff (later', runAff, apathize, Aff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.Exception (EXCEPTION, error)
+import Control.Monad.Eff.Exception (stack, message, EXCEPTION, error)
 import Control.Monad.Error.Class (throwError)
 import Data.Array (length, last, (!!))
 import Data.Date (Date, Now, now)
@@ -20,7 +21,7 @@ import Data.Date.Locale (Locale, month)
 import Data.Either (either)
 import Data.Function (runFn0)
 import Data.Int.Extended (safeParseInt)
-import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Data.Maybe (maybe, Maybe(Just, Nothing))
 import Data.String.Regex (Regex, match, noFlags, regex)
 import Data.Traversable (traverse)
 import Database.AnyDB (DB, Connection, ConnectionInfo, Query(Query), execute_, queryOne_, withConnection)
@@ -33,7 +34,7 @@ import Node.FS.Stats (Stats(Stats))
 import Node.OS (OS, hostname)
 import Node.Path (FilePath, concat, basename)
 import Node.Process (PROCESS)
-import Prelude ((>), pure, Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), (/=), (<<<), const)
+import Prelude (id, (>), pure, Unit, show, (<>), (>>=), unit, return, not, (&&), ($), bind, flip, (+), (<$>), (-), (/=), (<<<), const)
 
 mainPhotosDir :: FilePath
 mainPhotosDir = "photos"
@@ -60,7 +61,10 @@ logToFile :: forall eff. String -> Aff ( fs :: FS, now :: Now | eff ) Unit
 logToFile s = liftEff now >>= \n -> appendTextFile UTF8 logfile (toISOString n <> " " <> s <> "\n")
 
 main :: forall t350. Eff ( console :: CONSOLE , db :: DB , fs :: FS , buffer :: BUFFER , locale :: Locale , cp :: CHILD_PROCESS , err :: EXCEPTION, os :: OS, now :: Now, process :: PROCESS | t350 ) Unit
-main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection workerConnI \conn -> do
+main = runAff (\e -> let m = show e <> message e <> maybe "" id (stack e)
+                      in (log m) *> runAff (\_ -> pure unit) (\_ -> pure unit) (logToFile m)) 
+                      (const $ log "Worker done!") 
+                      $ withConnection workerConnI \conn -> do
   logToFile "Started Worker Script"
   stat logfile >>= \(Stats {size}) -> if size > 50000000.0 then unlink logfile else pure unit
   cname <- liftEff $ hostname
@@ -71,8 +75,10 @@ main = runAff (log <<< show) (const $ log "Worker done!") $ withConnection worke
   safeMkdir historyFolder
   safeMkdir mainPhotosDir
   safeMkdir mainPhotosPrintsDir
+
   mws <- queryOne_ queryWorkerState conn
   ws <- maybe (startup conn cf >>= \_ -> pure $ WorkerState {active: DefaultActive}) return mws
+  logToFile $ "Worker state: " <> show ws
   toCopy <- readdir mainPhotosDir
   printsToCopy <- readdir mainPhotosPrintsDir
   let dirToCopyTo = case ws of (WorkerState {active}) -> mkHistoryDirForActive active
@@ -104,6 +110,7 @@ switchEvents dateNow conn cname old new cf = do
   let newPhotosFolder = mkHistoryDirForActive new
 
   ------ Handling previous event --------
+  logToFile $ "Killing programs"
   killPrograms cf
 
   ------ Counting photos         --------
@@ -149,6 +156,7 @@ switchEvents dateNow conn cname old new cf = do
   sourcefiles <- readdir sourcedir
   readdir targetDir >>= traverse (\f -> unlink (concat [targetDir, basename f]))
   flip traverse sourcefiles (\f -> readFile (concat [sourcedir, f]) >>= overWriteFile (concat [targetDir, basename f]))
+  logToFile $ "Starting Programs"
   startPrograms cf
 
   safeMkdir newPhotosFolder
@@ -159,8 +167,9 @@ switchEvents dateNow conn cname old new cf = do
   
   
 startup :: forall e. Connection -> WorkerConfig -> 
-           Aff ( fs :: FS , buffer :: BUFFER , cp :: CHILD_PROCESS , err :: EXCEPTION , db :: DB | e ) Unit
+           Aff ( fs :: FS , buffer :: BUFFER , cp :: CHILD_PROCESS , err :: EXCEPTION , db :: DB, now :: Now | e ) Unit
 startup conn cf = do
+  logToFile $ "Running initial startup"
   safeMkdir $ targetDir
   sourcefiles <- readdir defaultDir
   flip traverse sourcefiles (\f -> readFile (concat [defaultDir, f]) >>= overWriteFile (concat [targetDir, basename f]))
@@ -198,6 +207,7 @@ readPrintCount fp = do
 killPrograms :: forall t78. WorkerConfig -> Aff ( cp :: CHILD_PROCESS , err :: EXCEPTION , buffer :: BUFFER | t78 ) Unit
 killPrograms (WorkerConfig {photoProgramExe}) = do
   apathize $ simpleExec ("taskkill") Nothing ["/F", "/IM", photoProgramExe] Nothing
+  later' 200 (pure unit)
   apathize $ simpleExecStr "logman stop Prints" Nothing Nothing
   pure unit
 
@@ -205,7 +215,9 @@ startPrograms :: forall t88. WorkerConfig -> Aff ( cp :: CHILD_PROCESS , err :: 
 startPrograms (WorkerConfig {photoProgramFullPath, photoProgramExe}) = do
   apathize $ simpleExecStr "logman start Prints" Nothing Nothing
   apathize $ simpleExec ("taskkill") Nothing ["/F", "/IM", photoProgramExe] Nothing
+  later' 200 (pure unit)
   simpleExecStr ("start " <> photoProgramFullPath) Nothing Nothing
+  later' 200 (pure unit)
   pure unit
 
 queryWorkerState :: Query WorkerState

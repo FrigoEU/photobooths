@@ -10,6 +10,9 @@ exports.toISOString = function iso8601(d){
 exports.toLocalDatetime = function toLocalDatetime(d){
   return d.toISOString().substring(0, 11) + d.toString().substring(16, 21);
 };
+exports.dateToSqlForComparing = function(d){
+  return d.toISOString().replace("T", " ").substr(0, 19);
+};
 exports.fromLocalDatetimeImpl = function fromLocalDatetimeImpl(nothing){
   return function(just){
     return function(str){//YYYY-mm-DDTHH:MM

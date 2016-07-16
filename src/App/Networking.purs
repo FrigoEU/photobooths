@@ -9,23 +9,25 @@ import App.Model.Event (PartialEvent(PartialEvent))
 import App.Model.Photobooth (Photobooth(Photobooth))
 import App.Model.SavedFile (SavedFile(SavedFile))
 import Control.Alt ((<|>))
+import Control.Apply ((*>))
 import Control.Bind (join)
 import Control.Monad.Aff (makeAff, runAff, Aff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (log, CONSOLE)
-import Control.Monad.Eff.Exception (error, Error)
+import Control.Monad.Eff.Exception (message, stack, error, Error)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
 import Control.Monad.Error.Class (throwError, class MonadError)
 import DOM.File.Types (Blob)
 import Data.Array (filter, elemIndex)
-import Data.Date (Now, now, Date, fromString, fromStringStrict)
-import Data.Either (either)
-import Data.Foreign (unsafeFromForeign)
-import Data.Foreign.Class (class IsForeign, readProp)
+import Data.Date (fromStringStrict, Now, now, Date, fromString)
+import Data.Either (Either(Right, Left), either)
+import Data.Foreign (F, toForeign, ForeignError(TypeMismatch), unsafeFromForeign)
+import Data.Foreign.Class (read, class IsForeign, readProp)
 import Data.Int.Extended (safeParseInt)
 import Data.Maybe (Maybe(Nothing, Just), maybe, isNothing)
-import Data.String (joinWith, drop)
+import Data.Maybe.Unsafe (fromJust)
+import Data.String (replace, joinWith, drop)
 import Data.String.Extended (startsWith)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(Tuple))
@@ -40,7 +42,7 @@ import Node.FS.Aff (unlink, readFile, readdir, mkdir, exists, stat, appendTextFi
 import Node.FS.Stats (Stats(Stats))
 import Node.OS (hostname)
 import Node.Path (normalize, concat, basename)
-import Prelude (Unit, (<$>), ($), return, pure, bind, show, (<>), unit, (++), (<<<), flip, id, negate, not, (>>=), (/=), (>), const)
+import Prelude ((<>), Unit, (<$>), ($), return, pure, bind, show, unit, (++), (<<<), flip, id, negate, not, (>>=), (/=), (>), const)
 import Unsafe.Coerce (unsafeCoerce)
 
 logfile :: String
@@ -51,7 +53,10 @@ logToFile s = liftEff now >>= \n -> appendTextFile UTF8 logfile (toISOString n <
 
 main = do
   --let cname = "mycomputername"
-  runAff (log <<< show) (const $ log "Everything synced!") $ withConnection networkingConnectionInfo $ \conn -> do
+  runAff (\e -> let m = show e <> message e <> maybe "" id (stack e)
+                 in (log m) *> runAff (\_ -> pure unit) (\_ -> pure unit) (logToFile m)) 
+         (const $ log "Everything synced!") 
+         $ withConnection networkingConnectionInfo $ \conn -> do
     logToFile "Started networkingscript"
     stat logfile >>= \(Stats {size}) -> if size > 50000000.0 then unlink logfile else pure unit
 
@@ -78,7 +83,7 @@ main = do
     
     ------ Sync Events --------------
     maybeLastUpdatedEvents <- queryOne getLastUpdateEvents [] conn
-    lastUpdatedEvents <- defaultDate maybeLastUpdatedEvents (fromStringStrict "2010-01-01T00:00:00.000Z")
+    let lastUpdatedEvents = readLastUpdated maybeLastUpdatedEvents 
     pes <- execEndpoint_ baseurl getNewEvents (Tuple cname lastUpdatedEvents) unit
     traverse (\(PartialEvent {id: Just id}) -> rmdirRecur $ mkEventDir id) pes -- Event updated: regenerate folder
     withTransaction (\tc -> traverse (\pe -> execute_ (upsertPartialEvent pe) conn) pes) conn
@@ -86,7 +91,7 @@ main = do
     
     ------ Sync Files  --------------
     maybeLastUpdatedFiles <- queryOne getLastUpdateFiles [] conn
-    lastUpdatedFiles <- defaultDate maybeLastUpdatedFiles (fromStringStrict "2010-01-01T00:00:00.000Z")
+    let lastUpdatedFiles = readLastUpdated maybeLastUpdatedFiles
     files <- execEndpoint_ baseurl getNewFiles (Tuple cname lastUpdatedFiles) unit
     let eventIdsWithNewFiles = (\(SavedFile {eventId: i}) -> i) <$> files
     traverse (\i -> rmdirRecur $ mkEventDir i) eventIdsWithNewFiles -- File updated: regenerate event folder
@@ -143,16 +148,14 @@ main = do
    
    
     
-data LastUpdated = LastUpdated String
+data LastUpdated = LastUpdated Date
                
 instance isForeignLastUpdated :: IsForeign LastUpdated where
   read obj = do
-    lastupdatedon <- readProp "lastupdatedon" obj
+    f <- readProp "lastupdatedon" obj
+    lastupdatedon <- maybe (Left $ TypeMismatch "Well formed date" f) Right (fromString ((replace " " "T" f) <> ".000"))
     return $ LastUpdated lastupdatedon
     
-toStr :: LastUpdated -> String
-toStr (LastUpdated s) = s
-
 data WrappedId = WrappedId Int
 instance isForeignWrappedId :: IsForeign WrappedId where
   read obj = do
@@ -207,6 +210,6 @@ downloadFileById s i = do
 
 saveFile :: forall eff. Connection -> Int -> Buffer -> Aff (db :: DB | eff) Unit
 saveFile c i b = execute (Query "update files set file = ? where id = ?") [toSql b, toSql i] c
-                                     
-defaultDate :: forall m. (MonadError Error m) => Maybe LastUpdated -> Maybe Date -> m Date
-defaultDate ms md = maybe (throwError $ error "Failed to parse date - last updated events") return ((join $ fromString <$> (toStr <$> ms)) <|> md)
+
+readLastUpdated ms = case fromJust ms of
+                          LastUpdated d -> d

@@ -1,7 +1,7 @@
 module App.DB where
   
 import App.DB (MyFile(MyFile), unpack, upsertEventStatistic, upsertMonthlyStatistic, selectFilesForEvent, insertEvent, insertPB, selectFilesForEvents, addFilesToEvents, myuser, newUser, mymonthlystatistic, myeventstatistic, myevent, yourbooth, mybooth)
-import App.Model.Date (toISOString)
+import App.Model.Date (toISOString, dateToSqlForComparing)
 import App.Model.Event (Event(Event), PartialEvent(PartialEvent), mkEvent, eventsTable)
 import App.Model.NetworkingState (insertDefaultNetworkingSate, createNetworkingStateTable, networkingStateTable)
 import App.Model.Photobooth (Photobooth(Photobooth), photoboothsTable)
@@ -14,6 +14,7 @@ import App.Model.WorkerState (WorkerState(WorkerState), createWorkerStateTable, 
 import Control.Apply ((*>))
 import Control.Monad.Aff (Aff)
 import Control.Monad.Eff.Class (liftEff)
+import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (error)
 import Control.Monad.Error.Class (throwError)
 import Data.Array (replicate, filter, length)
@@ -30,6 +31,7 @@ import Database.AnyDB.SqlValue (toSql)
 import Node.Buffer (Buffer)
 import Prelude (Unit, return, ($), bind, (<<<), (>>=), (<>), (>>>), unit, show, map, (<$>), (==), negate, (>), (*))
 import SQL (selectLastInserted, insert, selectStar, selectStarId, update, createTable, updatedonUpdateTrigger, updatedonInsertTrigger, dropTable)
+import Unsafe.Coerce (unsafeCoerce)
 
 networkingConnectionInfo :: ConnectionInfo
 networkingConnectionInfo = Sqlite3
@@ -290,7 +292,8 @@ queryAllStatistics conn cname = do
   return $ AllStatistics {eventStatistics, monthlyStatistics}
 
 queryNewEvents :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array PartialEvent)
-queryNewEvents conn (Tuple cname d) = query q [toSql cname, toSql $ toISOString d] conn
+queryNewEvents conn (Tuple cname d) = do
+  query q [toSql cname, toSql $ dateToSqlForComparing d] conn
   where
     q = Query $
         "Select * from EVENTS " <>
@@ -305,7 +308,7 @@ queryPhotobooth conn cname = queryOne q [toSql cname] conn
         "where computername = ?"
 
 queryNewFiles :: forall eff. Connection -> Tuple String Date -> Aff (db :: DB | eff) (Array SavedFile)
-queryNewFiles conn (Tuple cname d) = query q [toSql cname, toSql $ toISOString d] conn
+queryNewFiles conn (Tuple cname d) = query q [toSql cname, toSql $ dateToSqlForComparing d] conn
   where
     q = Query $
         "Select f.* from FILES f " <>

@@ -9,3 +9,7 @@ foreign import fromLocalDatetimeImpl :: forall a. Maybe a -> (a -> Maybe a) -> S
 
 fromLocalDatetime :: String -> Maybe Date
 fromLocalDatetime = fromLocalDatetimeImpl Nothing Just
+
+-- This is still using the old datetime, comparing with dates seems to be going badly
+-- so I added another function
+foreign import dateToSqlForComparing :: Date -> String

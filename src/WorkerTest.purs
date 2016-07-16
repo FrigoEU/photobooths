@@ -7,14 +7,14 @@ import App.Model.Event (Event(Event))
 import App.Model.Photobooth (Photobooth(Photobooth))
 import App.Model.SavedFile (SavedFile)
 import App.Model.Statistic (AllStatistics(AllStatistics), MonthlyStatistic(MonthlyStatistic))
-import Control.Monad.Aff (runAff, Aff)
+import Control.Monad.Aff (later', runAff, Aff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (error, EXCEPTION)
 import Control.Monad.Error.Class (throwError)
 import Data.Array (length, (!!))
-import Data.Date (fromStringStrict, now, Now)
+import Data.Date (Date, fromStringStrict, now, Now)
 import Data.Maybe (Maybe(Nothing, Just), maybe)
 import Data.Tuple (Tuple(Tuple))
 import Database.AnyDB (ConnectionInfo(Sqlite3), Connection, DB, connect)
@@ -26,11 +26,12 @@ import Node.FS.Aff (readFile, writeTextFile, readTextFile, readdir)
 import Node.OS (OS, hostname)
 import Node.Path (concat, normalize)
 import Node.Process (PROCESS, chdir)
-import Prelude (class Show, class Eq, show, Unit, ($), bind, return, (<>), (==))
+import Prelude (unit, pure, class Show, class Eq, show, Unit, ($), bind, return, (<>), (==))
 
 ---------------------------------------------------------------------
 -- How to:
--- Build: (all in one: npm run mkworkertest)
+-- all in one: npm run mkworkertest
+-- Build:
 -- npm run build
 -- npm run compile:networking -> netw.js
 -- npm run compile:worker -> work.js
@@ -58,6 +59,8 @@ photosPrintsDir = concat ["photos", "prints"]
 backgroundImagesDir :: String
 backgroundImagesDir = normalize "background_images"
 
+foreign import addTenMinutes :: Date -> Date
+
 type TestEffects = ( db :: DB , fs :: FS , cp :: CHILD_PROCESS , err :: EXCEPTION, os :: OS, process :: PROCESS, console :: CONSOLE, buffer :: BUFFER, now :: Now)
 
 main :: Eff TestEffects Unit
@@ -77,6 +80,16 @@ test = do
 
   liftEff $ chdir "klikhut-slave"
   runAndCheckSync workerDB cname
+  liftEff $ chdir ".."
+
+  later' 2000 (pure unit)
+
+  liftEff $ chdir "klikhut-master"
+  makeAnotherEvent mainDB cname
+  liftEff $ chdir ".."
+
+  liftEff $ chdir "klikhut-slave"
+  runAndCheckSyncAgain workerDB cname
   liftEff $ chdir ".."
 
   liftEff $ chdir "klikhut-slave"
@@ -126,10 +139,12 @@ setup mainDB workerDB cname = do
   rmdirRecur photosDir
   rmdirRecur printsDir
   rmdirRecur backgroundImagesDir
+  rmdirRecur "./clientprofiles"
   safeMkdir photosDir
   safeMkdir printsDir
   safeMkdir photosPrintsDir
   safeMkdir backgroundImagesDir
+  safeMkdir "./clientprofiles"
   liftEff $ chdir ".."
 
 
@@ -157,18 +172,19 @@ runWorkerAndCheckEvent workerDB cname = do
 
 addEventData :: Connection -> String -> Aff TestEffects Event
 addEventData workerDB cname = do
+  liftEff $ log "Adding Event Data!"
   writeTextFile UTF8 (concat ["photos", "mypic.jpg"]) "myphoto"
   writeTextFile UTF8 (concat ["photos", "prints", "myprintpic.jpg"]) "myphotoprint"
   safeMkdir (concat ["prints", "000001"])
   writeTextFile UTF8 (concat ["prints", "000001", "DataCollector01.csv"])
                      "\"blablabla\"\n\"12/18/2015 15:26:46.959\",\"21\""
-  future <- maybe (throwError $ error "future") return $ fromStringStrict "2020-12-21T01:01:01.000Z"
   nowDate <- liftEff now
+  let nowDatePlusTen = addTenMinutes nowDate
   updateEvent workerDB (Event { id: Just 1
                               , computername: cname
                               , name: "eventname"
                               , datefrom: nowDate -- so it gets started when we run worker next
-                              , dateuntil: future
+                              , dateuntil: nowDatePlusTen
                               , profile: "eventprofile"
                               , files: []})
 
@@ -178,6 +194,17 @@ runWorkerAndCheckDefault = do
   liftEff $ log $ "Result of work.js" <> res
   activeFiles <- readdir backgroundImagesDir
   liftEff $ check (activeFiles) ["def.txt"] "Default Profile active"
+
+runAndCheckSyncAgain :: Connection -> String -> Aff TestEffects Unit
+runAndCheckSyncAgain workerDB cname = do
+  res <- simpleExec "node" Nothing ["netw.js"] Nothing
+  liftEff $ log $ "Result of netw.js" <> res
+  evs <- queryEvents workerDB cname
+  liftEff $ check (length evs) 2 "Events syncing"
+  evFiles <- readdir (concat ["clientprofiles", "event_2"])
+  liftEff $ check (evFiles) ["ev1.txt", "ev2.txt"] $ "Event Profile Folder making init: " <> show evFiles
+  ev2File <- readTextFile UTF8 (concat ["clientprofiles", "event_2", "ev1.txt"]) 
+  liftEff $ check (ev2File) "changed!" $ "Event Profile Folder making overwrite: " <> show ev2File
 
 runAndCheckSync :: Connection -> String -> Aff TestEffects Unit
 runAndCheckSync workerDB cname = do
@@ -197,6 +224,19 @@ runAndCheckSync workerDB cname = do
 check :: forall a. (Show a, Eq a) => a -> a -> String -> Eff TestEffects Unit
 check actual expected text = if actual == expected then (log $ "OK - " <> text) 
                                                    else (log $ "ERROR - " <> text <> ". Expected value: " <> show expected <> ". Actual value: " <> show actual)
+
+makeAnotherEvent :: Connection -> String -> Aff TestEffects SavedFile
+makeAnotherEvent mainDB cname = do
+  future2 <- maybe (throwError $ error "future") return $ fromStringStrict "2030-12-21T01:01:01.000Z"
+  newEvent mainDB (Event { id: Nothing
+                         , computername: cname
+                         , name: "eventname2"
+                         , datefrom: future2
+                         , dateuntil: future2
+                         , profile: "eventprofile"
+                         , files: []})
+  filebuf <- readFile (normalize "temp.txt")
+  saveFileToDb mainDB (Tuple 2 "ev1.txt") filebuf
 
 makePbAndEvent :: Connection -> String -> Aff TestEffects SavedFile
 makePbAndEvent mainDB cname = do
