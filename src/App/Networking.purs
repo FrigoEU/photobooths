@@ -149,7 +149,8 @@ main = do
    
     
 data LastUpdated = LastUpdated Date
-               
+-- The trigger adds these createdOn/updatedOn fields in a weird way, this instance is kinda trial and error
+-- to match that weirdness, basically I think it's UTC in YYYY-mm-DD HH:MM:SS format
 instance isForeignLastUpdated :: IsForeign LastUpdated where
   read obj = do
     f <- readProp "lastupdatedon" obj

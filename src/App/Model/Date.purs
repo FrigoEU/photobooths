@@ -10,6 +10,11 @@ foreign import fromLocalDatetimeImpl :: forall a. Maybe a -> (a -> Maybe a) -> S
 fromLocalDatetime :: String -> Maybe Date
 fromLocalDatetime = fromLocalDatetimeImpl Nothing Just
 
--- This is still using the old datetime, comparing with dates seems to be going badly
--- so I added another function
+
+-- DATES in KLIKHUT
+-- ================
+-- Dates being added by the triggers are in YYYY-mm-DD HH:MM:SS (remember SQLite has no dates)
+-- so dateToSqlForComparing makes a format like that
+-- Other dates are being saved in ISOString time (in UTC!)
+
 foreign import dateToSqlForComparing :: Date -> String
